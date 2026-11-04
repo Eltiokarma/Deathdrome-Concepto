@@ -1,0 +1,53 @@
+[gd_scene load_steps=5 format=3]
+[ext_resource type="PackedScene" path="res://levels/_test/test_arena.tscn" id="1"]
+[ext_resource type="PackedScene" path="res://entities/runner/runner.tscn" id="2"]
+[ext_resource type="Script" path="res://levels/_test/driving_sandbox.gd" id="3"]
+
+[ext_resource type="Script" path="res://levels/_test/practice_respawner.gd" id="4"]
+
+[node name="DrivingSandbox" type="Node3D"]
+process_mode = 3
+script = ExtResource("3")
+[node name="Arena" parent="." instance=ExtResource("1")]
+process_mode = 1
+[node name="Runner" parent="." instance=ExtResource("2")]
+process_mode = 1
+position = Vector3(-17, 0.1, 15)
+[node name="Target" parent="." instance=ExtResource("2")]
+process_mode = 1
+position = Vector3(-17, 0.1, 0)
+rotation_degrees = Vector3(0, 90, 0)
+[node name="UI" type="CanvasLayer" parent="."]
+[node name="Title" type="Label" parent="UI"]
+offset_left = 24.0
+offset_top = 18.0
+theme_override_colors/font_color = Color(1, 0.8, 0.35, 1)
+theme_override_font_sizes/font_size = 26
+text = "PURGA / PRUEBA DE COMBATE"
+[node name="Status" type="Label" parent="UI"]
+offset_left = 26.0
+offset_top = 54.0
+theme_override_font_sizes/font_size = 18
+[node name="Help" type="Label" parent="UI"]
+offset_left = 26.0
+offset_top = 85.0
+theme_override_font_sizes/font_size = 14
+text = "W/S: acelerar/frenar · A/D: girar · Espacio: salto · C: cámara · V: mirar atrás\nF2: cambiar Runner · F3: stats · R: reiniciar · Esc: pausa · Mando compatible\nClic izquierdo / J / RB: láser · R: reiniciar ambos · Blanco reaparece automáticamente · Sin bots ni ronda."
+[node name="Stats" type="Label" parent="UI"]
+offset_left = 26.0
+offset_top = 155.0
+theme_override_font_sizes/font_size = 16
+
+[node name="CombatStatus" type="Label" parent="UI"]
+offset_left = 26.0
+offset_top = 265.0
+theme_override_font_sizes/font_size = 22
+
+[node name="PracticeRespawner" type="Node" parent="."]
+script = ExtResource("4")
+target_path = NodePath("../Target")
+
+[node name="RespawnStatus" type="Label" parent="UI"]
+offset_left = 26.0
+offset_top = 300.0
+theme_override_font_sizes/font_size = 18

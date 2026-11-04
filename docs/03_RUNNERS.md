@@ -20,6 +20,8 @@ Corrige el fallo F3 del original (velocidad y armas no se notaban): cada punto c
 |  | Energía de barrera | `80 + 10·A` | 90 | 110 | 130 |
 |  | Fijación de misil | `0.6 − 0.05·(A − 3)` s | 0.70 | 0.60 | 0.50 |
 
+La referencia de armas 3 para fijación vive en `weapons.missile.lock_reference_weapons`; el tiempo base y la variación por punto permanecen en `data/balance.json`. No cambia ningún valor de la tabla.
+
 ## 2. Los ocho
 
 | Runner | Significado | Vel. | Blind. | Manejo | Armas | Rol | Silueta | Color |

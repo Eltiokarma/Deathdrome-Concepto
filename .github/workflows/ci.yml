@@ -5,6 +5,9 @@ on:
     branches: [main]
   pull_request:
 
+permissions:
+  contents: read
+
 jobs:
   data:
     name: Validar datos de balance
@@ -24,14 +27,41 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: "3.12"
-      - run: pip install "gdtoolkit==4.*"
-      - name: gdlint
-        run: |
-          if find game -name '*.gd' 2>/dev/null | grep -q .; then
-            gdlint $(find game -name '*.gd')
-          else
-            echo "Aún no hay scripts GDScript (pre-M0)."
-          fi
+      - run: pip install gdtoolkit==4.5.0
+      - run: python3 scripts/check_gdscript.py
 
-  # Los tests GUT headless se habilitan en PUR-004, cuando exista game/project.godot
-  # y se fije la versión de Godot del proyecto.
+  godot:
+    name: Godot 4.6.3 · GUT y paquete
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Instalar Godot oficial (SHA-512)
+        run: |
+          mkdir -p "$RUNNER_TEMP/godot"
+          cd "$RUNNER_TEMP/godot"
+          base=https://github.com/godotengine/godot-builds/releases/download/4.6.3-stable
+          curl -fL --retry 3 "$base/Godot_v4.6.3-stable_linux.x86_64.zip" -o Godot_v4.6.3-stable_linux.x86_64.zip
+          curl -fL --retry 3 "$base/SHA512-SUMS.txt" -o SHA512-SUMS.txt
+          grep ' Godot_v4.6.3-stable_linux.x86_64.zip$' SHA512-SUMS.txt | sha512sum --check --strict
+          unzip -q Godot_v4.6.3-stable_linux.x86_64.zip
+          mv Godot_v4.6.3-stable_linux.x86_64 godot
+          chmod +x godot
+          echo "$RUNNER_TEMP/godot" >> "$GITHUB_PATH"
+      - run: python3 scripts/install_gut.py
+      - run: python3 scripts/check_project.py
+      - name: Capturar arena con OpenGL por software
+        env:
+          LIBGL_ALWAYS_SOFTWARE: "1"
+        run: |
+          mkdir -p "$RUNNER_TEMP/arena-preview"
+          xvfb-run -a godot --path game --scene res://levels/_test/test_arena.tscn --audio-driver Dummy --fixed-fps 30 --write-movie "$RUNNER_TEMP/arena-preview/arena.avi" --quit-after 30
+          xvfb-run -a godot --path game --audio-driver Dummy --fixed-fps 30 --write-movie "$RUNNER_TEMP/arena-preview/driving.avi" --quit-after 180 -- --driving-preview
+          xvfb-run -a godot --path game --audio-driver Dummy --fixed-fps 30 --write-movie "$RUNNER_TEMP/arena-preview/combat.avi" --quit-after 450 -- --combat-preview
+      - uses: actions/upload-artifact@v4
+        with:
+          name: combat-prototype-preview
+          path: ${{ runner.temp }}/arena-preview/*.avi

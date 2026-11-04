@@ -1,0 +1,89 @@
+[gd_scene load_steps=14 format=3]
+[ext_resource type="Script" path="res://entities/runner/runner.gd" id="1"]
+[ext_resource type="Script" path="res://entities/runner/runner_motor.gd" id="2"]
+[ext_resource type="Script" path="res://controllers/player_input.gd" id="3"]
+[ext_resource type="Script" path="res://entities/runner/runner_camera.gd" id="4"]
+[ext_resource type="Script" path="res://components/health_component.gd" id="5"]
+[ext_resource type="Script" path="res://components/laser_weapon.gd" id="6"]
+[sub_resource type="BoxShape3D" id="Hull"]
+size = Vector3(1, 0.7, 2.2)
+[sub_resource type="BoxMesh" id="Body"]
+size = Vector3(0.8, 0.45, 1.6)
+[sub_resource type="StandardMaterial3D" id="Dark"]
+albedo_color = Color(0.07, 0.08, 0.1, 1)
+[sub_resource type="CylinderMesh" id="Wheel"]
+top_radius = 0.32
+bottom_radius = 0.32
+height = 0.28
+radial_segments = 12
+material = SubResource("Dark")
+[sub_resource type="BoxMesh" id="Nose"]
+size = Vector3(0.4, 0.18, 0.65)
+[sub_resource type="StandardMaterial3D" id="Light"]
+albedo_color = Color(0.4, 0.9, 1, 1)
+emission_enabled = true
+emission = Color(0.1, 0.6, 0.8, 1)
+[sub_resource type="SphereShape3D" id="CameraProbe"]
+radius = 0.2
+
+[node name="Runner" type="CharacterBody3D"]
+collision_layer = 2
+collision_mask = 35
+script = ExtResource("1")
+[node name="CollisionShape3D" type="CollisionShape3D" parent="."]
+position = Vector3(0, 0.35, 0)
+shape = SubResource("Hull")
+[node name="Model" type="Node3D" parent="."]
+[node name="Body" type="MeshInstance3D" parent="Model"]
+position = Vector3(0, 0.45, 0)
+mesh = SubResource("Body")
+[node name="FrontWheel" type="MeshInstance3D" parent="Model"]
+position = Vector3(0, 0.32, -0.72)
+rotation_degrees = Vector3(0, 0, 90)
+mesh = SubResource("Wheel")
+[node name="RearWheel" type="MeshInstance3D" parent="Model"]
+position = Vector3(0, 0.32, 0.72)
+rotation_degrees = Vector3(0, 0, 90)
+mesh = SubResource("Wheel")
+[node name="Nose" type="MeshInstance3D" parent="Model"]
+position = Vector3(0, 0.52, -0.65)
+mesh = SubResource("Nose")
+material_override = SubResource("Light")
+[node name="GroundRays" type="Node3D" parent="."]
+[node name="Probe0" type="RayCast3D" parent="GroundRays"]
+position = Vector3(-0.4, 0.6, -0.85)
+target_position = Vector3(0, -1.2, 0)
+collision_mask = 1
+[node name="Probe1" type="RayCast3D" parent="GroundRays"]
+position = Vector3(0.4, 0.6, -0.85)
+target_position = Vector3(0, -1.2, 0)
+collision_mask = 1
+[node name="Probe2" type="RayCast3D" parent="GroundRays"]
+position = Vector3(-0.4, 0.6, 0.85)
+target_position = Vector3(0, -1.2, 0)
+collision_mask = 1
+[node name="Probe3" type="RayCast3D" parent="GroundRays"]
+position = Vector3(0.4, 0.6, 0.85)
+target_position = Vector3(0, -1.2, 0)
+collision_mask = 1
+
+[node name="RunnerMotor" type="Node" parent="."]
+script = ExtResource("2")
+[node name="PlayerInput" type="Node" parent="."]
+script = ExtResource("3")
+[node name="RunnerCamera" type="Node3D" parent="."]
+script = ExtResource("4")
+[node name="SpringArm3D" type="SpringArm3D" parent="RunnerCamera"]
+spring_length = 3.6
+collision_mask = 33
+margin = 0.2
+shape = SubResource("CameraProbe")
+[node name="Camera3D" type="Camera3D" parent="RunnerCamera/SpringArm3D"]
+current = true
+near = 0.05
+
+[node name="HealthComponent" type="Node" parent="."]
+script = ExtResource("5")
+[node name="LaserWeapon" type="Node3D" parent="."]
+position = Vector3(0, 0.5, -1.15)
+script = ExtResource("6")

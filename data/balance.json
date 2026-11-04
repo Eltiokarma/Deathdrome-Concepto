@@ -52,7 +52,33 @@
     "jump_apex_m": 2.5,
     "jump_cooldown_s": 1.2,
     "air_control": 0.2,
-    "wall_hit_speed_loss": 0.6
+    "wall_hit_speed_loss": 0.6,
+    "gravity_mps2": 20.0,
+    "brake_mult": 2.5,
+    "coast_mult": 0.35,
+    "grip_damping": 10.0,
+    "pose_response": 12.0,
+    "floor_max_angle_deg": 30.0,
+    "floor_snap_m": 0.4
+  },
+  "camera": {
+    "fov_vertical_deg": 60.0,
+    "turn_response": 10.0,
+    "near": {
+      "height_m": 1.4,
+      "distance_m": 3.6,
+      "pitch_deg": -7.0
+    },
+    "far": {
+      "height_m": 2.5,
+      "distance_m": 7.0,
+      "pitch_deg": -12.0
+    },
+    "cockpit": {
+      "height_m": 0.8,
+      "distance_m": 0.0,
+      "pitch_deg": 0.0
+    }
   },
   "weapons": {
     "laser": {
@@ -79,6 +105,7 @@
       "unlock_domain": 1,
       "damage": 40,
       "lock_time_s": 0.6,
+      "lock_reference_weapons": 3,
       "lock_time_per_weapon_point_s": -0.05,
       "lock_half_angle_deg": 20,
       "lock_range_m": 70,

@@ -1,0 +1,7 @@
+class_name Enums
+extends RefCounted
+
+enum DamageType { LASER, MISSILE, SHOCKWAVE, RAM, DRAIN, ION, TOWER, BARRIER, PURGE, MAGMA }
+enum AreaId { HUB, AREA_1, AREA_2, AREA_3, AREA_4 }
+enum RoundState { LOADING, INTRO, COUNTDOWN, PLAYING, PURGE, RESULTS }
+enum RunnerState { ACTIVE, ADVANCE, ESCAPED, DESTROYED }

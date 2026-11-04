@@ -1,0 +1,2 @@
+# Dependencias externas se excluyen en scripts/check_gdscript.py.
+max-line-length: 100

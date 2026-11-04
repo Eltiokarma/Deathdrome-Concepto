@@ -69,6 +69,12 @@ purga/
 
 **Convenciones:** archivos y carpetas en `snake_case`; clases (`class_name`) en `PascalCase`; código e identificadores en **inglés**, docs y textos de UI en **español** (vía archivos de traducción `.csv` desde M6).
 
+### Datos en ejecución y distribución (M0)
+
+`res://` corresponde a `game/`, no a la raíz del repositorio. `scripts/prepare_data.py` copia los dos JSON fuente a `game/data/` antes de abrir o exportar. Las copias no se versionan. `BalanceCatalog` valida contra `game/core/balance_schema.json`, y `Balance` expone `get_f`, `get_i`, `get_b`, `get_s` y `runner(id) -> RunnerStats`. Cada Runner devuelto es una instantánea independiente. Al añadir una clave requerida, actualizar el esquema y sus pruebas.
+
+El preset Linux incluye los JSON y excluye GUT/tests. `scripts/check_project.py` prueba también el PCK desde una carpeta temporal sin los archivos fuente. La arena es una escena de inspección, no el loop de juego.
+
 ## 3. Autoloads
 
 | Autoload | Responsabilidad | No hace |

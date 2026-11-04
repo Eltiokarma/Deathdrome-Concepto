@@ -1,12 +1,14 @@
 # PURGA
 
+[![CI](https://github.com/Eltiokarma/Deathdrome-Concepto/actions/workflows/ci.yml/badge.svg)](https://github.com/Eltiokarma/Deathdrome-Concepto/actions/workflows/ci.yml)
+
 > Combate vehicular en arenas-prisión. Ocho convictos, motos armadas, una cuota de muertes y un reloj que, al llegar a cero, no termina la partida: **te persigue**.
 
 **PURGA** (nombre de trabajo) es un juego de combate en arena en tercera persona, inspirado en el diseño de *DeathDrome* (Zipper Interactive, 1996). Es una obra **original**: reimplementamos ideas de diseño, no código, arte, nombres ni música del juego original. Ver [Reglas clean-room](CONTRIBUTING.md#reglas-clean-room).
 
-- **Motor:** Godot 4.x (GDScript), renderer *Compatibility* para correr en GPUs integradas.
+- **Motor:** Godot **4.6.3.stable**, edición estándar (GDScript), renderer *Compatibility* para correr en GPUs integradas.
 - **Plataforma objetivo:** PC (Windows / Linux). Multijugador LAN en una fase posterior.
-- **Estado:** pre-producción. La documentación está completa; el código arranca en el milestone M0.
+- **Estado:** pre-producción. Prototipo de conducción: ocho Runners seleccionables, movimiento, salto y cámara. Láser y daño contra un blanco de ensayo; bots y ronda pendientes.
 
 ---
 
@@ -44,8 +46,30 @@ Antes de comenzar una tarea, consultar [el relevo de trabajo](docs/10_RELEVO.md)
 ```bash
 git clone https://github.com/Eltiokarma/Deathdrome-Concepto.git
 cd Deathdrome-Concepto
-# Abrir game/project.godot con Godot 4.x (a partir de M0)
+python3 scripts/prepare_data.py
+godot --editor --path game
 ```
+
+Usar Godot **4.6.3.stable**. F5 abre el banco de conducción. W/S aceleran/frenan, A/D giran, Espacio salta, C cambia cámara, V mira atrás, Esc pausa, F2 cambia Runner, F3 muestra stats y R reubica la moto. También hay mapeos de mando. Clic izquierdo, J o RB disparan el láser contra el blanco; R reinicia ambos. El blanco reaparece automáticamente tras 4 s con escudo de 3 s; espera si ocupas su punto de aparición. No hay armas secundarias ni bots.
+
+Consulta [controles, pruebas y límites del prototipo](docs/11_CONDUCCION.md). La arena orbital anterior permanece en `game/levels/_test/test_arena.tscn` (F6).
+
+### Datos y exportación
+
+Editar únicamente `data/balance.json` y `data/runners.json` en la raíz. Ejecutar `python3 scripts/prepare_data.py` después de cada cambio: genera `game/data/`, ignorado por Git. El autoload `Balance` valida tipos y claves requeridas antes de publicar getters y stats; si no encuentra datos válidos, termina con código 1 y explica la ruta fallida.
+
+El preset `game/export_presets.cfg` incluye esos JSON y el esquema. `python3 scripts/check_project.py` exporta un PCK y lo arranca desde una carpeta aislada para comprobar que no depende del árbol fuente. Un ejecutable Linux/Windows completo requiere las plantillas de exportación de Godot; esta comprobación solo genera el paquete PCK.
+
+### Pruebas
+
+```bash
+python3 scripts/install_gut.py  # GUT 9.6.1, commit fijado; requiere git y red
+python3 -m pip install gdtoolkit==4.5.0
+python3 scripts/check_gdscript.py
+python3 scripts/check_project.py
+```
+
+GUT se instala bajo `game/addons/gut/` (MIT, licencia incluida por el instalador). CI ejecuta validación de balance, lint, GUT, prueba del paquete aislado y publica un video de la arena en el artefacto `combat-prototype-preview`. Las pruebas geométricas verifican colisiones y medidas; no sustituyen el playtest de conducción ni la medición de 120 fps en GPU integrada.
 
 1. Lee [CONTRIBUTING.md](CONTRIBUTING.md).
 2. Elige un issue con la etiqueta `good first issue` del milestone activo ([Roadmap](docs/08_ROADMAP.md)).
