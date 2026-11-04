@@ -17,6 +17,10 @@ var _preview_tick: int = 0
 
 func _ready() -> void:
 	$Arena/Overlay.hide()
+	# Los rótulos grandes de la vista orbital no deben tapar la conducción.
+	for marker: Node in $Arena.get_children():
+		if marker is Label3D:
+			marker.pixel_size *= 0.25
 	$Arena/Camera.set_process(false)
 	$Arena/Camera.set_process_unhandled_input(false)
 	runner.get_node("RunnerCamera/SpringArm3D/Camera3D").make_current()
