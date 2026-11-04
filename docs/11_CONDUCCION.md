@@ -18,7 +18,7 @@ Godot 4.6.3.stable. Desde la raíz: `python3 scripts/prepare_data.py`, abrir `ga
 | Valores derivados / diagnóstico | F3 | — |
 | Reubicar en salida | R | — |
 
-S frena: no hay marcha atrás. F2, F3 y R son herramientas del banco de pruebas, no controles definitivos de campaña. Se puede girar detenido para salir de una pared. El láser ya funciona con clic izquierdo/J/RB; las secundarias, barrera y radar siguen pendientes. El Runner de ensayo no tiene IA; R restaura ambos vehículos.
+S frena: no hay marcha atrás. F2, F3 y R son herramientas del banco de pruebas, no controles definitivos de campaña. Se puede girar detenido para salir de una pared. El láser ya funciona con clic izquierdo/J/RB; las secundarias, barrera y radar siguen pendientes. El Runner de ensayo no tiene IA; R restaura ambos vehículos y cancela la reaparición pendiente.
 
 ## Arquitectura
 
@@ -60,3 +60,14 @@ CI publica `combat-prototype-preview`: vista orbital y recorrido automático rea
 - Medir GPU integrada. El render de CI es por software y no demuestra 120 fps.
 
 Salud y láser se añadieron en PUR-020/021. No hay bots, rondas, retro-render ni red. No declarar cerrado PUR-011/PUR-014 solo por los tests de regresión: requieren playtest de conducción y cámara.
+
+
+## Ciclo automático del blanco de ensayo
+
+Al destruir el blanco, `PracticeRespawner` espera `respawn.delay_s` (4 s) y lo restaura con `respawn.spawn_shield_s` (3 s). El contador de bajas se conserva. La pantalla muestra cuenta atrás, escudo o punto ocupado. Si el jugador se coloca en la aparición, el blanco espera a que se despeje; no se teletransporta dentro de otro Runner. Esc congela el temporizador. R reinicia de inmediato y cancela el ciclo pendiente.
+
+Prueba manual: mantener J hasta destruir; observar cuenta atrás y escudo; disparar durante el escudo no reduce integridad. Repetir pausando durante la cuenta atrás. Para bloqueo, destruir y conducir al punto antes de que termine la espera, después apartarse.
+
+Este servicio está restringido al sandbox y comprueba ocupación por Runners en un punto fijo conocido. No es el respawn de ronda: no gestiona créditos, Purga, IA, selección de puntos ni peligros. Al implementar RoundManager, definir una política propia en lugar de reutilizarlo sin esas reglas.
+
+Las entradas de daño nulas/no finitas se rechazan sin tocar salud ni atribución. Al morir, el estado `destroyed` se fija antes de emitir `runner_damaged`, evitando una segunda aplicación letal desde un callback de ese evento. Los listeners no deben reiniciar el Runner dentro de ese callback; usar un controlador de ciclo de vida después del evento de destrucción.

@@ -1,5 +1,18 @@
 # Relevo de trabajo — Codex / Claude
 
+## 2026-11-04 · Codex · Práctica continua y robustez del daño
+
+**Rama:** `feat/practice-respawn`, basada en PR #4. Conservar el orden de revisión e integración de los PR anteriores. No hay tareas reservadas al cerrar esta entrega.
+
+- Nuevo PracticeRespawner exclusivo del sandbox: demora/escudo desde Balance, cuenta atrás, pausa, bloqueo por ocupación y cancelación al reiniciar manualmente. Emite `runner_respawned` una vez por ciclo. No implementa respawn de ronda/Purga.
+- Salud rechaza datos de daño y tiempos no finitos. Estado de muerte fijado antes de llamar listeners de daño para evitar una segunda muerte reentrante.
+- Pruebas de demora/escudo, pausa, punto ocupado, reset, entradas inválidas y callback de daño; ver PR para número final y CI. La captura de combate de CI ahora dura 15 s para mostrar destrucción, reaparición y escudo.
+- La CI de PR #4 ya pasó; su video fue descargado y revisado (daño y baja visibles). Eso no sustituye revisar el video de esta rama.
+- Instrucciones de uso/playtest y límites en docs/11_CONDUCCION.md. No cambian cifras de balance.
+- Siguientes prioridades: revisar/integrar los PR, probar conducción/mando real, y después barrera (PUR-022) o RoundManager. No usar PracticeRespawner como sustituto del sistema de ronda.
+
+Las entradas siguientes conservan el historial.
+
 ## 2026-11-04 · Codex · Salud y láser de ensayo
 
 **Rama:** `feat/PUR-020-021-combat`, basada en PR #3. Continúa la cadena #1 → #2 → #3 → esta entrega; sin merges automáticos.

@@ -50,7 +50,7 @@ python3 scripts/prepare_data.py
 godot --editor --path game
 ```
 
-Usar Godot **4.6.3.stable**. F5 abre el banco de conducción. W/S aceleran/frenan, A/D giran, Espacio salta, C cambia cámara, V mira atrás, Esc pausa, F2 cambia Runner, F3 muestra stats y R reubica la moto. También hay mapeos de mando. Clic izquierdo, J o RB disparan el láser contra el blanco; R reinicia ambos. No hay armas secundarias ni bots.
+Usar Godot **4.6.3.stable**. F5 abre el banco de conducción. W/S aceleran/frenan, A/D giran, Espacio salta, C cambia cámara, V mira atrás, Esc pausa, F2 cambia Runner, F3 muestra stats y R reubica la moto. También hay mapeos de mando. Clic izquierdo, J o RB disparan el láser contra el blanco; R reinicia ambos. El blanco reaparece automáticamente tras 4 s con escudo de 3 s; espera si ocupas su punto de aparición. No hay armas secundarias ni bots.
 
 Consulta [controles, pruebas y límites del prototipo](docs/11_CONDUCCION.md). La arena orbital anterior permanece en `game/levels/_test/test_arena.tscn` (F6).
 

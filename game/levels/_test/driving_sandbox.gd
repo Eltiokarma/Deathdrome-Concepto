@@ -13,6 +13,7 @@ var _selection: int = 0
 var _show_stats: bool = false
 var _preview: bool = false
 var _preview_tick: int = 0
+@onready var respawner: PracticeRespawner = $PracticeRespawner
 @onready var target: Runner = $Target
 @onready var runner: Runner = $Runner
 @onready var status: Label = $UI/Status
@@ -53,11 +54,19 @@ func _physics_process(_delta: float) -> void:
 func _process(_delta: float) -> void:
 	status.text = "%s   ·   %.1f m/s   ·   %s" % [
 		runner.stats.display_name.to_upper(), Vector2(runner.velocity.x, runner.velocity.z).length(),
-		"PAUSA" if get_tree().paused else "BANCO DE CONDUCCIÓN",
+		"PAUSA" if get_tree().paused else "BANCO DE PRUEBAS",
 	]
 	$UI/CombatStatus.text = "INTEGRIDAD %.0f / %.0f   |   BLANCO %.0f / %.0f   |   BAJAS %d" % [
 		runner.current_integrity, runner.stats.max_integrity, target.current_integrity,
 		target.stats.max_integrity, _kills]
+	var respawn_text: String = ""
+	if respawner.pending:
+		respawn_text = "PUNTO DE REAPARICIÓN OCUPADO" if respawner.blocked else (
+			"BLANCO REAPARECE EN %.1f s" % respawner.remaining
+		)
+	elif target.health.spawn_shield_s > 0.0:
+		respawn_text = "ESCUDO DEL BLANCO: %.1f s" % target.health.spawn_shield_s
+	$UI/RespawnStatus.text = respawn_text
 	stats_label.visible = _show_stats
 	stats_label.text = (
 		"Vel. máx.: %.1f m/s  |  Aceleración: %.1f s\n"
@@ -75,6 +84,7 @@ func _unhandled_input(event: InputEvent) -> void:
 	elif event.is_action_pressed("debug_stats"):
 		_show_stats = not _show_stats
 	elif event.is_action_pressed("reset_runner"):
+		respawner.cancel()
 		runner.reset_at(SPAWN)
 		target.reset_at(Vector3(-17, 0.1, 0), PI / 2.0)
 	elif event.is_action_pressed("select_runner"):

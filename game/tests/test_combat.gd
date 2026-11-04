@@ -175,3 +175,47 @@ func test_firing_breaks_spawn_shield_but_not_safe_zone() -> void:
 	var before: float = victim.current_integrity
 	attacker.laser.tick(1.0, true)
 	assert_eq(victim.current_integrity, before)
+
+
+func test_nonfinite_damage_cannot_corrupt_health_or_attribution() -> void:
+	assert_eq(victim.health.apply(null), 0.0)
+	var info: DamageInfo = _damage()
+	info.direction = Vector3(NAN, 0, 0)
+	assert_eq(victim.health.apply(info), 0.0)
+	info.direction = Vector3.RIGHT
+	info.amount = INF
+	assert_eq(victim.health.apply(info), 0.0)
+	info.amount = 10.0
+	attacker.stats.laser_mult = INF
+	assert_eq(victim.health.apply(info), 0.0)
+	assert_eq(victim.current_integrity, 100.0)
+	assert_null(victim.health.credited_attacker())
+
+
+func test_death_state_is_final_before_damage_callbacks() -> void:
+	watch_signals(EventBus)
+	var info: DamageInfo = _damage()
+	info.amount = 1000.0
+	var nested: Dictionary = {"calls": 0, "damage": -1.0, "dead": false}
+	var callback: Callable = func(received: Runner, _info: DamageInfo, _remaining: float) -> void:
+		if received == victim and nested.calls == 0:
+			nested.calls += 1
+			nested.dead = victim.health.destroyed
+			nested.damage = victim.health.apply(info)
+	EventBus.runner_damaged.connect(callback)
+	victim.health.apply(info)
+	EventBus.runner_damaged.disconnect(callback)
+	assert_true(nested.dead)
+	assert_eq(nested.damage, 0.0)
+	assert_signal_emit_count(EventBus, "runner_destroyed", 1)
+
+
+func test_invalid_time_cannot_extend_shield_or_poison_attribution_clock() -> void:
+	victim.health.apply(_damage())
+	victim.health.spawn_shield_s = 3.0
+	victim.health.tick(-100.0)
+	victim.health.tick(NAN)
+	assert_eq(victim.health.spawn_shield_s, 3.0)
+	assert_eq(victim.health.credited_attacker(), attacker)
+	victim.health.tick(5.1)
+	assert_null(victim.health.credited_attacker())

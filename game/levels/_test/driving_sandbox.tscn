@@ -1,7 +1,9 @@
-[gd_scene load_steps=4 format=3]
+[gd_scene load_steps=5 format=3]
 [ext_resource type="PackedScene" path="res://levels/_test/test_arena.tscn" id="1"]
 [ext_resource type="PackedScene" path="res://entities/runner/runner.tscn" id="2"]
 [ext_resource type="Script" path="res://levels/_test/driving_sandbox.gd" id="3"]
+
+[ext_resource type="Script" path="res://levels/_test/practice_respawner.gd" id="4"]
 
 [node name="DrivingSandbox" type="Node3D"]
 process_mode = 3
@@ -30,7 +32,7 @@ theme_override_font_sizes/font_size = 18
 offset_left = 26.0
 offset_top = 85.0
 theme_override_font_sizes/font_size = 14
-text = "W/S: acelerar/frenar · A/D: girar · Espacio: salto · C: cámara · V: mirar atrás\nF2: cambiar Runner · F3: stats · R: reiniciar · Esc: pausa · Mando compatible\nClic izquierdo / J / RB: láser · R: reiniciar ambos · Sin bots ni ronda."
+text = "W/S: acelerar/frenar · A/D: girar · Espacio: salto · C: cámara · V: mirar atrás\nF2: cambiar Runner · F3: stats · R: reiniciar · Esc: pausa · Mando compatible\nClic izquierdo / J / RB: láser · R: reiniciar ambos · Blanco reaparece automáticamente · Sin bots ni ronda."
 [node name="Stats" type="Label" parent="UI"]
 offset_left = 26.0
 offset_top = 155.0
@@ -40,3 +42,12 @@ theme_override_font_sizes/font_size = 16
 offset_left = 26.0
 offset_top = 265.0
 theme_override_font_sizes/font_size = 22
+
+[node name="PracticeRespawner" type="Node" parent="."]
+script = ExtResource("4")
+target_path = NodePath("../Target")
+
+[node name="RespawnStatus" type="Label" parent="UI"]
+offset_left = 26.0
+offset_top = 300.0
+theme_override_font_sizes/font_size = 18
