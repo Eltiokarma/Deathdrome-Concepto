@@ -58,8 +58,9 @@ jobs:
           LIBGL_ALWAYS_SOFTWARE: "1"
         run: |
           mkdir -p "$RUNNER_TEMP/arena-preview"
-          xvfb-run -a godot --path game --audio-driver Dummy --fixed-fps 30 --write-movie "$RUNNER_TEMP/arena-preview/arena.avi" --quit-after 30
+          xvfb-run -a godot --path game --scene res://levels/_test/test_arena.tscn --audio-driver Dummy --fixed-fps 30 --write-movie "$RUNNER_TEMP/arena-preview/arena.avi" --quit-after 30
+          xvfb-run -a godot --path game --audio-driver Dummy --fixed-fps 30 --write-movie "$RUNNER_TEMP/arena-preview/driving.avi" --quit-after 180 -- --driving-preview
       - uses: actions/upload-artifact@v4
         with:
-          name: arena-greybox-preview
-          path: ${{ runner.temp }}/arena-preview/arena.avi
+          name: driving-prototype-preview
+          path: ${{ runner.temp }}/arena-preview/*.avi

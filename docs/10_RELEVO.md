@@ -1,5 +1,26 @@
 # Relevo de trabajo — Codex / Claude
 
+## 2026-11-04 · Codex · Primer Runner manejable
+
+**Rama:** `feat/PUR-003-014-driving`, basada en PR #2. PR apilado: revisar/integrar en orden #1 → #2 → esta entrega, retargeteando las bases después. No quedan bloques reservados por Codex al terminar.
+
+### Implementado
+- PUR-003: enums, DamageInfo y las señales tipadas de EventBus. Contratos; no daño ni ronda todavía.
+- PUR-010: InputFrame saneado, PlayerInput, acciones de teclado/mando en project.godot. El Runner no lee Input directamente.
+- PUR-011/012/013: CharacterBody3D con aceleración/freno, giro, agarre lateral, cuatro sondas de suelo, stats derivados y salto de 2,5 m con recarga. F2 selecciona cualquiera de los ocho; F3 muestra stats.
+- PUR-014: cámara cercana/lejana/cabina, mirar atrás y SpringArm con barrido de esfera. Reinicio R y pausa Esc en el sandbox.
+- Escena principal ahora `driving_sandbox.tscn`; la arena orbital original sigue intacta y accesible por F6.
+
+### Límites y pruebas
+- `docs/11_CONDUCCION.md` documenta controles, parámetros nuevos, pruebas y playtest pendiente.
+- Las cuatro sondas inclinan la malla; no constituyen suspensión física del casco. PUR-011 queda como prototipo, pendiente de feel y suspensión completa.
+- Las pruebas cubren movimiento y colisiones reales, salto, rampa/cornisa, cámara, InputMap, teclado + mando sintético y pausa. Ver discusión del PR para resultado final de CI y video.
+- No afirmar soporte de mando físico o rendimiento en GPU integrada sin probar ese hardware.
+- Las acciones de armas/radar están preparadas, pero no implementan combate/radar. Salud es solo el valor inicial de stats.
+- Próximo bloque sugerido: revisión de conducción con Opus; luego PUR-020 (HealthComponent/daño) y PUR-021 (láser), o PUR-015 para retro-render.
+
+Las entradas siguientes son históricas; prevalece esta sección.
+
 ## 2026-11-04 · Codex · Balance, pruebas y arena
 
 **Rama:** `feat/PUR-002-005-foundations`, basada en `feat/PUR-001-godot-foundation` (PR #1). Entrega pendiente de revisión; integrar primero PR #1 o conservar su base al reorganizar los PR.
