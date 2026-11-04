@@ -8,7 +8,7 @@
 
 - **Motor:** Godot **4.6.3.stable**, edición estándar (GDScript), renderer *Compatibility* para correr en GPUs integradas.
 - **Plataforma objetivo:** PC (Windows / Linux). Multijugador LAN en una fase posterior.
-- **Estado:** pre-producción. Prototipo de conducción: ocho Runners seleccionables, movimiento, salto y cámara. Combate pendiente.
+- **Estado:** pre-producción. Prototipo de conducción: ocho Runners seleccionables, movimiento, salto y cámara. Láser y daño contra un blanco de ensayo; bots y ronda pendientes.
 
 ---
 
@@ -50,7 +50,7 @@ python3 scripts/prepare_data.py
 godot --editor --path game
 ```
 
-Usar Godot **4.6.3.stable**. F5 abre el banco de conducción. W/S aceleran/frenan, A/D giran, Espacio salta, C cambia cámara, V mira atrás, Esc pausa, F2 cambia Runner, F3 muestra stats y R reubica la moto. También hay mapeos de mando. Las armas todavía no funcionan.
+Usar Godot **4.6.3.stable**. F5 abre el banco de conducción. W/S aceleran/frenan, A/D giran, Espacio salta, C cambia cámara, V mira atrás, Esc pausa, F2 cambia Runner, F3 muestra stats y R reubica la moto. También hay mapeos de mando. Clic izquierdo, J o RB disparan el láser contra el blanco; R reinicia ambos. No hay armas secundarias ni bots.
 
 Consulta [controles, pruebas y límites del prototipo](docs/11_CONDUCCION.md). La arena orbital anterior permanece en `game/levels/_test/test_arena.tscn` (F6).
 
@@ -69,7 +69,7 @@ python3 scripts/check_gdscript.py
 python3 scripts/check_project.py
 ```
 
-GUT se instala bajo `game/addons/gut/` (MIT, licencia incluida por el instalador). CI ejecuta validación de balance, lint, GUT, prueba del paquete aislado y publica un video de la arena en el artefacto `driving-prototype-preview`. Las pruebas geométricas verifican colisiones y medidas; no sustituyen el playtest de conducción ni la medición de 120 fps en GPU integrada.
+GUT se instala bajo `game/addons/gut/` (MIT, licencia incluida por el instalador). CI ejecuta validación de balance, lint, GUT, prueba del paquete aislado y publica un video de la arena en el artefacto `combat-prototype-preview`. Las pruebas geométricas verifican colisiones y medidas; no sustituyen el playtest de conducción ni la medición de 120 fps en GPU integrada.
 
 1. Lee [CONTRIBUTING.md](CONTRIBUTING.md).
 2. Elige un issue con la etiqueta `good first issue` del milestone activo ([Roadmap](docs/08_ROADMAP.md)).

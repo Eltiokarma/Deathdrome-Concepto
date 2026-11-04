@@ -4,16 +4,21 @@ extends CharacterBody3D
 
 @export var runner_id: StringName = &"amaru"
 var stats: RunnerStats
-var current_integrity: float = 0.0
+var current_integrity: float:
+	get:
+		return health.current if health != null else 0.0
 var input_frame := InputFrame.new()
 var last_input := InputFrame.new()
 var controller: PlayerInput
 
+@onready var health: HealthComponent = $HealthComponent
+@onready var laser: LaserWeapon = $LaserWeapon
 @onready var motor: RunnerMotor = $RunnerMotor
 @onready var model: Node3D = $Model
 
 
 func _ready() -> void:
+	add_to_group("runners")
 	controller = get_node_or_null("PlayerInput") as PlayerInput
 	setup(runner_id)
 	floor_max_angle = deg_to_rad(Balance.get_f("movement.floor_max_angle_deg"))
@@ -27,7 +32,8 @@ func setup(id: StringName) -> void:
 		return
 	runner_id = id
 	stats = next
-	current_integrity = stats.max_integrity
+	if health != null:
+		health.reset(stats.max_integrity)
 	if model != null:
 		var material := StandardMaterial3D.new()
 		material.albedo_color = stats.color
@@ -36,9 +42,17 @@ func setup(id: StringName) -> void:
 
 
 func _physics_process(delta: float) -> void:
+	health.tick(delta)
+	if health.destroyed:
+		velocity = Vector3.ZERO
+		model.hide()
+		set_collision_layer_value(2, false)
+		laser.tick(delta, false)
+		return
 	var frame: InputFrame = controller.sample() if controller != null else input_frame
 	last_input = frame.sanitized()
 	motor.step(self, last_input, delta)
+	laser.tick(delta, last_input.laser)
 
 
 func reset_at(point: Vector3, yaw: float = 0.0) -> void:
@@ -48,3 +62,7 @@ func reset_at(point: Vector3, yaw: float = 0.0) -> void:
 	input_frame = InputFrame.new()
 	last_input = InputFrame.new()
 	motor.reset()
+	health.reset(stats.max_integrity)
+	laser.reset()
+	set_collision_layer_value(2, true)
+	model.visible = ($RunnerCamera as RunnerCamera).mode != 2

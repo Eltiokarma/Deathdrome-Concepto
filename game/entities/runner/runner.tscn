@@ -1,8 +1,10 @@
-[gd_scene load_steps=12 format=3]
+[gd_scene load_steps=14 format=3]
 [ext_resource type="Script" path="res://entities/runner/runner.gd" id="1"]
 [ext_resource type="Script" path="res://entities/runner/runner_motor.gd" id="2"]
 [ext_resource type="Script" path="res://controllers/player_input.gd" id="3"]
 [ext_resource type="Script" path="res://entities/runner/runner_camera.gd" id="4"]
+[ext_resource type="Script" path="res://components/health_component.gd" id="5"]
+[ext_resource type="Script" path="res://components/laser_weapon.gd" id="6"]
 [sub_resource type="BoxShape3D" id="Hull"]
 size = Vector3(1, 0.7, 2.2)
 [sub_resource type="BoxMesh" id="Body"]
@@ -79,3 +81,9 @@ shape = SubResource("CameraProbe")
 [node name="Camera3D" type="Camera3D" parent="RunnerCamera/SpringArm3D"]
 current = true
 near = 0.05
+
+[node name="HealthComponent" type="Node" parent="."]
+script = ExtResource("5")
+[node name="LaserWeapon" type="Node3D" parent="."]
+position = Vector3(0, 0.5, -1.15)
+script = ExtResource("6")

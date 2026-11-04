@@ -1,5 +1,19 @@
 # Relevo de trabajo — Codex / Claude
 
+## 2026-11-04 · Codex · Salud y láser de ensayo
+
+**Rama:** `feat/PUR-020-021-combat`, basada en PR #3. Continúa la cadena #1 → #2 → #3 → esta entrega; sin merges automáticos.
+
+- HealthComponent es fuente de integridad: zona franca en ambos lados, escudo, coraza, multiplicadores direccionales/stat de armas, autodaño y excepciones letales. Atribuye al último atacante válido en 5 s mediante referencia débil; entorno/autotorre conservan la atribución vigente. Emite daño/destrucción en EventBus; no modifica puntaje/cuota.
+- LaserWeapon: 8 Hz, cono ±15°, alcance 60 m, selección por menor ángulo, desempate por distancia, rayo de visión que respeta mundo/barreras, rampa sobre el mismo blanco y reinicio tras 0,4 s. Trazo y triángulo visuales de prototipo.
+- Sandbox: blanco estacionario, integridad y contador de bajas de ensayo. Clic/J/RB dispara; R reinicia ambos. `--combat-preview` dispara InputFrame real para video de CI.
+- Aclaradas en docs/02 dos reglas: barrera ignora escudo/coraza salvo zona franca; TTK continuo no equivale a instantes discretos de disparo. Roadmap ajusta únicamente la tolerancia del test discreto; números de balance intactos.
+- Las protecciones están implementadas como estado del componente: todavía no hay pickups, volúmenes de zona franca, respawn de ronda ni StatusEffects. Purga/barrera solo tienen reglas de daño; sus emisores no existen aún.
+- El contador de bajas del sandbox no es puntuación/campaña. El blanco desaparece al destruirse y se restaura manualmente; efectos de explosión/piloto quedan pendientes.
+- Validación y video: ver discusión del PR. Revisión siguiente: integración de los PR, feel de conducción, y PUR-022 (barrera) o ronda/respawn. Ningún bloque queda reservado por Codex al terminar.
+
+Las secciones siguientes son históricas.
+
 ## 2026-11-04 · Codex · Primer Runner manejable
 
 **Rama:** `feat/PUR-003-014-driving`, basada en PR #2. PR apilado: revisar/integrar en orden #1 → #2 → esta entrega, retargeteando las bases después. No quedan bloques reservados por Codex al terminar.

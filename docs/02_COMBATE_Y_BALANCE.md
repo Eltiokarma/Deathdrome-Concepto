@@ -29,6 +29,8 @@ Cada impacto produce un `DamageInfo { amount, type, source, direction, position 
 5. **Multiplicador del atacante** (stat de armas del Runner, solo `LASER`): ver [03](03_RUNNERS.md).
 6. Restar de la integridad; si llega a 0 → destrucción.
 
+**Precedencia de excepciones:** después de zona franca y autodaño, resolver los tipos letales antes del escudo/coraza. La regla letal siguiente prevalece sobre los pasos 2–3.
+
 `PURGE` y `BARRIER` son daño **letal**: ignoran todo excepto la zona franca (la barrera no existe dentro del Área 0; la Purga sí entra).
 
 ### 2.2 Dirección (láser)
@@ -84,6 +86,10 @@ Cada impacto produce un `DamageInfo { amount, type, source, direction, position 
 | 130 PI (blindaje 5) | 5.92 s | 5.01 s | 8.24 s |
 
 Cálculo para el frente con 100 PI: hacen falta 100 / 0.7 = 142.9 PI "de costado" → 2 + (142.9 − 36) / 24 = 6.45 s.
+
+### Discretización del prototipo (PUR-021)
+
+La tabla anterior es continua. A 8 Hz, un impacto se resuelve cada 0,125 s; el primero ocurre tras un intervalo, no instantáneamente. Cada tiro integra la curva sobre su intervalo (multiplicador medio de la rampa), conservando exactamente el daño acumulado en los instantes de disparo. El tiempo real de destrucción se redondea al siguiente impacto: tolerancia de **un intervalo de tiro**, más el paso de física al observarlo. La curva continua conserva la comprobación numérica; exigir <2 % para todos los TTK discretos sería incompatible con esta cadencia. No se altera el DPS ni la tabla.
 
 ## 4. Arma primaria: Barrera
 

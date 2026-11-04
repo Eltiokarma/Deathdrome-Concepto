@@ -11,13 +11,17 @@ process_mode = 1
 [node name="Runner" parent="." instance=ExtResource("2")]
 process_mode = 1
 position = Vector3(-17, 0.1, 15)
+[node name="Target" parent="." instance=ExtResource("2")]
+process_mode = 1
+position = Vector3(-17, 0.1, 0)
+rotation_degrees = Vector3(0, 90, 0)
 [node name="UI" type="CanvasLayer" parent="."]
 [node name="Title" type="Label" parent="UI"]
 offset_left = 24.0
 offset_top = 18.0
 theme_override_colors/font_color = Color(1, 0.8, 0.35, 1)
 theme_override_font_sizes/font_size = 26
-text = "PURGA / PRUEBA DE CONDUCCIÓN"
+text = "PURGA / PRUEBA DE COMBATE"
 [node name="Status" type="Label" parent="UI"]
 offset_left = 26.0
 offset_top = 54.0
@@ -26,8 +30,13 @@ theme_override_font_sizes/font_size = 18
 offset_left = 26.0
 offset_top = 85.0
 theme_override_font_sizes/font_size = 14
-text = "W/S: acelerar/frenar · A/D: girar · Espacio: salto · C: cámara · V: mirar atrás\nF2: cambiar Runner · F3: stats · R: reiniciar · Esc: pausa · Mando compatible\nPrototipo: sin combate, bots ni ronda."
+text = "W/S: acelerar/frenar · A/D: girar · Espacio: salto · C: cámara · V: mirar atrás\nF2: cambiar Runner · F3: stats · R: reiniciar · Esc: pausa · Mando compatible\nClic izquierdo / J / RB: láser · R: reiniciar ambos · Sin bots ni ronda."
 [node name="Stats" type="Label" parent="UI"]
 offset_left = 26.0
 offset_top = 155.0
 theme_override_font_sizes/font_size = 16
+
+[node name="CombatStatus" type="Label" parent="UI"]
+offset_left = 26.0
+offset_top = 265.0
+theme_override_font_sizes/font_size = 22

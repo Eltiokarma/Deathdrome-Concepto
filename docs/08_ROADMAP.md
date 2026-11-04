@@ -157,7 +157,7 @@ Implementar el orden de aplicación de daño de [02 §2.1](02_COMBATE_Y_BALANCE.
 - [ ] Cono de ±15°, alcance 60 m, 8 disparos/s, 1.5 PI base.
 - [ ] Rampa ×1.0 → ×2.0 en 2 s; se reinicia a los 0.4 s sin impacto.
 - [ ] Multiplicadores direccionales ×0.7 / ×1.0 / ×1.2.
-- [ ] Test que reproduce la tabla de TTK de [02 §3](02_COMBATE_Y_BALANCE.md#ttk-solo-láser-impacto-continuo) con error < 2 %.
+- [ ] Test de la curva continua de [02 §3](02_COMBATE_Y_BALANCE.md#ttk-solo-láser-impacto-continuo) con error < 2 %; el TTK observado a 8 Hz admite un intervalo de tiro más un paso de física (ver discretización en 02).
 
 ### PUR-022 · Barrera
 **Etiquetas:** `combat`  
