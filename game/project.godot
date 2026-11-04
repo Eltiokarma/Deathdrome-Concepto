@@ -4,7 +4,16 @@ config_version=5
 
 [application]
 config/name="PURGA"
+run/main_scene="res://levels/_test/test_arena.tscn"
 config/features=PackedStringArray("4.6", "GL Compatibility")
+
+[display]
+window/size/viewport_width=1280
+window/size/viewport_height=720
+window/stretch/mode="canvas_items"
+
+[autoload]
+Balance="*res://autoload/balance.gd"
 
 [layer_names]
 3d_physics/layer_1="world"

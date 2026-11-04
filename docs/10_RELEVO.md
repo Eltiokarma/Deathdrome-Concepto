@@ -1,5 +1,25 @@
 # Relevo de trabajo — Codex / Claude
 
+## 2026-11-04 · Codex · Balance, pruebas y arena
+
+**Rama:** `feat/PUR-002-005-foundations`, basada en `feat/PUR-001-godot-foundation` (PR #1). Entrega pendiente de revisión; integrar primero PR #1 o conservar su base al reorganizar los PR.
+
+### Implementado
+- **PUR-002:** autoload Balance y catálogo validado; getters tipados y stats de los ocho Runners, con instantáneas que no alteran el catálogo. Claves obligatorias/tipos en `game/core/balance_schema.json`; datos faltantes/malformados detienen el arranque con error explícito.
+- **PUR-004:** GUT 9.6.1 fijado a commit, lint solo de nuestro código, CI con Godot 4.6.3 y prueba de PCK aislado. Badge de CI y comandos en README.
+- **PUR-005:** escena greybox como escena principal, luz y cámara orbital de inspección; no es cámara de Runner. Dimensiones y pendientes verificadas por consultas físicas.
+- JSON fuente en raíz; `prepare_data.py` genera las copias exportables. `lock_reference_weapons=3` hace explícita la referencia de la fórmula de fijación; no modifica los valores derivados.
+
+### Verificación y pendientes
+- GUT cubre tablas de los ocho Runners, getters, datos inválidos, aislamiento de las instantáneas, recarga fallida, geometría y colisiones.
+- Apertura y ejecución headless, lint y paquete PCK aislado comprobados localmente. Resultado final de CI y vista de arena: ver discusión del PR.
+- **PUR-005 no se declara cerrado:** falta medir >120 fps en una GPU integrada concreta y el playtest con el futuro Runner. No inferir rendimiento del render por software de CI.
+- PUR-003 sigue pendiente. Definir contratos Runner/DamageInfo con gameplay antes de declarar señales tipadas que los referencien.
+- Tras integrar: PUR-003 → PUR-010 → PUR-011 para llegar a conducción. Codex no reserva esos bloques.
+- No se sembraron issues en masa. No hay armas, bots, ronda ni combate implementados.
+
+Las secciones siguientes conservan el historial; prevalece la entrada más reciente.
+
 ## 2026-11-03 · Codex · PUR-001 listo para revisión
 
 **Rama:** `feat/PUR-001-godot-foundation`. **Estado:** implementado y validado en headless; pendiente de revisión e integración. Este bloque no está disponible para otra implementación.

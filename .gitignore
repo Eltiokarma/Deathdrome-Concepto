@@ -2,7 +2,6 @@
 .godot/
 .import/
 *.translation
-export_presets.cfg
 /build/
 /exports/
 /game/build/
@@ -28,3 +27,8 @@ __pycache__/
 *.iso
 *.nrg
 ddrome*
+
+# Generados por scripts de preparación
+/game/data/
+/game/addons/gut/
+/game/test-results/

@@ -1,0 +1,441 @@
+[gd_scene load_steps=24 format=3]
+
+[ext_resource type="Script" path="res://levels/_test/arena_camera.gd" id="1"]
+[sub_resource type="Environment" id="Env"]
+background_mode = 1
+background_color = Color(0.055, 0.075, 0.10, 1)
+ambient_light_source = 3
+ambient_light_color = Color(0.65, 0.75, 0.9, 1)
+ambient_light_energy = 0.65
+tonemap_mode = 0
+
+[sub_resource type="StandardMaterial3D" id="Floor"]
+albedo_color = Color(0.17, 0.21, 0.25, 1)
+roughness = 1.0
+
+[sub_resource type="StandardMaterial3D" id="Wall"]
+albedo_color = Color(0.32, 0.39, 0.44, 1)
+roughness = 1.0
+
+[sub_resource type="StandardMaterial3D" id="Ramp"]
+albedo_color = Color(0.85, 0.61, 0.17, 1)
+roughness = 1.0
+
+[sub_resource type="StandardMaterial3D" id="Platform"]
+albedo_color = Color(0.22, 0.47, 0.49, 1)
+roughness = 1.0
+
+[sub_resource type="BoxMesh" id="FloorMesh"]
+size = Vector3(60, 1, 60)
+material = SubResource("Floor")
+
+[sub_resource type="BoxShape3D" id="FloorShape"]
+size = Vector3(60, 1, 60)
+
+[sub_resource type="BoxMesh" id="NorthWallMesh"]
+size = Vector3(60, 3, 1)
+material = SubResource("Wall")
+
+[sub_resource type="BoxShape3D" id="NorthWallShape"]
+size = Vector3(60, 3, 1)
+
+[sub_resource type="BoxMesh" id="WestWallMesh"]
+size = Vector3(1, 3, 60)
+material = SubResource("Wall")
+
+[sub_resource type="BoxShape3D" id="WestWallShape"]
+size = Vector3(1, 3, 60)
+
+[sub_resource type="BoxMesh" id="PlatformMesh"]
+size = Vector3(25, 3, 6)
+material = SubResource("Platform")
+
+[sub_resource type="BoxShape3D" id="PlatformShape"]
+size = Vector3(25, 3, 6)
+
+[sub_resource type="BoxMesh" id="CorridorLeftMesh"]
+size = Vector3(1, 5, 18)
+material = SubResource("Wall")
+
+[sub_resource type="BoxShape3D" id="CorridorLeftShape"]
+size = Vector3(1, 5, 18)
+
+[sub_resource type="BoxMesh" id="CorridorRightMesh"]
+size = Vector3(1, 5, 18)
+material = SubResource("Wall")
+
+[sub_resource type="BoxShape3D" id="CorridorRightShape"]
+size = Vector3(1, 5, 18)
+
+[sub_resource type="BoxMesh" id="CeilingMesh"]
+size = Vector3(9, 0.5, 8)
+material = SubResource("Platform")
+
+[sub_resource type="BoxShape3D" id="CeilingShape"]
+size = Vector3(9, 0.5, 8)
+
+[sub_resource type="BoxMesh" id="LowWallMesh"]
+size = Vector3(10, 1.2, 0.6)
+material = SubResource("Ramp")
+
+[sub_resource type="BoxShape3D" id="LowWallShape"]
+size = Vector3(10, 1.2, 0.6)
+
+[sub_resource type="StandardMaterial3D" id="Grid"]
+albedo_color = Color(0.28, 0.33, 0.37, 1)
+shading_mode = 0
+
+[sub_resource type="BoxMesh" id="GridLine"]
+size = Vector3(60, 0.01, 0.025)
+material = SubResource("Grid")
+
+[node name="TestArena" type="Node3D"]
+
+[node name="Environment" type="WorldEnvironment" parent="."]
+environment = SubResource("Env")
+
+[node name="Sun" type="DirectionalLight3D" parent="."]
+rotation_degrees = Vector3(-55, -30, 0)
+light_color = Color(1, 0.91, 0.77, 1)
+light_energy = 1.15
+shadow_enabled = true
+
+[node name="Camera" type="Camera3D" parent="."]
+position = Vector3(43, 42, 48)
+current = true
+fov = 56.0
+script = ExtResource("1")
+
+[node name="Floor" type="StaticBody3D" parent="."]
+position = Vector3(0, -0.5, 0)
+collision_layer = 1
+collision_mask = 0
+
+[node name="Mesh" type="MeshInstance3D" parent="Floor"]
+mesh = SubResource("FloorMesh")
+
+[node name="Collision" type="CollisionShape3D" parent="Floor"]
+shape = SubResource("FloorShape")
+
+[node name="NorthWall" type="StaticBody3D" parent="."]
+position = Vector3(0, 1.5, -30.5)
+collision_layer = 1
+collision_mask = 0
+
+[node name="Mesh" type="MeshInstance3D" parent="NorthWall"]
+mesh = SubResource("NorthWallMesh")
+
+[node name="Collision" type="CollisionShape3D" parent="NorthWall"]
+shape = SubResource("NorthWallShape")
+
+[node name="WestWall" type="StaticBody3D" parent="."]
+position = Vector3(-30.5, 1.5, 0)
+collision_layer = 1
+collision_mask = 0
+
+[node name="Mesh" type="MeshInstance3D" parent="WestWall"]
+mesh = SubResource("WestWallMesh")
+
+[node name="Collision" type="CollisionShape3D" parent="WestWall"]
+shape = SubResource("WestWallShape")
+
+[node name="Platform" type="StaticBody3D" parent="."]
+position = Vector3(-2.5, 1.5, -20)
+collision_layer = 1
+collision_mask = 0
+
+[node name="Mesh" type="MeshInstance3D" parent="Platform"]
+mesh = SubResource("PlatformMesh")
+
+[node name="Collision" type="CollisionShape3D" parent="Platform"]
+shape = SubResource("PlatformShape")
+
+[node name="Ramp15" type="CSGPolygon3D" parent="."]
+position = Vector3(-14, 0, -5.803847577293368)
+rotation_degrees = Vector3(0, 90, 0)
+polygon = PackedVector2Array(0, 0, 11.196152422706632, 3, 11.196152422706632, 0)
+depth = 6.0
+material = SubResource("Ramp")
+use_collision = true
+collision_layer = 1
+collision_mask = 0
+
+[node name="Ramp15Label" type="Label3D" parent="."]
+position = Vector3(-17, 4, -14)
+billboard = 1
+text = "15°"
+font_size = 56
+pixel_size = 0.018
+modulate = Color(1, 0.85, 0.43, 1)
+outline_size = 8
+
+[node name="Ramp25" type="CSGPolygon3D" parent="."]
+position = Vector3(1, 0, -10.566479238471324)
+rotation_degrees = Vector3(0, 90, 0)
+polygon = PackedVector2Array(0, 0, 6.433520761528676, 3, 6.433520761528676, 0)
+depth = 6.0
+material = SubResource("Ramp")
+use_collision = true
+collision_layer = 1
+collision_mask = 0
+
+[node name="Ramp25Label" type="Label3D" parent="."]
+position = Vector3(-2, 4, -14)
+billboard = 1
+text = "25°"
+font_size = 56
+pixel_size = 0.018
+modulate = Color(1, 0.85, 0.43, 1)
+outline_size = 8
+
+[node name="CorridorLeft" type="StaticBody3D" parent="."]
+position = Vector3(14, 2.5, 0)
+collision_layer = 1
+collision_mask = 0
+
+[node name="Mesh" type="MeshInstance3D" parent="CorridorLeft"]
+mesh = SubResource("CorridorLeftMesh")
+
+[node name="Collision" type="CollisionShape3D" parent="CorridorLeft"]
+shape = SubResource("CorridorLeftShape")
+
+[node name="CorridorRight" type="StaticBody3D" parent="."]
+position = Vector3(22, 2.5, 0)
+collision_layer = 1
+collision_mask = 0
+
+[node name="Mesh" type="MeshInstance3D" parent="CorridorRight"]
+mesh = SubResource("CorridorRightMesh")
+
+[node name="Collision" type="CollisionShape3D" parent="CorridorRight"]
+shape = SubResource("CorridorRightShape")
+
+[node name="Ceiling" type="StaticBody3D" parent="."]
+position = Vector3(18, 5.25, -5)
+collision_layer = 1
+collision_mask = 0
+
+[node name="Mesh" type="MeshInstance3D" parent="Ceiling"]
+mesh = SubResource("CeilingMesh")
+
+[node name="Collision" type="CollisionShape3D" parent="Ceiling"]
+shape = SubResource("CeilingShape")
+
+[node name="LowWall" type="StaticBody3D" parent="."]
+position = Vector3(-9, 0.6, 10)
+collision_layer = 1
+collision_mask = 0
+
+[node name="Mesh" type="MeshInstance3D" parent="LowWall"]
+mesh = SubResource("LowWallMesh")
+
+[node name="Collision" type="CollisionShape3D" parent="LowWall"]
+shape = SubResource("LowWallShape")
+
+[node name="PlatformLabel" type="Label3D" parent="."]
+position = Vector3(-3, 5, -22)
+billboard = 1
+text = "PLATAFORMA  /  3 m"
+font_size = 56
+pixel_size = 0.018
+modulate = Color(1, 0.85, 0.43, 1)
+outline_size = 8
+
+[node name="CorridorLabel" type="Label3D" parent="."]
+position = Vector3(18, 7, 0)
+billboard = 1
+text = "PASILLO  /  7 m"
+font_size = 56
+pixel_size = 0.018
+modulate = Color(1, 0.85, 0.43, 1)
+outline_size = 8
+
+[node name="CeilingLabel" type="Label3D" parent="."]
+position = Vector3(18, 8, -7)
+billboard = 1
+text = "TECHO  /  5 m"
+font_size = 56
+pixel_size = 0.018
+modulate = Color(1, 0.85, 0.43, 1)
+outline_size = 8
+
+[node name="LowWallLabel" type="Label3D" parent="."]
+position = Vector3(-9, 2.7, 10)
+billboard = 1
+text = "MURO  /  1.2 m"
+font_size = 56
+pixel_size = 0.018
+modulate = Color(1, 0.85, 0.43, 1)
+outline_size = 8
+
+[node name="Grid0_0" type="MeshInstance3D" parent="."]
+position = Vector3(0, 0.012, -28)
+rotation_degrees = Vector3(0, 0, 0)
+mesh = SubResource("GridLine")
+
+[node name="Grid1_0" type="MeshInstance3D" parent="."]
+position = Vector3(-28, 0.012, 0)
+rotation_degrees = Vector3(0, 90, 0)
+mesh = SubResource("GridLine")
+
+[node name="Grid0_4" type="MeshInstance3D" parent="."]
+position = Vector3(0, 0.012, -24)
+rotation_degrees = Vector3(0, 0, 0)
+mesh = SubResource("GridLine")
+
+[node name="Grid1_4" type="MeshInstance3D" parent="."]
+position = Vector3(-24, 0.012, 0)
+rotation_degrees = Vector3(0, 90, 0)
+mesh = SubResource("GridLine")
+
+[node name="Grid0_8" type="MeshInstance3D" parent="."]
+position = Vector3(0, 0.012, -20)
+rotation_degrees = Vector3(0, 0, 0)
+mesh = SubResource("GridLine")
+
+[node name="Grid1_8" type="MeshInstance3D" parent="."]
+position = Vector3(-20, 0.012, 0)
+rotation_degrees = Vector3(0, 90, 0)
+mesh = SubResource("GridLine")
+
+[node name="Grid0_12" type="MeshInstance3D" parent="."]
+position = Vector3(0, 0.012, -16)
+rotation_degrees = Vector3(0, 0, 0)
+mesh = SubResource("GridLine")
+
+[node name="Grid1_12" type="MeshInstance3D" parent="."]
+position = Vector3(-16, 0.012, 0)
+rotation_degrees = Vector3(0, 90, 0)
+mesh = SubResource("GridLine")
+
+[node name="Grid0_16" type="MeshInstance3D" parent="."]
+position = Vector3(0, 0.012, -12)
+rotation_degrees = Vector3(0, 0, 0)
+mesh = SubResource("GridLine")
+
+[node name="Grid1_16" type="MeshInstance3D" parent="."]
+position = Vector3(-12, 0.012, 0)
+rotation_degrees = Vector3(0, 90, 0)
+mesh = SubResource("GridLine")
+
+[node name="Grid0_20" type="MeshInstance3D" parent="."]
+position = Vector3(0, 0.012, -8)
+rotation_degrees = Vector3(0, 0, 0)
+mesh = SubResource("GridLine")
+
+[node name="Grid1_20" type="MeshInstance3D" parent="."]
+position = Vector3(-8, 0.012, 0)
+rotation_degrees = Vector3(0, 90, 0)
+mesh = SubResource("GridLine")
+
+[node name="Grid0_24" type="MeshInstance3D" parent="."]
+position = Vector3(0, 0.012, -4)
+rotation_degrees = Vector3(0, 0, 0)
+mesh = SubResource("GridLine")
+
+[node name="Grid1_24" type="MeshInstance3D" parent="."]
+position = Vector3(-4, 0.012, 0)
+rotation_degrees = Vector3(0, 90, 0)
+mesh = SubResource("GridLine")
+
+[node name="Grid0_28" type="MeshInstance3D" parent="."]
+position = Vector3(0, 0.012, 0)
+rotation_degrees = Vector3(0, 0, 0)
+mesh = SubResource("GridLine")
+
+[node name="Grid1_28" type="MeshInstance3D" parent="."]
+position = Vector3(0, 0.012, 0)
+rotation_degrees = Vector3(0, 90, 0)
+mesh = SubResource("GridLine")
+
+[node name="Grid0_32" type="MeshInstance3D" parent="."]
+position = Vector3(0, 0.012, 4)
+rotation_degrees = Vector3(0, 0, 0)
+mesh = SubResource("GridLine")
+
+[node name="Grid1_32" type="MeshInstance3D" parent="."]
+position = Vector3(4, 0.012, 0)
+rotation_degrees = Vector3(0, 90, 0)
+mesh = SubResource("GridLine")
+
+[node name="Grid0_36" type="MeshInstance3D" parent="."]
+position = Vector3(0, 0.012, 8)
+rotation_degrees = Vector3(0, 0, 0)
+mesh = SubResource("GridLine")
+
+[node name="Grid1_36" type="MeshInstance3D" parent="."]
+position = Vector3(8, 0.012, 0)
+rotation_degrees = Vector3(0, 90, 0)
+mesh = SubResource("GridLine")
+
+[node name="Grid0_40" type="MeshInstance3D" parent="."]
+position = Vector3(0, 0.012, 12)
+rotation_degrees = Vector3(0, 0, 0)
+mesh = SubResource("GridLine")
+
+[node name="Grid1_40" type="MeshInstance3D" parent="."]
+position = Vector3(12, 0.012, 0)
+rotation_degrees = Vector3(0, 90, 0)
+mesh = SubResource("GridLine")
+
+[node name="Grid0_44" type="MeshInstance3D" parent="."]
+position = Vector3(0, 0.012, 16)
+rotation_degrees = Vector3(0, 0, 0)
+mesh = SubResource("GridLine")
+
+[node name="Grid1_44" type="MeshInstance3D" parent="."]
+position = Vector3(16, 0.012, 0)
+rotation_degrees = Vector3(0, 90, 0)
+mesh = SubResource("GridLine")
+
+[node name="Grid0_48" type="MeshInstance3D" parent="."]
+position = Vector3(0, 0.012, 20)
+rotation_degrees = Vector3(0, 0, 0)
+mesh = SubResource("GridLine")
+
+[node name="Grid1_48" type="MeshInstance3D" parent="."]
+position = Vector3(20, 0.012, 0)
+rotation_degrees = Vector3(0, 90, 0)
+mesh = SubResource("GridLine")
+
+[node name="Grid0_52" type="MeshInstance3D" parent="."]
+position = Vector3(0, 0.012, 24)
+rotation_degrees = Vector3(0, 0, 0)
+mesh = SubResource("GridLine")
+
+[node name="Grid1_52" type="MeshInstance3D" parent="."]
+position = Vector3(24, 0.012, 0)
+rotation_degrees = Vector3(0, 90, 0)
+mesh = SubResource("GridLine")
+
+[node name="Grid0_56" type="MeshInstance3D" parent="."]
+position = Vector3(0, 0.012, 28)
+rotation_degrees = Vector3(0, 0, 0)
+mesh = SubResource("GridLine")
+
+[node name="Grid1_56" type="MeshInstance3D" parent="."]
+position = Vector3(28, 0.012, 0)
+rotation_degrees = Vector3(0, 90, 0)
+mesh = SubResource("GridLine")
+
+[node name="Overlay" type="CanvasLayer" parent="."]
+
+[node name="Title" type="Label" parent="Overlay"]
+offset_left = 28.0
+offset_top = 24.0
+theme_override_colors/font_color = Color(0.98, 0.79, 0.36, 1)
+theme_override_font_sizes/font_size = 30
+text = "PURGA   /   CAMPO DE PRUEBAS"
+
+[node name="Subtitle" type="Label" parent="Overlay"]
+offset_left = 30.0
+offset_top = 65.0
+theme_override_font_sizes/font_size = 16
+text = "M0 · GREYBOX     /     60 × 60 m     /     SIN GAMEPLAY"
+
+[node name="Help" type="Label" parent="Overlay"]
+offset_left = 30.0
+offset_top = 100.0
+theme_override_colors/font_color = Color(0.7, 0.77, 0.82, 1)
+theme_override_font_sizes/font_size = 14
+text = "← → Orbitar     ·     Rueda: zoom     ·     Inicio: restablecer"

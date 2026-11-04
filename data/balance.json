@@ -79,6 +79,7 @@
       "unlock_domain": 1,
       "damage": 40,
       "lock_time_s": 0.6,
+      "lock_reference_weapons": 3,
       "lock_time_per_weapon_point_s": -0.05,
       "lock_half_angle_deg": 20,
       "lock_range_m": 70,
