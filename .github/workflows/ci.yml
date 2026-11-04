@@ -1,0 +1,37 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  data:
+    name: Validar datos de balance
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: python3 scripts/validate_data.py
+
+  gdscript:
+    name: Lint GDScript
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: pip install "gdtoolkit==4.*"
+      - name: gdlint
+        run: |
+          if find game -name '*.gd' 2>/dev/null | grep -q .; then
+            gdlint $(find game -name '*.gd')
+          else
+            echo "Aún no hay scripts GDScript (pre-M0)."
+          fi
+
+  # Los tests GUT headless se habilitan en PUR-004, cuando exista game/project.godot
+  # y se fije la versión de Godot del proyecto.

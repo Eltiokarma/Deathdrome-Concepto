@@ -1,0 +1,27 @@
+{
+  "_meta": {
+    "schema": 1,
+    "stat_total": 12,
+    "docs": "docs/03_RUNNERS.md"
+  },
+  "formulas": {
+    "max_speed_mps": { "base": 16.0, "per_point": 2.5, "stat": "speed" },
+    "accel_time_s": { "base": 2.6, "per_point": -0.2, "stat": "speed" },
+    "max_integrity": { "base": 55, "per_point": 15, "stat": "armor" },
+    "mass": { "base": 0.8, "per_point": 0.1, "stat": "armor" },
+    "turn_rate_deg_s": { "base": 70, "per_point": 20, "stat": "handling" },
+    "lateral_grip": { "base": 0.70, "per_point": 0.06, "stat": "handling" },
+    "laser_mult": { "base": 0.85, "per_point": 0.05, "stat": "weapons" },
+    "barrier_energy": { "base": 80, "per_point": 10, "stat": "weapons" }
+  },
+  "runners": [
+    { "id": "puma",    "name": "Puma",    "meaning": "puma",              "speed": 4, "armor": 2, "handling": 4, "weapons": 2, "color": "#FF8A1F", "unlock": "start" },
+    { "id": "kuntur",  "name": "Kuntur",  "meaning": "cóndor",            "speed": 5, "armor": 2, "handling": 3, "weapons": 2, "color": "#E8EEF2", "unlock": "domain_4" },
+    { "id": "chikchi", "name": "Chikchi", "meaning": "granizo",           "speed": 2, "armor": 4, "handling": 2, "weapons": 4, "color": "#5EC8FF", "unlock": "start" },
+    { "id": "lloqlla", "name": "Lloqlla", "meaning": "huaico",            "speed": 2, "armor": 5, "handling": 2, "weapons": 3, "color": "#A0673A", "unlock": "domain_2" },
+    { "id": "illapa",  "name": "Illapa",  "meaning": "rayo",              "speed": 3, "armor": 2, "handling": 3, "weapons": 4, "color": "#FFE135", "unlock": "domain_6" },
+    { "id": "wikuna",  "name": "Wik'uña", "meaning": "vicuña",            "speed": 3, "armor": 3, "handling": 5, "weapons": 1, "color": "#3DDC68", "unlock": "start" },
+    { "id": "supay",   "name": "Supay",   "meaning": "demonio andino",    "speed": 4, "armor": 3, "handling": 2, "weapons": 3, "color": "#FF3B3B", "unlock": "domain_8" },
+    { "id": "amaru",   "name": "Amaru",   "meaning": "serpiente sagrada", "speed": 3, "armor": 3, "handling": 3, "weapons": 3, "color": "#E040FB", "unlock": "start" }
+  ]
+}

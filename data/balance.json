@@ -1,0 +1,185 @@
+{
+  "_meta": {
+    "schema": 1,
+    "units": "m, s, PI (puntos de integridad)",
+    "docs": "docs/02_COMBATE_Y_BALANCE.md"
+  },
+  "round": {
+    "duration_s": 300,
+    "intro_s": 4,
+    "quota_formula": "min(base + floor((domain - 1) / 2) + (round - 1), max)",
+    "quota_base": 2,
+    "quota_max": 7,
+    "open_areas_by_round": [[1, 2], [1, 2, 3], [1, 2, 3, 4]],
+    "hub_safe_mode": "always",
+    "hub_safe_round_start_s": 10,
+    "warning_at_s": 30,
+    "clock_yellow_at_s": 60
+  },
+  "purge": {
+    "speed_mps": 3.5,
+    "domain_8_speed_mult": 1.5,
+    "hub_close_s": 10,
+    "lethal": true,
+    "respawn_allowed": false
+  },
+  "respawn": {
+    "delay_s": 4.0,
+    "mercy_kill_extra_s": 2.0,
+    "spawn_shield_s": 3.0,
+    "spawn_shield_breaks_on_fire": true,
+    "keep_secondaries": false
+  },
+  "death": {
+    "pyre_s": 6.0,
+    "pilot_window_s": 2.5,
+    "pilot_integrity": 10,
+    "pilot_speed_mps": 6.0
+  },
+  "attribution": {
+    "last_damage_window_s": 5.0
+  },
+  "damage": {
+    "directional": {
+      "front_half_angle_deg": 45,
+      "rear_half_angle_deg": 45,
+      "front_mult": 0.7,
+      "side_mult": 1.0,
+      "rear_mult": 1.2
+    }
+  },
+  "movement": {
+    "jump_apex_m": 2.5,
+    "jump_cooldown_s": 1.2,
+    "air_control": 0.2,
+    "wall_hit_speed_loss": 0.6
+  },
+  "weapons": {
+    "laser": {
+      "fire_rate_hz": 8,
+      "damage_per_shot": 1.5,
+      "range_m": 60,
+      "autoaim_half_angle_deg": 15,
+      "ramp_max_mult": 2.0,
+      "ramp_time_s": 2.0,
+      "ramp_reset_s": 0.4
+    },
+    "barrier": {
+      "energy_formula": "base + per_weapon_point * weapons",
+      "energy_base": 80,
+      "energy_per_weapon_point": 10,
+      "drain_per_s": 30,
+      "regen_per_s": 10,
+      "regen_delay_s": 1.5,
+      "segment_lifetime_s": 3.5,
+      "segment_height_m": 1.2,
+      "lethal": true
+    },
+    "missile": {
+      "unlock_domain": 1,
+      "damage": 40,
+      "lock_time_s": 0.6,
+      "lock_time_per_weapon_point_s": -0.05,
+      "lock_half_angle_deg": 20,
+      "lock_range_m": 70,
+      "speed_mps": 32,
+      "turn_rate_deg_s": 90,
+      "lifetime_s": 4.0
+    },
+    "shockwave": {
+      "unlock_domain": 2,
+      "damage_center": 50,
+      "damage_edge": 15,
+      "radius_m": 10,
+      "height_m": 1.6,
+      "requires_los": true
+    },
+    "ram": {
+      "unlock_domain": 3,
+      "damage": 60,
+      "self_damage": 5,
+      "lock_time_s": 0.3,
+      "lock_range_m": 25,
+      "dash_s": 1.0,
+      "dash_speed_mult": 2.2,
+      "miss_slow_s": 1.5
+    },
+    "drainer": {
+      "unlock_domain": 4,
+      "damage_per_s": 6,
+      "duration_s": 5,
+      "drains_barrier": true,
+      "barrier_block_s": 5,
+      "speed_mps": 40,
+      "range_m": 50
+    },
+    "ion_whip": {
+      "unlock_domain": 6,
+      "damage": 20,
+      "range_m": 15,
+      "stun_s": 1.5,
+      "stun_immunity_s": 3.0
+    }
+  },
+  "inventory": {
+    "secondary_slots": 3,
+    "allow_duplicates": true,
+    "weapon_pickup_respawn_s": 20
+  },
+  "items": {
+    "health_orb": { "unlock_domain": 1, "heal": 35, "respawn_s": 25 },
+    "life_credit": { "unlock_domain": 1, "amount": 1, "respawn": false },
+    "key": { "unlock_domain": 2, "colors": ["red", "green", "blue"], "respawn": false },
+    "armor_shell": { "unlock_domain": 5, "duration_s": 5, "status_immune": true, "respawn_s": 45 },
+    "cloak": { "unlock_domain": 7, "duration_s": 6, "reveal_distance_m": 10, "breaks_on_fire": true, "respawn_s": 45 }
+  },
+  "hazards": {
+    "fusion_tower": {
+      "damage_center": 70,
+      "damage_edge": 25,
+      "radius_m": 8,
+      "height_m": 1.6,
+      "requires_los": true,
+      "recharge_s": 25,
+      "chain_delay_s": 0.15
+    },
+    "magma": { "damage_per_s": 20 },
+    "ice": { "grip_mult": 0.6 }
+  },
+  "campaign": {
+    "start_credits": 3,
+    "max_credits": 9,
+    "credit_cost_round_failed": 1
+  },
+  "score": {
+    "kill": 1000,
+    "first_blood": 300,
+    "barrier_kill_bonus": 250,
+    "tower_kill_bonus": 250,
+    "mercy_kill": 500,
+    "round_clear": 2000,
+    "time_left_per_s": 10,
+    "purge_escape_bonus": 1000,
+    "suicide": -250
+  },
+  "ai": {
+    "think_hz": 30,
+    "vision_half_angle_deg": 70,
+    "vision_range_m": 60,
+    "hearing_range_m": 25,
+    "memory_s": 4,
+    "max_bots_targeting_player": 2,
+    "mercy_assist_deaths_without_kill": 3,
+    "difficulty": {
+      "1": { "reaction_s": 0.60, "aim_error_deg": 18, "dodge_chance": 0.20, "aggression": 0.3, "tactics": [] },
+      "2": { "reaction_s": 0.45, "aim_error_deg": 12, "dodge_chance": 0.35, "aggression": 0.4, "tactics": ["flank"] },
+      "3": { "reaction_s": 0.35, "aim_error_deg": 8, "dodge_chance": 0.50, "aggression": 0.5, "tactics": ["flank", "tower", "barrier"] },
+      "4": { "reaction_s": 0.25, "aim_error_deg": 5, "dodge_chance": 0.65, "aggression": 0.6, "tactics": ["flank", "tower", "barrier", "ram", "whip_combo"] },
+      "5": { "reaction_s": 0.18, "aim_error_deg": 3, "dodge_chance": 0.80, "aggression": 0.7, "tactics": ["flank", "tower", "barrier", "ram", "whip_combo", "tower_jump"] }
+    },
+    "difficulty_by_domain": {
+      "1": [1, 2], "2": [1, 2], "3": [2, 3], "4": [2, 3],
+      "5": [3, 4], "6": [3, 4], "7": [4, 5], "8": [4, 5]
+    }
+  }
+}

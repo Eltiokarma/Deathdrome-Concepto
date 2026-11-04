@@ -1,0 +1,28 @@
+# Godot
+.godot/
+.import/
+*.translation
+export_presets.cfg
+/build/
+/exports/
+
+# Mono (por si acaso)
+.mono/
+data_*/
+mono_crash.*.json
+
+# Sistema / editores
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+*.swp
+
+# Python
+__pycache__/
+*.pyc
+
+# Archivos del juego original: NUNCA en el repo (reglas clean-room)
+*.iso
+*.nrg
+ddrome*

@@ -1,0 +1,11 @@
+# Normaliza finales de línea
+* text=auto eol=lf
+*.bat text eol=crlf
+
+# Binarios
+*.png binary
+*.jpg binary
+*.ogg binary
+*.wav binary
+*.glb binary
+*.blend binary
