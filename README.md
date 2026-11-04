@@ -4,9 +4,9 @@
 
 **PURGA** (nombre de trabajo) es un juego de combate en arena en tercera persona, inspirado en el diseño de *DeathDrome* (Zipper Interactive, 1996). Es una obra **original**: reimplementamos ideas de diseño, no código, arte, nombres ni música del juego original. Ver [Reglas clean-room](CONTRIBUTING.md#reglas-clean-room).
 
-- **Motor:** Godot 4.x (GDScript), renderer *Compatibility* para correr en GPUs integradas.
+- **Motor:** Godot **4.6.3.stable**, edición estándar (GDScript), renderer *Compatibility* para correr en GPUs integradas.
 - **Plataforma objetivo:** PC (Windows / Linux). Multijugador LAN en una fase posterior.
-- **Estado:** pre-producción. La documentación está completa; el código arranca en el milestone M0.
+- **Estado:** pre-producción. Base documental y estructura Godot disponibles (PUR-001); gameplay pendiente.
 
 ---
 
@@ -44,7 +44,16 @@ Antes de comenzar una tarea, consultar [el relevo de trabajo](docs/10_RELEVO.md)
 ```bash
 git clone https://github.com/Eltiokarma/Deathdrome-Concepto.git
 cd Deathdrome-Concepto
-# Abrir game/project.godot con Godot 4.x (a partir de M0)
+godot --editor --path game
+```
+
+Usar Godot **4.6.3.stable**. Comprobar con `godot --version`. El proyecto abre en el editor; todavía no tiene escena principal para ejecutar con F6/F5. La arena de prueba corresponde a PUR-005.
+
+Comprobación de apertura sin interfaz:
+
+```bash
+godot --headless --editor --path game --quit
+python3 scripts/validate_data.py
 ```
 
 1. Lee [CONTRIBUTING.md](CONTRIBUTING.md).

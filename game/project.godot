@@ -1,0 +1,22 @@
+; PURGA — Godot 4.6.3.stable (standard, GDScript).
+; Edit project settings through the Godot editor.
+config_version=5
+
+[application]
+config/name="PURGA"
+config/features=PackedStringArray("4.6", "GL Compatibility")
+
+[layer_names]
+3d_physics/layer_1="world"
+3d_physics/layer_2="runner"
+3d_physics/layer_3="projectile"
+3d_physics/layer_4="pickup"
+3d_physics/layer_5="hazard"
+3d_physics/layer_6="barrier"
+3d_physics/layer_7="trigger"
+3d_physics/layer_8="purge"
+3d_physics/layer_9="pilot"
+
+[rendering]
+renderer/rendering_method="gl_compatibility"
+renderer/rendering_method.mobile="gl_compatibility"

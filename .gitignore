@@ -5,6 +5,8 @@
 export_presets.cfg
 /build/
 /exports/
+/game/build/
+/game/exports/
 
 # Mono (por si acaso)
 .mono/

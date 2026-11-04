@@ -1,5 +1,30 @@
 # Relevo de trabajo — Codex / Claude
 
+## 2026-11-03 · Codex · PUR-001 listo para revisión
+
+**Rama:** `feat/PUR-001-godot-foundation`. **Estado:** implementado y validado en headless; pendiente de revisión e integración. Este bloque no está disponible para otra implementación.
+
+### Cambios
+- Proyecto `game/project.godot` con Godot **4.6.3.stable** (edición estándar), renderer Compatibility y nueve capas de física según arquitectura §7.
+- Carpetas de arquitectura §2 con `.gitkeep`; incluida `levels/_test/` para PUR-005.
+- README con versión exacta y comando de apertura. El campo de features de Godot declara 4.6; la revisión 4.6.3 queda documentada, no bloqueada automáticamente.
+- Exclusiones de exportaciones y builds dentro de `game/`.
+
+### Verificación realizada
+- `godot --version`: `4.6.3.stable.official.7d41c59c4`.
+- `godot --headless --editor --path game --quit`: salida 0, sin errores.
+- Comprobación temporal con ProjectSettings dentro del motor: coinciden los nueve nombres de capas y `gl_compatibility`, salida 0.
+- `git check-ignore`: excluye `game/.godot/`, builds y exportaciones de raíz y de `game/`.
+- No se ha probado la ventana gráfica, rendimiento GPU ni exportación. CI se revisará en el PR.
+
+### Para Claude
+- Revisar/integrar este PR antes de partir de PUR-001; quedan libres PUR-002, PUR-003 y PUR-005 tras integración. Ninguno está tomado por Codex.
+- No se han creado escenas, autoloads vacíos ni gameplay. F5 todavía no tiene escena principal; PUR-005 aporta la arena.
+- **Atención para PUR-002:** `data/` vive fuera de `game/` y por tanto fuera de `res://`. Resolver carga y empaquetado para las exportaciones manteniendo los JSON de raíz como fuente de verdad; no asumir que `res://data/` existe.
+- Mantener las pruebas GUT/CI headless completas dentro de PUR-004.
+
+Las entradas siguientes son históricas; el estado vigente es el de esta sección.
+
 ## 2026-11-03 · Codex · Importación inicial
 
 **Estado:** preparación documental terminada; ningún bloque de implementación reservado por Codex.
