@@ -1,7 +1,7 @@
 extends Camera3D
 ## Cámara de inspección del greybox; no es la cámara de Runner de PUR-014.
 
-var _distance: float = 77.0
+var _distance: float = 85.0
 var _angle: float = 0.73
 
 
@@ -21,7 +21,7 @@ func _unhandled_input(event: InputEvent) -> void:
 		elif event.button_index == MOUSE_BUTTON_WHEEL_DOWN:
 			_distance = minf(110.0, _distance + 4.0)
 	elif event is InputEventKey and event.pressed and event.keycode == KEY_HOME:
-		_distance = 77.0
+		_distance = 85.0
 		_angle = 0.73
 
 

@@ -86,7 +86,7 @@ albedo_color = Color(0.28, 0.33, 0.37, 1)
 shading_mode = 0
 
 [sub_resource type="BoxMesh" id="GridLine"]
-size = Vector3(60, 0.01, 0.025)
+size = Vector3(60, 0.01, 0.1)
 material = SubResource("Grid")
 
 [node name="TestArena" type="Node3D"]
@@ -164,8 +164,8 @@ collision_mask = 0
 position = Vector3(-17, 4, -14)
 billboard = 1
 text = "15°"
-font_size = 56
-pixel_size = 0.018
+font_size = 64
+pixel_size = 0.03
 modulate = Color(1, 0.85, 0.43, 1)
 outline_size = 8
 
@@ -183,8 +183,8 @@ collision_mask = 0
 position = Vector3(-2, 4, -14)
 billboard = 1
 text = "25°"
-font_size = 56
-pixel_size = 0.018
+font_size = 64
+pixel_size = 0.03
 modulate = Color(1, 0.85, 0.43, 1)
 outline_size = 8
 
@@ -236,8 +236,8 @@ shape = SubResource("LowWallShape")
 position = Vector3(-3, 5, -22)
 billboard = 1
 text = "PLATAFORMA  /  3 m"
-font_size = 56
-pixel_size = 0.018
+font_size = 64
+pixel_size = 0.03
 modulate = Color(1, 0.85, 0.43, 1)
 outline_size = 8
 
@@ -245,8 +245,8 @@ outline_size = 8
 position = Vector3(18, 7, 0)
 billboard = 1
 text = "PASILLO  /  7 m"
-font_size = 56
-pixel_size = 0.018
+font_size = 64
+pixel_size = 0.03
 modulate = Color(1, 0.85, 0.43, 1)
 outline_size = 8
 
@@ -254,8 +254,8 @@ outline_size = 8
 position = Vector3(18, 8, -7)
 billboard = 1
 text = "TECHO  /  5 m"
-font_size = 56
-pixel_size = 0.018
+font_size = 64
+pixel_size = 0.03
 modulate = Color(1, 0.85, 0.43, 1)
 outline_size = 8
 
@@ -263,8 +263,8 @@ outline_size = 8
 position = Vector3(-9, 2.7, 10)
 billboard = 1
 text = "MURO  /  1.2 m"
-font_size = 56
-pixel_size = 0.018
+font_size = 64
+pixel_size = 0.03
 modulate = Color(1, 0.85, 0.43, 1)
 outline_size = 8
 
