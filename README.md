@@ -1,0 +1,60 @@
+# PURGA
+
+> Combate vehicular en arenas-prisión. Ocho convictos, motos armadas, una cuota de muertes y un reloj que, al llegar a cero, no termina la partida: **te persigue**.
+
+**PURGA** (nombre de trabajo) es un juego de combate en arena en tercera persona, inspirado en el diseño de *DeathDrome* (Zipper Interactive, 1996). Es una obra **original**: reimplementamos ideas de diseño, no código, arte, nombres ni música del juego original. Ver [Reglas clean-room](CONTRIBUTING.md#reglas-clean-room).
+
+- **Motor:** Godot 4.x (GDScript), renderer *Compatibility* para correr en GPUs integradas.
+- **Plataforma objetivo:** PC (Windows / Linux). Multijugador LAN en una fase posterior.
+- **Estado:** pre-producción. La documentación está completa; el código arranca en el milestone M0.
+
+---
+
+## El juego en 30 segundos
+
+1. Ocho Runners amanecen en el **Área 0** (el hub central), una zona franca donde nadie puede disparar.
+2. Suena la sirena y todos salen a las salas laterales (Áreas 1–4) a buscar armas.
+3. Cada ronda exige una **cuota de kills** (empieza en 2 y sube).
+4. Al cumplirla, el estado cambia a **ADVANCE**: vuelves al Área 0 y entras al **portal de escape**. La moto sube por un túnel vertical y escapas.
+5. Si el reloj llega a 0 empieza la **Purga**: un muro de rayos que avanza desde los bordes hacia el centro y mata todo lo que toca.
+
+## Documentación
+
+| Doc | Para quién | Contenido |
+|---|---|---|
+| [00 · Investigación](docs/00_INVESTIGACION.md) | Todos | Qué sabemos del original, fuentes, incógnitas |
+| [01 · GDD](docs/01_GDD.md) | Todos | Visión, loop, flujo de pantallas, decisiones de diseño, glosario |
+| [02 · Combate y balance](docs/02_COMBATE_Y_BALANCE.md) | Gameplay | Todas las armas, daños, TTK, puntaje, reglas de daño |
+| [03 · Runners](docs/03_RUNNERS.md) | Gameplay / Arte | Los 8 vehículos, stats y fórmulas |
+| [04 · Dominios y niveles](docs/04_DOMINIOS_Y_NIVELES.md) | Level design | Métricas, estructura de áreas, los 8 Dominios |
+| [05 · HUD y UI](docs/05_HUD_Y_UI.md) | UI | Cada elemento del HUD, menús, mensajes |
+| [06 · IA](docs/06_IA.md) | Gameplay | Máquina de estados de los bots, dificultad |
+| [07 · Arquitectura](docs/07_ARQUITECTURA.md) | Programación | Estructura Godot, autoloads, componentes, señales, capas |
+| [08 · Roadmap](docs/08_ROADMAP.md) | Todos | Milestones e issues con criterios de aceptación |
+| [09 · Arte y audio](docs/09_ARTE_Y_AUDIO.md) | Arte / Audio | Guía de estilo, paletas, presupuesto poligonal |
+
+Los números de balance viven en [`data/balance.json`](data/balance.json) y [`data/runners.json`](data/runners.json). **Los docs explican; el JSON manda.** Si hay discrepancia, gana el JSON y se abre un issue para corregir el doc.
+
+## Coordinación
+
+Antes de comenzar una tarea, consultar [el relevo de trabajo](docs/10_RELEVO.md) y actualizar allí el bloque que se toma.
+
+## Empezar a contribuir
+
+```bash
+git clone https://github.com/Eltiokarma/Deathdrome-Concepto.git
+cd Deathdrome-Concepto
+# Abrir game/project.godot con Godot 4.x (a partir de M0)
+```
+
+1. Lee [CONTRIBUTING.md](CONTRIBUTING.md).
+2. Elige un issue con la etiqueta `good first issue` del milestone activo ([Roadmap](docs/08_ROADMAP.md)).
+3. Rama `feat/<id-issue>-descripcion`, PR contra `main`.
+
+Para sembrar milestones, etiquetas e issues en un repo nuevo: `scripts/seed_github.sh` (requiere `gh` autenticado).
+
+## Licencia
+
+Código bajo [MIT](LICENSE). Los assets originales del proyecto (modelos, texturas, audio) se licencian aparte en `game/assets/LICENSE-ASSETS.md` cuando existan.
+
+*DeathDrome* es marca y obra de sus respectivos titulares. Este proyecto no está afiliado ni respaldado por ellos.
