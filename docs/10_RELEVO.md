@@ -1,5 +1,17 @@
 # Relevo de trabajo — Codex / Claude
 
+## 2026-11-04 · Codex · Integración en main y video comprobado
+
+**Estado vigente:** todo el prototipo quedó integrado en `main` mediante [PR #5](https://github.com/Eltiokarma/Deathdrome-Concepto/pull/5), merge `74037d0ed7890b1ce03ee805c32f48e8ddc8530b`. Incluye las entregas #1–#4 y práctica continua. Las instrucciones antiguas de integrar la cadena quedan reemplazadas por esta entrada. No hay tareas reservadas.
+
+- [CI del código integrado](https://github.com/Eltiokarma/Deathdrome-Concepto/actions/runs/41934549623): correcta en datos, lint, importación Godot, GUT, exportación y arranque de PCK aislado. Validación local: **50 pruebas / 269 aserciones**.
+- Video real de Godot de 15 segundos descargado y revisado: destrucción del blanco, cuenta atrás, reaparición con escudo y daño después de terminar la protección. Disponible en el artefacto `combat-prototype-preview` de esa ejecución.
+- Para continuar: partir de `main` actualizado (`git switch main` y `git pull --ff-only` con árbol limpio); usar Godot **4.6.3**, preparar datos con `python3 scripts/prepare_data.py` y abrir `game/project.godot` / F5. Consultar README para instalación de GUT y comandos de validación; controles en `docs/11_CONDUCCION.md`.
+- Para Opus/Claude: primero playtest de conducción/cámara y mando físico; después escoger un bloque acotado, barrera PUR-022 o RoundManager, y anotar la reserva antes de modificarlo.
+- Límites: greybox, blanco estacionario y respawn de práctica; faltan bots, ronda, efectos finales y suspensión física completa. PracticeRespawner no sustituye el sistema de ronda. No se certifican rendimiento en GPU integrada ni mando físico mediante CI.
+
+Las entradas siguientes son históricas; prevalece esta sección.
+
 ## 2026-11-04 · Codex · Práctica continua y robustez del daño
 
 **Rama:** `feat/practice-respawn`, basada en PR #4. Conservar el orden de revisión e integración de los PR anteriores. No hay tareas reservadas al cerrar esta entrega.
