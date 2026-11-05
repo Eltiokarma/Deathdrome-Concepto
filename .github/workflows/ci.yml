@@ -62,6 +62,7 @@ jobs:
           xvfb-run -a godot --path game --audio-driver Dummy --fixed-fps 30 --write-movie "$RUNNER_TEMP/arena-preview/driving.avi" --quit-after 180 -- --driving-preview
           xvfb-run -a godot --path game --audio-driver Dummy --fixed-fps 30 --write-movie "$RUNNER_TEMP/arena-preview/combat.avi" --quit-after 450 -- --combat-preview
           xvfb-run -a godot --path game --scene res://levels/_test/round_sandbox.tscn --audio-driver Dummy --fixed-fps 30 --write-movie "$RUNNER_TEMP/arena-preview/round.avi" --quit-after 1050 -- --combat-preview --portal-preview
+          xvfb-run -a godot --path game --audio-driver Dummy --fixed-fps 30 --write-movie "$RUNNER_TEMP/arena-preview/barrier.avi" --quit-after 300 -- --barrier-preview
       - uses: actions/upload-artifact@v4
         with:
           name: combat-prototype-preview

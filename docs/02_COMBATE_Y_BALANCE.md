@@ -106,6 +106,8 @@ La tabla anterior es continua. A 8 Hz, un impacto se resuelve cada 0,125 s; el p
 | Restricción | Deshabilitada en el Área 0; los segmentos que entren al Área 0 se disipan |
 | Bonus | +250 puntos por kill con barrera |
 
+Parámetros técnicos de la estela de prototipo: `segment_width_m=0.12`, `sample_interval_s=0.05`, `pool_size=96`, `rear_offset_m=1.2`, `max_gap_m=6`. La reserva no reemplaza segmentos vivos si se satura. La muestra conserva el resto temporal, con una emisión máxima por paso de física. El corte de continuidad evita unir teletransportes. En zona franca se disipa el segmento completo; en pendientes su caja cubre también el desnivel entre extremos.
+
 ## 5. Secundarias
 
 Tres slots. Cada pickup llena un slot libre (se pueden repetir). Con los 3 llenos no recoges más. Ciclas con Q/E y disparas con el botón secundario.

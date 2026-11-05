@@ -6,6 +6,8 @@ const RUNNERS: Array[StringName] = [
 ]
 const SPAWN := Vector3(-17, 0.1, 15)
 
+var _barrier_preview: bool = false
+var _barrier_time: float = 0.0
 var _combat_preview: bool = false
 var _kills: int = 0
 
@@ -24,6 +26,13 @@ func _ready() -> void:
 	target.controller = null
 	target.get_node("RunnerCamera").set_physics_process(false)
 	EventBus.runner_destroyed.connect(_on_destroyed)
+	_barrier_preview = "--barrier-preview" in OS.get_cmdline_user_args()
+	if _barrier_preview:
+		runner.controller = null
+		runner.input_frame.throttle = 0.35
+		runner.input_frame.barrier = true
+		runner.input_frame.look_back = true
+		target.reset_at(Vector3(-17, 0.1, 23))
 	_combat_preview = "--combat-preview" in OS.get_cmdline_user_args()
 	if _combat_preview:
 		runner.controller = null
@@ -43,6 +52,10 @@ func _ready() -> void:
 
 
 func _physics_process(_delta: float) -> void:
+	if _barrier_preview and not get_tree().paused:
+		_barrier_time += _delta
+		target.input_frame.throttle = 1.0 if _barrier_time > 1.0 else 0.0
+		runner.input_frame.barrier = _barrier_time < 3.0
 	if _preview and not get_tree().paused:
 		_preview_tick += 1
 		runner.input_frame.jump = _preview_tick == 160
@@ -67,6 +80,8 @@ func _process(_delta: float) -> void:
 	elif target.health.spawn_shield_s > 0.0:
 		respawn_text = "ESCUDO DEL BLANCO: %.1f s" % target.health.spawn_shield_s
 	$UI/RespawnStatus.text = respawn_text
+	$UI/BarrierStatus.text = "BARRERA %.0f / %.0f · Mantener L / Ctrl / X del mando" % [
+		runner.barrier.energy, runner.stats.barrier_energy]
 	stats_label.visible = _show_stats
 	stats_label.text = (
 		"Vel. máx.: %.1f m/s  |  Aceleración: %.1f s\n"
