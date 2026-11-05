@@ -1,5 +1,11 @@
 # Relevo de trabajo — Codex / Claude
 
+## 2026-11-05 · Propuesta de plano PUR-070 preparada por Codex
+
+Para reducir trabajo de Claude se añadió [ficha del Penal Altiplano](dominios/01_penal_altiplano.md) y plano SVG de implantación. Incluye dimensiones, conexiones, aperturas por ronda, reservas de contenido, tiempos ideales y contrato propuesto de Purga. No cambia código ni balance.
+
+**La recomendación anterior de empezar el plano desde cero queda sustituida:** Claude debe revisar esta propuesta, concretar interiores/deflectores y pasar al blockout por entregas. PUR-070 queda como propuesta documental pendiente de aprobación de diseño; no confundir el plano con geometría validada. No hay tareas reservadas. Revisión documental de medidas y enlaces; no se repite la suite del juego por esta entrega documental.
+
 ## 2026-11-05 · Pendientes vigentes y guía para Claude
 
 **Punto de partida:** `main` en `79d5890744e576b9fa424a55e7b30ab3c7389005`, PR #12 integrado. Esta lista sustituye las recomendaciones de “siguiente bloque” de las entradas históricas inferiores. Es un inventario de implementación y validación, no una declaración de cierre de todos los criterios del roadmap.
