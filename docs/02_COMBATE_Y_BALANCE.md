@@ -219,3 +219,8 @@ El puntaje se acumula entre rondas y Dominios.
 2. **Mide antes de opinar.** El modo debug (F3) muestra DPS, rampa del láser y TTK real por duelo; el log de partida (`user://logs/match_*.csv`) registra cada impacto.
 3. **Un cambio por PR**, con etiqueta `balance` y el antes/después de las métricas del punto 1.
 4. Si un valor del JSON cambia, actualiza la tabla correspondiente de este doc en el mismo PR.
+
+
+### Parámetros del ascenso de prototipo
+
+`portal.ascent_s = 3` conserva la duración del GDD. `portal.ascent_height_m = 12` define únicamente el recorrido visual de ensayo. El tiempo restante de salida se captura al entrar al portal, antes del ascenso.

@@ -1,5 +1,19 @@
 # Relevo de trabajo — Codex / Claude
 
+## 2026-11-04 · Codex · Portal selectivo y ascenso de ensayo (PUR-033)
+
+Rama `feat/round-portal` desde main, después de PR #7 integrado. Portal en `(0, 0, 15)`, a la derecha del punto de inicio de F7; podio de Ø 10 m, anillo del color del jugador cuando cumple cuota.
+
+- Cada Runner con cuota recibe una excepción de colisión propia; los demás siguen bloqueados. Solo PLAYING/PURGE y Runners vivos pueden entrar.
+- Entrada real por Area3D: bloquea control, apaga láser y retira al Runner de los blancos. Ascenso de 3 s por túnel octogonal con cámara inferior y fundido; emite una sola vez `runner_escaped` con el reloj capturado al entrar.
+- En este ensayo, la salida del jugador termina en RESULTS. Enter reinicia en la ronda siguiente; se restauran grupo, colisión y cámara, y se revocan los permisos antiguos. Esc pausa el ascenso; F7 vuelve a práctica. Durante ascenso se bloquean reset/selección/finalización manual.
+- PURGE permite conducir hasta el portal, pero desactiva reaparición; todavía no hay muros de Purga. No confundir esto con una ronda completa/campaña.
+- Parámetros: `portal.ascent_s=3` cumple diseño; `portal.ascent_height_m=12` es altura visual del prototipo. No cambia cuota, daño ni duración de ronda.
+- CI graba 35 s: combate, cuota, conducción al portal y ascenso mediante InputFrame real. Resultados de pruebas y revisión visual en el PR.
+- Pendientes para Opus: playtest/cámara y arte final del túnel; zona franca física, barrera, muros de Purga, bots y puntaje. El estado de acceso es por participante, la presentación usa un único observador local. No hay tareas reservadas al terminar.
+
+Las entradas siguientes conservan el historial.
+
 ## 2026-11-04 · Codex · Cuotas conectadas a las bajas
 
 PR #6 integrado en main tras CI correcta (merge `d93eec0`). Esta entrega parte de ese main en `feat/round-quota`.

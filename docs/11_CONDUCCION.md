@@ -75,6 +75,13 @@ Las entradas de daño nulas/no finitas se rechazan sin tocar salud ni atribució
 
 ## Ensayo de ronda (F7)
 
-F7 abre un ensayo de RoundManager sobre la misma arena. Intro de 4 s con cuota, cuenta de 3 s y reloj de 5:00. Durante intro/cuenta no se conduce; en PLAYING funcionan los controles de práctica. Al agotarse el reloj se anuncia PURGE y se congela este ensayo: **todavía no hay muros de Purga**. Enter finaliza manualmente y muestra RESULTS; otro Enter avanza R1 → R2 → R3 → R1. F7 vuelve a práctica. Esc pausa también las cuentas.
+F7 abre un ensayo de RoundManager sobre la misma arena. Intro de 4 s con cuota, cuenta de 3 s y reloj de 5:00. Durante intro/cuenta no se conduce; en PLAYING funcionan los controles de práctica. Al agotarse el reloj se anuncia PURGE y se desactiva el respawn, pero se puede conducir al portal: **todavía no hay muros de Purga**. Enter finaliza manualmente y muestra RESULTS; otro Enter avanza R1 → R2 → R3 → R1. F7 vuelve a práctica. Esc pausa también las cuentas.
 
-La cuota ya cuenta bajas atribuidas de los participantes registrados, incluso durante PURGE. El HUD muestra progreso y CUOTA CUMPLIDA; falta conectar el portal y su ascenso. Sin bots ni campaña. `round_manager.gd` no decide quién gana ni cuánto dura la Purga: el futuro nivel llama `finish(result)`. Los eventos se publican en EventBus. La escena puede abrirse directamente: `godot --path game --scene res://levels/_test/round_sandbox.tscn`.
+La cuota ya cuenta bajas atribuidas de los participantes registrados, incluso durante PURGE. El HUD muestra progreso y CUOTA CUMPLIDA; el portal de ensayo ya permite salida y ascenso. Sin bots ni campaña. `round_manager.gd` no decide quién gana ni cuánto dura la Purga: el futuro nivel llama `finish(result)`. Los eventos se publican en EventBus. La escena puede abrirse directamente: `godot --path game --scene res://levels/_test/round_sandbox.tscn`.
+
+
+### Portal de ensayo
+
+En F7, cumple la cuota y conduce hacia el podio a la derecha del inicio (`x=0, z=15`). Cerrado es sólido; al cumplir la cuota su anillo toma tu color y puedes entrar. El control pasa a un ascenso de 3 s por túnel octogonal; la salida guarda el tiempo de entrada y lleva a RESULTS. Enter inicia la siguiente ronda. Esc pausa; no se permite R/F2/Enter durante el ascenso. El podio conserva colisión para Runners sin cuota.
+
+La escena sigue siendo un prototipo de un jugador con blanco inmóvil, sin zona franca física ni muros de Purga. El futuro nivel decidirá resultados multijugador; el portal publica `runner_escaped`, no concede puntaje ni créditos.

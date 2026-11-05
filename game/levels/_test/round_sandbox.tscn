@@ -1,9 +1,11 @@
-[gd_scene load_steps=5 format=3]
+[gd_scene load_steps=6 format=3]
 [ext_resource type="PackedScene" path="res://levels/_test/driving_sandbox.tscn" id="1"]
 [ext_resource type="Script" path="res://levels/_test/round_sandbox.gd" id="2"]
 [ext_resource type="Script" path="res://round/round_manager.gd" id="3"]
 
 [ext_resource type="Script" path="res://round/round_progress.gd" id="4"]
+
+[ext_resource type="PackedScene" path="res://entities/portal/round_portal.tscn" id="5"]
 
 [node name="RoundSandbox" instance=ExtResource("1")]
 script = ExtResource("2")
@@ -17,3 +19,10 @@ theme_override_font_sizes/font_size = 24
 
 [node name="RoundProgress" type="Node" parent="RoundManager"]
 script = ExtResource("4")
+
+[node name="Portal" parent="." instance=ExtResource("5")]
+process_mode = 1
+position = Vector3(0, 0, 15)
+manager_path = NodePath("../RoundManager")
+progress_path = NodePath("../RoundManager/RoundProgress")
+viewer_path = NodePath("../Runner")
