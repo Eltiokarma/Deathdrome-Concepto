@@ -1,5 +1,49 @@
 # Relevo de trabajo — Codex / Claude
 
+## 2026-11-05 · Pendientes vigentes y guía para Claude
+
+**Punto de partida:** `main` en `79d5890744e576b9fa424a55e7b30ab3c7389005`, PR #12 integrado. Esta lista sustituye las recomendaciones de “siguiente bloque” de las entradas históricas inferiores. Es un inventario de implementación y validación, no una declaración de cierre de todos los criterios del roadmap.
+
+### Lo que ya funciona y debe conservarse
+
+Conducción de los ocho Runners con stats, salto y cámaras; salud/atribución; láser y barrera; blanco de práctica con reaparición; estados/reloj de ronda; cuota individual; portal selectivo con ascenso; zona franca; puntaje de sesión; Purga radial letal de ensayo. CI verificada en PR #12: **105 pruebas / 612 aserciones**, lint, importación, exportación y ejecución del PCK. Video real revisado: frente radial, muerte y RESULTS. Estos resultados no certifican mando físico, rendimiento real ni una partida completa contra siete bots.
+
+### Orden recomendado de trabajo (una entrega acotada cada vez)
+
+| Prioridad | Bloque / IDs | Qué falta y cómo comprobarlo |
+|---|---|---|
+| 1 | Dominio 1: plano, áreas y compuertas — PUR-070, 032, 036, 071 | Crear ficha/plano de Penal Altiplano; después hub y cuatro salas con métricas del diseño, umbrales sin parpadeo y aperturas R1:1–2 / R2:+3 / R3:+4. Validar recorridos, colisiones y futura navegación. No sustituir toda la arena en el mismo PR del plano. |
+| 2 | Muerte y reaparición de ronda — PUR-023/024 | Piloto de 10 PI, ventana de 2.5 s, mercy kill, explosión/pira de 6 s. Después respawn real en hub a 4 s o 6 s tras mercy kill; escudo 3 s, integridad/barrera llenas, slots vacíos cuando exista inventario. Probar atribución, pausa y prohibición de respawn en Purga. PracticeRespawner no es el sistema definitivo. |
+| 3 | Inventario y pickups — PUR-040 | Tres slots repetibles, selección Q/E, rechazo cuando están llenos y reaparición de pickups a 20 s. Es dependencia del BotBrain previsto; no declarar completa IA antes de resolverla. |
+| 4 | Primer rival y luego siete bots — PUR-050/051/052/055 | Empezar por percepción y un bot que produzca InputFrame; después navegación, combate, búsqueda de armas y escape/Purga. Añadir depuración F4/log. Ampliar a siete y medir escapes en 20 rondas (objetivo ≥90% para bots con cuota). PUR-053/054 requieren además torres/tácticas; no cerrar toda IA con un perseguidor sencillo. |
+| 5 | Purga del dominio — completar PUR-034 | Adaptar frentes a salas/compuertas y cubrir todo volumen jugable sin refugios accidentales, manteniendo 3.5 m/s, cierre del hub en 10 s y D8 ×1.5. El radial actual sigue disponible como ensayo. Depende de disponer de geometría real. |
+| 6 | Arsenal y peligros — PUR-041–048 | Fijación, misil, onda, torres, embestida, drenador, látigo e ítems. Seguir dependencias del roadmap, pruebas de línea de visión, zona franca, atribución y salto sobre onda/torre. |
+| 7 | Interfaz y campaña — PUR-025, 060–066 | Separar HUD de presentación del controlador de ensayo; HUD completo, mensajes, radar, menús, resumen desglosado, créditos/Game Over, guardado versionado y contraseñas. Puntaje actual solo vive en la instancia de sesión. Accesibilidad y traducción pendientes. |
+| 8 | Arte, audio y demostración pública — PUR-015, 072–075 | Render retro conmutable, modelos/kit modular, VFX y audio completo (solo hay aviso sintético de Purga). Registrar licencias. Benchmark en GPU objetivo con ocho Runners y playtest ≥5 personas / ≥20 rondas antes de declarar vertical slice. |
+| Después | LAN y dominios restantes — PUR-080–083, 090–096 | Servidor/lobby/sincronización y dominios 2–8, después de validar la demo y sus dependencias. No son tareas de acabado menores. |
+
+### Implementado parcialmente o pendiente de validación
+
+- **PUR-005/011/014:** greybox, conducción y cámaras utilizables; faltan medición en GPU integrada, suspensión completa/feel y playtest de cámaras. Las cuatro sondas actuales inclinan la malla, no equivalen a suspensión física del casco.
+- **PUR-010:** entrada de teclado/mando cubierta con pruebas sintéticas; falta mando físico.
+- **PUR-022:** barrera funcional y probada; falta playtest de esquiva/salto y coste real con ocho Runners.
+- **PUR-031/033:** zona franca y portal funcionan en ensayo; integrar dimensiones y accesos en el dominio, pulir túnel/cámara/arte.
+- **PUR-035:** reglas de puntaje y cuotas implementadas; mercy kill tiene tratamiento probado pero carece de piloto/emisor jugable, y el bonus de torre espera a la torre. Falta persistencia de campaña.
+- **PUR-030/034:** ciclo de ensayo y Purga funcionales; todavía no representan una ronda completa con ocho participantes y progresión de campaña.
+
+### Instrucciones de coordinación para Claude / Codex
+
+1. Leer esta sección, `docs/08_ROADMAP.md` y los documentos de diseño del bloque elegido. Actualizar desde main con árbol limpio; revisar PRs abiertos antes de editar.
+2. **Primera entrega recomendada para Claude: PUR-070, ficha y plano del Dominio 1.** Usar plantilla y métricas de `docs/04_DOMINIOS_Y_NIVELES.md`; dejar ubicaciones de hub, cuatro salas, compuertas, spawns, rutas y frentes de Purga. Cerrar con plano revisable y siguiente bloque concreto; no construir toda la campaña.
+3. Registrar aquí agente, rama, alcance y archivos antes de implementar. Esta recomendación no reserva una tarea ni afirma que Claude ya la leyó. **Al cerrar esta anotación no hay bloques reservados por Codex.**
+4. Reutilizar Balance, InputFrame, HealthComponent, RoundManager/Progress/Score, portal y zona franca. No duplicar sistemas ni cambiar números de balance sin documentar motivo y evidencia.
+5. Cada PR debe indicar qué criterios cumple y cuáles siguen pendientes, pruebas realmente ejecutadas y video si cambia jugabilidad. Mantener al día esta lista y el relevo. Para cambios solo documentales, revisar enlaces/contenido; no hace falta repetir la suite del juego.
+6. Evitar tomar el mismo conjunto de archivos simultáneamente. Si se dividen tareas, dejar explícitos los contratos compartidos antes de modificar Runner, EventBus o el sandbox.
+
+**Referencia de verificación:** [PR #12](https://github.com/Eltiokarma/Deathdrome-Concepto/pull/12) · [CI aprobada](https://github.com/Eltiokarma/Deathdrome-Concepto/actions/runs/42094925073). El roadmap conserva criterios de aceptación de diseño; sus casillas históricas sin marcar no deben interpretarse como inventario actualizado de código.
+
+---
+
 ## 2026-11-05 · Codex · Purga radial de ensayo (PUR-034)
 
 Rama `feat/PUR-034-purge` desde main tras PR #11 integrado. El ensayo F7 ya ejecuta una Purga letal al llegar a 0:00, con aviso rojo y sirena original generada en PCM al cruzar 0:30.
