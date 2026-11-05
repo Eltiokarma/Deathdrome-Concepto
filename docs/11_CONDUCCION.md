@@ -71,3 +71,10 @@ Prueba manual: mantener J hasta destruir; observar cuenta atrás y escudo; dispa
 Este servicio está restringido al sandbox y comprueba ocupación por Runners en un punto fijo conocido. No es el respawn de ronda: no gestiona créditos, Purga, IA, selección de puntos ni peligros. Al implementar RoundManager, definir una política propia en lugar de reutilizarlo sin esas reglas.
 
 Las entradas de daño nulas/no finitas se rechazan sin tocar salud ni atribución. Al morir, el estado `destroyed` se fija antes de emitir `runner_damaged`, evitando una segunda aplicación letal desde un callback de ese evento. Los listeners no deben reiniciar el Runner dentro de ese callback; usar un controlador de ciclo de vida después del evento de destrucción.
+
+
+## Ensayo de ronda (F7)
+
+F7 abre un ensayo de RoundManager sobre la misma arena. Intro de 4 s con cuota, cuenta de 3 s y reloj de 5:00. Durante intro/cuenta no se conduce; en PLAYING funcionan los controles de práctica. Al agotarse el reloj se anuncia PURGE y se congela este ensayo: **todavía no hay muros de Purga**. Enter finaliza manualmente y muestra RESULTS; otro Enter avanza R1 → R2 → R3 → R1. F7 vuelve a práctica. Esc pausa también las cuentas.
+
+Cuota informativa, no ligada aún a bajas/portal; sin bots ni campaña. `round_manager.gd` no decide quién gana ni cuánto dura la Purga: el futuro nivel llama `finish(result)`. Los eventos se publican en EventBus. La escena puede abrirse directamente: `godot --path game --scene res://levels/_test/round_sandbox.tscn`.

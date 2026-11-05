@@ -1,0 +1,14 @@
+[gd_scene load_steps=4 format=3]
+[ext_resource type="PackedScene" path="res://levels/_test/driving_sandbox.tscn" id="1"]
+[ext_resource type="Script" path="res://levels/_test/round_sandbox.gd" id="2"]
+[ext_resource type="Script" path="res://round/round_manager.gd" id="3"]
+
+[node name="RoundSandbox" instance=ExtResource("1")]
+script = ExtResource("2")
+[node name="RoundManager" type="Node" parent="."]
+process_mode = 1
+script = ExtResource("3")
+[node name="RoundStatus" type="Label" parent="UI"]
+offset_left = 26.0
+offset_top = 350.0
+theme_override_font_sizes/font_size = 24
