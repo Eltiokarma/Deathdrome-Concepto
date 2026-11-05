@@ -1,5 +1,27 @@
 # Relevo de trabajo — Codex / Claude
 
+## 2026-11-05 · Relevo para el próximo avance pequeño de Claude
+
+**Pedido de Gerson:** dejar todo anotado y permitir un avance pequeño, cuidando el consumo de tokens. Codex termina aquí; no mantiene tareas reservadas ni trabajo en segundo plano.
+
+### Estado al entregar
+- Código de Purga integrado por PR #12; última verificación de gameplay: 105 pruebas / 612 aserciones y CI correcta. No se han ejecutado nuevas pruebas del juego por los cambios documentales posteriores.
+- Ficha y plano inicial del Dominio 1 publicados en `main`, commit `5c522eb4962105924d81a1410d40866b746bfb12`. Son propuesta, no geometría construida.
+- Leer primero [ficha PUR-070](dominios/01_penal_altiplano.md), [plano SVG](dominios/img/01_penal_altiplano.svg) y métricas de [docs/04](04_DOMINIOS_Y_NIVELES.md). La lista completa de pendientes está debajo; las entradas antiguas son historial.
+
+### Siguiente entrega sugerida: cerrar detalles del plano, sin ampliar alcance
+1. Actualizar desde `main` y comprobar PRs/reservas existentes. Registrar aquí la rama y los archivos tomados.
+2. Revisar la propuesta PUR-070 y concretar **solo el hub, su acceso al podio y el interior de la sala 1**: coordenadas de rampas, deflectores, reservas de torres/pickups y dos rutas de paso.
+3. Actualizar ficha y SVG juntos. Comprobar sobre el plano anchos, pendientes, espacio entre spawns/podio y corte de rectas a ≤60 m; señalar como pendientes las comprobaciones físicas. No extrapolar esa revisión a las cuatro salas.
+4. Entregar un PR documental breve con decisiones, medidas y pendientes. No implementar todavía bots, arsenal, compuertas ni toda la geometría del dominio en esta entrega.
+5. Terminar dejando aquí PR/commit, qué se verificó y cuál sería el siguiente bloque: greybox del hub + sala 1 en una escena separada. No declarar PUR-071 terminado.
+
+**Cuidado:** los tiempos de la ficha son ideales a velocidad constante; las posiciones interiores, cobertura real de Purga, navegación y rendimiento todavía no están validados. Mantener el sandbox existente y los valores de Balance. Si la revisión descubre incompatibilidades, documentarlas y corregir el plano antes de construir.
+
+Esta nota es el canal de coordinación; no implica que Claude ya haya leído o aceptado la tarea.
+
+---
+
 ## 2026-11-05 · Propuesta de plano PUR-070 preparada por Codex
 
 Para reducir trabajo de Claude se añadió [ficha del Penal Altiplano](dominios/01_penal_altiplano.md) y plano SVG de implantación. Incluye dimensiones, conexiones, aperturas por ronda, reservas de contenido, tiempos ideales y contrato propuesto de Purga. No cambia código ni balance.
