@@ -50,10 +50,14 @@ func tick(delta: float) -> void:
 			continue
 		journey.elapsed = minf(duration, journey.elapsed + delta)
 		var weight: float = journey.elapsed / duration
-		runner.global_position = journey.start + Vector3.UP * (
+		var center := Vector3(global_position.x, journey.start.y, global_position.z)
+		runner.global_position = journey.start.lerp(center, minf(weight * 3.0, 1.0))
+		runner.global_position += Vector3.UP * (
 			Balance.get_f("portal.ascent_height_m") * weight * weight)
 		if runner == viewer:
-			$AscentCamera.global_position = runner.global_position + Vector3(0, -2, 4)
+			$AscentCamera.global_position = Vector3(global_position.x,
+				maxf(global_position.y + 0.6, runner.global_position.y - 2.0),
+				global_position.z + 3.0)
 			$AscentCamera.look_at(runner.global_position + Vector3.UP)
 			$Overlay/Fade.color.a = clampf((weight - 0.75) * 4.0, 0.0, 1.0)
 		if journey.elapsed >= duration:
@@ -104,6 +108,7 @@ func _on_state(state: int) -> void:
 			journey.done = true
 		$Overlay/Fade.color.a = 0.0
 		$Tunnel.hide()
+		viewer.get_node("RunnerCamera/SpringArm3D/Camera3D").make_current()
 
 
 func reset() -> void:
