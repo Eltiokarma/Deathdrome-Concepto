@@ -1,0 +1,22 @@
+[gd_scene load_steps=4 format=3]
+[ext_resource type="Script" path="res://round/purge_field.gd" id="1"]
+[sub_resource type="CylinderMesh" id="WallMesh"]
+top_radius = 1.0
+bottom_radius = 1.0
+height = 1.0
+radial_segments = 64
+cap_top = false
+cap_bottom = false
+[sub_resource type="StandardMaterial3D" id="Red"]
+transparency = 1
+shading_mode = 0
+cull_mode = 2
+albedo_color = Color(1, 0.08, 0.02, 0.65)
+[node name="PurgeField" type="Node3D"]
+script = ExtResource("1")
+[node name="Wall" type="MeshInstance3D" parent="."]
+visible = false
+mesh = SubResource("WallMesh")
+material_override = SubResource("Red")
+[node name="Warning" type="AudioStreamPlayer" parent="."]
+volume_db = -8.0

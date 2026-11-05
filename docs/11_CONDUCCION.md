@@ -75,7 +75,7 @@ Las entradas de daño nulas/no finitas se rechazan sin tocar salud ni atribució
 
 ## Ensayo de ronda (F7)
 
-F7 abre un ensayo de RoundManager sobre la misma arena. Intro de 4 s con cuota, cuenta de 3 s y reloj de 5:00. Durante intro/cuenta no se conduce; en PLAYING funcionan los controles de práctica. Al agotarse el reloj se anuncia PURGE y se desactiva el respawn, pero se puede conducir al portal: **todavía no hay muros de Purga**. Enter finaliza manualmente y muestra RESULTS; otro Enter avanza R1 → R2 → R3 → R1. F7 vuelve a práctica. Esc pausa también las cuentas.
+F7 abre un ensayo de RoundManager sobre la misma arena. Intro de 4 s con cuota, cuenta de 3 s y reloj de 5:00. Durante intro/cuenta no se conduce; en PLAYING funcionan los controles de práctica. Al agotarse el reloj se anuncia PURGE y se desactiva el respawn, pero se puede conducir al portal: **el frente radial avanza hasta cerrar el portal**. Enter finaliza manualmente y muestra RESULTS; otro Enter avanza R1 → R2 → R3 → R1. F7 vuelve a práctica. Esc pausa también las cuentas.
 
 La cuota ya cuenta bajas atribuidas de los participantes registrados, incluso durante PURGE. El HUD muestra progreso y CUOTA CUMPLIDA; el portal de ensayo ya permite salida y ascenso. Sin bots ni campaña. `round_manager.gd` no decide quién gana ni cuánto dura la Purga: el futuro nivel llama `finish(result)`. Los eventos se publican en EventBus. La escena puede abrirse directamente: `godot --path game --scene res://levels/_test/round_sandbox.tscn`.
 
@@ -84,7 +84,7 @@ La cuota ya cuenta bajas atribuidas de los participantes registrados, incluso du
 
 En F7, cumple la cuota y conduce hacia el podio a la derecha del inicio (`x=0, z=15`). Cerrado es sólido; al cumplir la cuota su anillo toma tu color y puedes entrar. El control pasa a un ascenso de 3 s por túnel octogonal; la salida guarda el tiempo de entrada y lleva a RESULTS. Enter inicia la siguiente ronda. Esc pausa; no se permite R/F2/Enter durante el ascenso. El podio conserva colisión para Runners sin cuota.
 
-La escena sigue siendo un prototipo de un jugador con blanco inmóvil, con zona franca alrededor del portal, pero sin muros de Purga. El futuro nivel decidirá resultados multijugador; el portal publica `runner_escaped`, RoundScore concede el puntaje en F7; todavía no hay créditos de campaña.
+La escena sigue siendo un prototipo de un jugador con blanco inmóvil, con zona franca alrededor del portal, y una Purga radial de ensayo. El futuro nivel decidirá resultados multijugador; el portal publica `runner_escaped`, RoundScore concede el puntaje en F7; todavía no hay créditos de campaña.
 
 
 ### Zona franca alrededor del portal
@@ -106,3 +106,12 @@ La zona franca impide emitir y disipa cualquier segmento que la toque. La compro
 El HUD muestra el total y el último cambio. Primera baja atribuida: 1300; las siguientes: 1000. Barrera/torre añaden 250; muerte sin atribución/suicidio resta 250. Escapar añade 2000 y 10 por segundo completo al entrar al portal; entrar durante Purga añade 1000. El tiempo de ascenso no reduce la recompensa.
 
 Enter para pasar a otra ronda conserva puntos y reinicia primera sangre. Morir o R tampoco borran el total. Salir del ensayo con F7 lo termina: no hay guardado persistente aún. Mercy kill tiene su regla y pruebas (+500 una vez por vida), pero falta el piloto y su interacción jugable.
+
+
+### Purga radial (F7)
+
+A 0:30 el reloj se vuelve rojo y suena una sirena breve. A 0:00 aparece un frente rojo que avanza hacia el portal a 3.5 m/s (5.25 en D8). Al alcanzar el disco del portal, lo cierra en 10 s. La zona franca, escudo, coraza y salto no protegen; morir termina el ensayo y no permite reaparición. R/F2 y recuperación automática por caída quedan deshabilitados en esa fase.
+
+Si ya entraste al portal, puedes terminar el ascenso. Enter reinicia otro ensayo desde RESULTS. Para probar sin esperar cinco minutos, F8 adelanta a 0:30 y una segunda pulsación a 0:00. La captura `--purge-preview` comienza a 0:02 exclusivamente para pruebas; no cambia duración de balance.
+
+Es un cierre radial alrededor de la arena greybox (radio inicial 56 m, hub de ensayo 7 m), todavía no los frentes de las cuatro salas del dominio definitivo. La pared visual mide 12 m, pero el daño cubre toda la columna vertical para evitar refugios fuera de la arena. La sirena se genera en código sin audio externo.
