@@ -1,5 +1,19 @@
 # Relevo de trabajo — Codex / Claude
 
+## 2026-11-05 · Codex · Barrera con reserva de segmentos (PUR-022)
+
+Rama `feat/PUR-022-barrier` desde main después del PR #9. Mantener L / Ctrl / botón X del mando activa la estela; el HUD muestra energía. No se cambian consumo, regeneración, altura ni duración originales.
+
+- BarrierWeapon consume InputFrame.barrier: energía por stats, 30/s, regeneración 10/s tras 1.5 s de soltar/bloquear. Mantener el botón con energía agotada no regenera. Activar rompe el escudo salvo dentro de zona franca.
+- Reserva de 96 segmentos por Runner, creada en ready. Sin instanciar segmentos durante juego; saturación no sustituye segmentos vivos. Cada segmento vive 3.5 s, queda fijo en mundo y mide 1.2 m de alto en suelo plano. En pendientes la caja cubre el desnivel.
+- Colisión sólida en layer barrier, con excepción para su dueño. Runner resuelve daño letal tras move_and_slide; consulta adicional detecta rivales ya superpuestos. Se puede saltar por encima del volumen y bloquea hitscan. La estela persiste al morir el dueño y conserva atribución hasta caducar; reset manual limpia su reserva.
+- Zona franca bloquea emisión. Una intersección con su volumen disipa el segmento completo, aun si ambos extremos quedan fuera. Se usa envolvente conservadora en coordenadas de la zona: puede disipar antes en bordes diagonales, nunca conservar un segmento que la cruza.
+- Parámetros técnicos añadidos al balance: ancho 0.12 m, intervalo nominal 0.05 s, reserva 96, salida trasera 1.2 m y corte de continuidad 6 m para teletransportes. Las pausas congelan vida y energía.
+- CI agrega barrier.avi: emisor avanza con cámara mirando atrás; perseguidor cruza la estela. Validación local: suite previa de 85 pruebas correcta; las 11 pruebas finales de barrera (137 aserciones) pasan, además del lint. Importación y paquete aislado verificados. Resultado completo de CI y revisión visual en el PR. No se certifica rendimiento con ocho Runners en hardware real.
+- Próximo: playtest de feel/barrera, muros de Purga, bots y puntaje (bonus de barrera aún no se concede: el sistema de score sigue pendiente). Se cierra la dependencia funcional de disipación de PUR-031; arte/efectos siguen siendo greybox. No hay tareas reservadas al finalizar.
+
+Las entradas siguientes conservan el historial.
+
 ## 2026-11-05 · Codex · Zona franca espacial (PUR-031)
 
 Rama `feat/PUR-031-safe-zone` desde main tras PR #8 integrado. Volumen cilíndrico visible alrededor del portal en F7; consulta geométrica inmediata al disparar/recibir daño, sin esperar señales de solapamiento de física.

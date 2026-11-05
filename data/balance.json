@@ -101,6 +101,11 @@
       "regen_delay_s": 1.5,
       "segment_lifetime_s": 3.5,
       "segment_height_m": 1.2,
+      "segment_width_m": 0.12,
+      "sample_interval_s": 0.05,
+      "pool_size": 96,
+      "rear_offset_m": 1.2,
+      "max_gap_m": 6.0,
       "lethal": true
     },
     "missile": {

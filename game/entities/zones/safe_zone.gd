@@ -52,3 +52,20 @@ func _process(_delta: float) -> void:
 	var enabled: bool = active()
 	_material.albedo_color = Color(0.1, 0.8, 0.65, 0.25) if enabled else Color(0.4, 0.4, 0.4, 0.12)
 	$Label.text = "ZONA FRANCA" if enabled else "ZONA FRANCA / INACTIVA"
+
+
+func intersects_box(box_transform: Transform3D, size: Vector3) -> bool:
+	if not active():
+		return false
+	var minimum := Vector3(INF, INF, INF)
+	var maximum := Vector3(-INF, -INF, -INF)
+	for x: float in [-0.5, 0.5]:
+		for y: float in [-0.5, 0.5]:
+			for z: float in [-0.5, 0.5]:
+				var corner: Vector3 = to_local(box_transform * (size * Vector3(x, y, z)))
+				minimum = minimum.min(corner)
+				maximum = maximum.max(corner)
+	# Envolvente conservadora: disipa el segmento completo si roza el volumen.
+	var nearest := Vector2(clampf(0.0, minimum.x, maximum.x), clampf(0.0, minimum.z, maximum.z))
+	return nearest.length_squared() <= radius * radius and (
+		minimum.y <= height * 0.5 and maximum.y >= -height * 0.5)

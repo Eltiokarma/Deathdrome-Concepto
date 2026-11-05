@@ -12,6 +12,7 @@ var last_input := InputFrame.new()
 var controller: PlayerInput
 
 @onready var health: HealthComponent = $HealthComponent
+@onready var barrier: BarrierWeapon = $BarrierWeapon
 @onready var laser: LaserWeapon = $LaserWeapon
 @onready var motor: RunnerMotor = $RunnerMotor
 @onready var model: Node3D = $Model
@@ -34,6 +35,8 @@ func setup(id: StringName) -> void:
 	stats = next
 	if health != null:
 		health.reset(stats.max_integrity)
+	if barrier != null:
+		barrier.reset()
 	if model != null:
 		var material := StandardMaterial3D.new()
 		material.albedo_color = stats.color
@@ -47,11 +50,17 @@ func _physics_process(delta: float) -> void:
 		velocity = Vector3.ZERO
 		model.hide()
 		set_collision_layer_value(2, false)
+		barrier.tick(delta, false)
 		laser.tick(delta, false)
 		return
 	var frame: InputFrame = controller.sample() if controller != null else input_frame
 	last_input = frame.sanitized()
 	motor.step(self, last_input, delta)
+	for index: int in range(get_slide_collision_count()):
+		var segment := get_slide_collision(index).get_collider() as BarrierSegment
+		if segment != null:
+			segment.hit(self)
+	barrier.tick(delta, last_input.barrier)
 	laser.tick(delta, last_input.laser)
 
 
@@ -64,5 +73,6 @@ func reset_at(point: Vector3, yaw: float = 0.0) -> void:
 	motor.reset()
 	health.reset(stats.max_integrity)
 	laser.reset()
+	barrier.reset()
 	set_collision_layer_value(2, true)
 	model.visible = ($RunnerCamera as RunnerCamera).mode != 2

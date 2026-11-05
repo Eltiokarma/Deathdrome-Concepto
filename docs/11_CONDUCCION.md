@@ -18,7 +18,7 @@ Godot 4.6.3.stable. Desde la raíz: `python3 scripts/prepare_data.py`, abrir `ga
 | Valores derivados / diagnóstico | F3 | — |
 | Reubicar en salida | R | — |
 
-S frena: no hay marcha atrás. F2, F3 y R son herramientas del banco de pruebas, no controles definitivos de campaña. Se puede girar detenido para salir de una pared. El láser ya funciona con clic izquierdo/J/RB; las secundarias, barrera y radar siguen pendientes. El Runner de ensayo no tiene IA; R restaura ambos vehículos y cancela la reaparición pendiente.
+S frena: no hay marcha atrás. F2, F3 y R son herramientas del banco de pruebas, no controles definitivos de campaña. Se puede girar detenido para salir de una pared. El láser ya funciona con clic izquierdo/J/RB; las secundarias y el radar siguen pendientes. El Runner de ensayo no tiene IA; R restaura ambos vehículos y cancela la reaparición pendiente.
 
 ## Arquitectura
 
@@ -91,4 +91,11 @@ La escena sigue siendo un prototipo de un jugador con blanco inmóvil, con zona 
 
 En F7, el disco verde alrededor del podio protege y bloquea el láser mientras el origen del Runner esté dentro. El HUD lo indica. La Purga ignora esa protección. Salir del disco permite volver a disparar; saltar normalmente dentro conserva la protección.
 
-El volumen del ensayo tiene radio 7 m (no reproduce todavía la sala completa de Ø 40 m). Sigue `round.hub_safe_mode`: `always`, `round_start` (intro/cuenta y primeros 10 s de juego) u `off`. El temporizador usa RoundManager, por lo que respeta pausa y reinicio. Falta disipación de segmentos de barrera hasta implementar PUR-022.
+El volumen del ensayo tiene radio 7 m (no reproduce todavía la sala completa de Ø 40 m). Sigue `round.hub_safe_mode`: `always`, `round_start` (intro/cuenta y primeros 10 s de juego) u `off`. El temporizador usa RoundManager, por lo que respeta pausa y reinicio. Los segmentos de barrera que intersectan el volumen se disipan completos.
+
+
+### Barrera
+
+Mantén **L / Ctrl / X del mando** mientras conduces para dejar una estela de tu color. Energía según Runner; consume 30/s y regenera 10/s tras 1.5 s sin activación. El HUD muestra energía. Tus segmentos no te dañan ni bloquean; los rivales mueren al tocarlos y pueden saltarlos. Duran 3.5 s, incluso si muere el dueño. R limpia los segmentos de los Runners reiniciados.
+
+La zona franca impide emitir y disipa cualquier segmento que la toque. La comprobación de intersección es conservadora en bordes diagonales. No hay bonus de puntos todavía. Para captura reproducible: `godot --path game -- --barrier-preview`.
