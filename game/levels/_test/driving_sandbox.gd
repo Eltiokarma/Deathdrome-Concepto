@@ -79,7 +79,10 @@ func _process(_delta: float) -> void:
 
 
 func _unhandled_input(event: InputEvent) -> void:
-	if event.is_action_pressed("pause"):
+	if event is InputEventKey and event.pressed and not event.echo and event.keycode == KEY_F7:
+		get_tree().paused = false
+		get_tree().change_scene_to_file("res://levels/_test/round_sandbox.tscn")
+	elif event.is_action_pressed("pause"):
 		get_tree().paused = not get_tree().paused
 	elif event.is_action_pressed("debug_stats"):
 		_show_stats = not _show_stats

@@ -175,7 +175,7 @@ Los pickups de arma reaparecen a los **20 s** de ser recogidos.
 | Duración | 5:00 |
 | Cuota | `min(2 + floor((dominio − 1) / 2) + (ronda − 1), 7)` |
 | Áreas abiertas | Ronda 1: 1–2 · Ronda 2: 1–3 · Ronda 3: 1–4 |
-| Inicio | 4 s de intro + sirena; las compuertas abren a los 0:00 de la cuenta inicial |
+| Inicio | 4 s de intro + cuenta inicial de 3 s (`round.countdown_s`); las compuertas abren a los 0:00 de la cuenta inicial |
 
 Cuota por Dominio y ronda:
 

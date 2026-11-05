@@ -2,6 +2,7 @@ extends Node
 ## Hechos globales; sin lógica de gameplay.
 
 signal round_intro_started(domain_id: int, round_index: int, quota: int)
+signal round_state_changed(state: int)
 signal round_started()
 signal round_clock_tick(seconds_left: float)
 signal purge_started()

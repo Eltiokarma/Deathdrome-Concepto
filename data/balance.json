@@ -7,6 +7,7 @@
   "round": {
     "duration_s": 300,
     "intro_s": 4,
+    "countdown_s": 3,
     "quota_formula": "min(base + floor((domain - 1) / 2) + (round - 1), max)",
     "quota_base": 2,
     "quota_max": 7,

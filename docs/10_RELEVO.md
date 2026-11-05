@@ -1,5 +1,17 @@
 # Relevo de trabajo — Codex / Claude
 
+## 2026-11-04 · Codex · PUR-030: gestor de ronda y ensayo F7
+
+Rama `feat/PUR-030-round-manager`, desde `main`. Implementado el ciclo LOADING → INTRO → COUNTDOWN → PLAYING → PURGE → RESULTS, reloj y fórmula de cuota. Ensayo F7 separado de la práctica. Validación local: 57 pruebas / 330 aserciones, lint, importación y PCK aislado correctos. CI y captura de 10 s de intro/cuenta/inicio en el PR.
+
+- Intro de 4 s existente; se explicita una cuenta inicial de 3 s en `round.countdown_s`. Los 300 s de juego empiezan después. No cambian cuotas ni duración de juego.
+- `begin(domain, round)` valida D1–8/R1–3; `finish(result)` es responsabilidad del nivel. No termina automáticamente por alcanzar cuota ni inventa duración de Purga.
+- El ensayo bloquea conducción antes del inicio y después del reloj; Enter termina manualmente / inicia la siguiente ronda. F7 vuelve a práctica. No representa una campaña completa.
+- Sin muros de Purga, portal, puntaje ni seguimiento de cuotas por jugador; cuota solo informativa. Respawn sigue siendo el de práctica y se desactiva al llegar a Purga.
+- Siguiente bloque libre: PUR-022 barrera o integración de cuota/portal con RoundManager. Mantener el playtest físico pendiente. No hay tareas reservadas al finalizar esta entrega.
+
+Las entradas siguientes conservan el historial.
+
 ## 2026-11-04 · Codex · Integración en main y video comprobado
 
 **Estado vigente:** todo el prototipo quedó integrado en `main` mediante [PR #5](https://github.com/Eltiokarma/Deathdrome-Concepto/pull/5), merge `74037d0ed7890b1ce03ee805c32f48e8ddc8530b`. Incluye las entregas #1–#4 y práctica continua. Las instrucciones antiguas de integrar la cadena quedan reemplazadas por esta entrada. No hay tareas reservadas.

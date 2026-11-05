@@ -3,6 +3,7 @@
     "round": "object",
     "round.duration_s": "number",
     "round.intro_s": "number",
+    "round.countdown_s": "number",
     "round.quota_formula": "string",
     "round.quota_base": "number",
     "round.quota_max": "number",
