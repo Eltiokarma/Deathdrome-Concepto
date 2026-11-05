@@ -2,6 +2,7 @@ class_name HealthComponent
 extends Node
 ## Salud y atribución; no modifica cuota, puntaje ni HUD.
 
+var life_id: int = 0
 var current: float = 0.0
 var maximum: float = 0.0
 var destroyed: bool = false
@@ -15,6 +16,7 @@ var _last_attacker: WeakRef
 
 
 func reset(value: float) -> void:
+	life_id += 1
 	maximum = value
 	current = value
 	destroyed = false

@@ -1,5 +1,18 @@
 # Relevo de trabajo — Codex / Claude
 
+## 2026-11-04 · Codex · Cuotas conectadas a las bajas
+
+PR #6 integrado en main tras CI correcta (merge `d93eec0`). Esta entrega parte de ese main en `feat/round-quota`.
+
+- RoundProgress, hijo de RoundManager, registra participantes explícitos y consume `runner_destroyed`. Cuenta la atribución decidida por HealthComponent; no recalcula el atacante.
+- Cada vida tiene un identificador creciente en HealthComponent; una muerte cuenta como máximo una vez, incluso si se repite la señal. Reset manual y respawn generan una nueva vida. No hay crédito retroactivo de muertes sin atribución.
+- Bajas de PLAYING/PURGE suman; intro/cuenta/resultados, suicidio, mercy kill y participantes ajenos no suman. La muerte propia no borra la cuota; una nueva intro sí reinicia el progreso.
+- F7 muestra bajas/cuota y CUOTA CUMPLIDA; `quota_reached` sale una vez al cruzar el umbral. El futuro portal puede consultar `has_quota(runner)`. Cumplir cuota no termina la ronda automáticamente.
+- CI genera 30 s de combate en el ensayo de ronda para mostrar el progreso. Validación local: 64 pruebas; suite completa con 355 aserciones más una aserción de suicidio añadida y verificada en los 7 tests de cuotas (26 aserciones). Lint y paquete aislado correctos. CI final en el PR.
+- Pendientes: portal sólido/selectivo y ascenso PUR-033, barrera PUR-022, zona franca física, muros de Purga y bots. No se implementa puntaje de campaña ni se declara cerrado PUR-033. Ninguna tarea reservada al finalizar.
+
+Las entradas siguientes son históricas.
+
 ## 2026-11-04 · Codex · PUR-030: gestor de ronda y ensayo F7
 
 Rama `feat/PUR-030-round-manager`, desde `main`. Implementado el ciclo LOADING → INTRO → COUNTDOWN → PLAYING → PURGE → RESULTS, reloj y fórmula de cuota. Ensayo F7 separado de la práctica. Validación local: 57 pruebas / 330 aserciones, lint, importación y PCK aislado correctos. CI y captura de 10 s de intro/cuenta/inicio en el PR.
