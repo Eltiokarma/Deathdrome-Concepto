@@ -6,9 +6,21 @@ var life_id: int = 0
 var current: float = 0.0
 var maximum: float = 0.0
 var destroyed: bool = false
-var in_safe_zone: bool = false
+var in_safe_zone: bool:
+	get:
+		if _manual_safe_zone:
+			return true
+		if not is_instance_valid(runner) or not runner.is_inside_tree():
+			return false
+		for zone: SafeZone in get_tree().get_nodes_in_group("safe_zones"):
+			if zone.protects(runner):
+				return true
+		return false
+	set(value):
+		_manual_safe_zone = value
 var spawn_shield_s: float = 0.0
 var armored: bool = false
+var _manual_safe_zone: bool = false
 var _clock: float = 0.0
 var _last_damage_at: float = -INF
 var _last_attacker: WeakRef

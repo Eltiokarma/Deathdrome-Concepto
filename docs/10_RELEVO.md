@@ -1,5 +1,18 @@
 # Relevo de trabajo — Codex / Claude
 
+## 2026-11-05 · Codex · Zona franca espacial (PUR-031)
+
+Rama `feat/PUR-031-safe-zone` desde main tras PR #8 integrado. Volumen cilíndrico visible alrededor del portal en F7; consulta geométrica inmediata al disparar/recibir daño, sin esperar señales de solapamiento de física.
+
+- `SafeZone` sigue `round.hub_safe_mode`: always / round_start / off. round_start protege intro/cuenta y los primeros 10 s de PLAYING; el reloj del gestor conserva la pausa. Sin gestor, round_start permanece inactivo.
+- `HealthComponent.in_safe_zone` combina la bandera manual existente con los volúmenes activos. Los volúmenes se consultan por posición actual: reset, teletransporte, salida y eliminación de una zona no dejan estados obsoletos. Solapamientos suman protección.
+- El punto de referencia es el origen del Runner (centro de la huella), no el casco completo. Radio y altura usan coordenadas locales, admiten transformación del volumen. Valores por defecto: radio 20 m y altura 12 m; el sandbox usa radio 7 m para conservar el combate fuera del portal. No es el Área 0 completa del dominio final.
+- Dentro no hay daño normal ni láser, hacia dentro o hacia fuera. Disparar estando bloqueado no rompe el escudo de aparición; salir restaura disparo. PURGE sigue siendo letal. HUD indica protección y excepción de Purga.
+- PUR-031 queda pendiente de disipar segmentos de barrera, porque PUR-022 todavía no implementa esos segmentos. Las futuras armas deben respetar la misma propiedad de salud antes de disparar.
+- Validación local: 76 pruebas / 417 aserciones, lint, importación y exportación/arranque PCK correctos. CI y revisión visual en el PR. Próximos bloques: barrera, muros de Purga, bots y pulido del portal. No hay tareas reservadas al finalizar.
+
+Las entradas siguientes conservan el historial.
+
 ## 2026-11-04 · Codex · Portal selectivo y ascenso de ensayo (PUR-033)
 
 Rama `feat/round-portal` desde main, después de PR #7 integrado. Portal en `(0, 0, 15)`, a la derecha del punto de inicio de F7; podio de Ø 10 m, anillo del color del jugador cuando cumple cuota.
