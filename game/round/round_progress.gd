@@ -71,3 +71,7 @@ func _on_destroyed(victim: Runner, killer: Runner, _weapon: StringName) -> void:
 	EventBus.quota_progress_changed.emit(killer, count, manager.quota)
 	if count == manager.quota:
 		EventBus.quota_reached.emit(killer)
+
+
+func is_participant(runner: Runner) -> bool:
+	return _registered(runner)

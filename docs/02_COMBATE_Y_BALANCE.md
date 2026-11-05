@@ -213,7 +213,7 @@ Cuota por Dominio y ronda:
 | Escapar durante la Purga | +1000 |
 | Suicidio / muerte sin atribución | −250 |
 
-El puntaje se acumula entre rondas y Dominios.
+El puntaje se acumula entre rondas y Dominios. El bonus temporal cuenta segundos completos (`floor`) del reloj capturado al entrar al portal; no resta los 3 s de ascenso. El bonus de Purga corresponde a entrar con reloj exactamente 0, aunque el ascenso termine después de comenzar la Purga.
 
 ## 13. Cómo balancear
 
