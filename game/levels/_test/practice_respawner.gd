@@ -5,6 +5,7 @@ extends Node
 @export var target_path: NodePath
 @export var spawn_position := Vector3(-17, 0.1, 0)
 @export var spawn_yaw: float = PI / 2.0
+var enabled: bool = true
 var remaining: float = 0.0
 var pending: bool = false
 var blocked: bool = false
@@ -21,7 +22,7 @@ func _physics_process(delta: float) -> void:
 
 
 func tick(delta: float) -> void:
-	if get_tree().paused or not pending or not is_finite(delta) or delta < 0.0:
+	if not enabled or get_tree().paused or not pending or not is_finite(delta) or delta < 0.0:
 		return
 	# Un reset manual cancela la reaparición pendiente.
 	if not is_instance_valid(target) or not target.health.destroyed:
@@ -46,7 +47,7 @@ func cancel() -> void:
 
 
 func _on_destroyed(victim: Runner, _killer: Runner, _weapon: StringName) -> void:
-	if victim != target or pending:
+	if not enabled or victim != target or pending:
 		return
 	pending = true
 	blocked = false

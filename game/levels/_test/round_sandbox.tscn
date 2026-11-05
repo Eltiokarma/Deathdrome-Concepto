@@ -1,4 +1,4 @@
-[gd_scene load_steps=8 format=3]
+[gd_scene load_steps=9 format=3]
 [ext_resource type="PackedScene" path="res://levels/_test/driving_sandbox.tscn" id="1"]
 [ext_resource type="Script" path="res://levels/_test/round_sandbox.gd" id="2"]
 [ext_resource type="Script" path="res://round/round_manager.gd" id="3"]
@@ -10,6 +10,8 @@
 [ext_resource type="PackedScene" path="res://entities/zones/safe_zone.tscn" id="6"]
 
 [ext_resource type="Script" path="res://round/round_score.gd" id="7"]
+
+[ext_resource type="PackedScene" path="res://round/purge_field.tscn" id="8"]
 
 [node name="RoundSandbox" instance=ExtResource("1")]
 script = ExtResource("2")
@@ -50,3 +52,13 @@ offset_left = 26.0
 offset_top = 455.0
 theme_override_font_sizes/font_size = 20
 text = "PUNTAJE 0"
+
+[node name="PurgeField" parent="." instance=ExtResource("8")]
+process_mode = 1
+position = Vector3(0, 0, 15)
+manager_path = NodePath("../RoundManager")
+[node name="PurgeStatus" type="Label" parent="UI"]
+offset_left = 26.0
+offset_top = 490.0
+theme_override_font_sizes/font_size = 20
+theme_override_colors/font_color = Color(1, 0.3, 0.2, 1)

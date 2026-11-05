@@ -6,6 +6,7 @@ const RUNNERS: Array[StringName] = [
 ]
 const SPAWN := Vector3(-17, 0.1, 15)
 
+var allow_recovery: bool = true
 var _barrier_preview: bool = false
 var _barrier_time: float = 0.0
 var _combat_preview: bool = false
@@ -60,7 +61,7 @@ func _physics_process(_delta: float) -> void:
 		_preview_tick += 1
 		runner.input_frame.jump = _preview_tick == 160
 		runner.input_frame.steering = 0.7 if _preview_tick > 235 else 0.0
-	if runner.position.y < -8.0:
+	if allow_recovery and runner.position.y < -8.0:
 		runner.reset_at(SPAWN)
 
 

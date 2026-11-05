@@ -1,5 +1,18 @@
 # Relevo de trabajo — Codex / Claude
 
+## 2026-11-05 · Codex · Purga radial de ensayo (PUR-034)
+
+Rama `feat/PUR-034-purge` desde main tras PR #11 integrado. El ensayo F7 ya ejecuta una Purga letal al llegar a 0:00, con aviso rojo y sirena original generada en PCM al cruzar 0:30.
+
+- Campo radial centrado en el portal `(0,0,15)`: radio inicial 56 m (cubre la arena de 60×60), hasta radio 7 m a 3.5 m/s; dominio 8 usa ×1.5. El último radio 7 m se cierra en 10 s, también en D8. Geometría exportada en la escena, velocidades/tiempos del balance existente.
+- La región exterior del frente es letal a cualquier altura; incluye el centro exacto al cerrar. Ignora zona franca, escudo y coraza mediante DamageType.PURGE y conserva atribución de HealthComponent. No depende de solapamientos de Area3D ni permite saltar el frente.
+- Runner ya admitido al portal queda fuera de la lista de blancos y puede completar su ascenso aunque cierre todo. El resto no reaparece: se deshabilita explícitamente PracticeRespawner y se bloquean R/F2 y recuperación por caída en PURGE/RESULTS.
+- Muerte del jugador durante Purga termina el ensayo en RESULTS, con penalización/atribución ya procesadas y modelo retirado. Enter inicia otro ensayo; F7 sale. F8, solo como herramienta de prueba, adelanta primero al aviso de 30 s y luego a Purga sin modificar balance.
+- CI añade purge.avi (18 s), adelantando solo el reloj del ensayo para mostrar frente y muerte. Ver resultados finales y revisión visual en el PR. Validación local inicial: 105 pruebas / 612 aserciones, lint y paquete aislado correctos.
+- PUR-034 sigue parcial respecto al dominio definitivo: el greybox no tiene las cuatro salas/compuertas. Falta sustituir este frente radial por geometría de salas y validar su cobertura; no presentar este ensayo como diseño final. Pendientes libres: dominio/áreas, bots, piloto, arte y guardado de campaña.
+
+Las entradas siguientes conservan el historial.
+
 ## 2026-11-05 · Codex · Puntaje de sesión en el ensayo de ronda
 
 Rama `feat/round-score` desde main tras PR #10 integrado. RoundScore vive bajo RoundProgress y consume eventos de participantes registrados; el HUD de F7 escucha score_changed.
