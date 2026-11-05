@@ -27,6 +27,8 @@ func _ready() -> void:
 
 func _process(delta: float) -> void:
 	super._process(delta)
+	$UI/SafeStatus.text = "ZONA FRANCA · ARMAS BLOQUEADAS · LA PURGA SÍ DAÑA" if (
+		runner.health.in_safe_zone) else ""
 	var clock: int = ceili(round_manager.seconds_left)
 	var phase: String = RoundManager.State.keys()[round_manager.state]
 	if round_manager.state in [RoundManager.State.INTRO, RoundManager.State.COUNTDOWN]:

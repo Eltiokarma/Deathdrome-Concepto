@@ -84,4 +84,11 @@ La cuota ya cuenta bajas atribuidas de los participantes registrados, incluso du
 
 En F7, cumple la cuota y conduce hacia el podio a la derecha del inicio (`x=0, z=15`). Cerrado es sólido; al cumplir la cuota su anillo toma tu color y puedes entrar. El control pasa a un ascenso de 3 s por túnel octogonal; la salida guarda el tiempo de entrada y lleva a RESULTS. Enter inicia la siguiente ronda. Esc pausa; no se permite R/F2/Enter durante el ascenso. El podio conserva colisión para Runners sin cuota.
 
-La escena sigue siendo un prototipo de un jugador con blanco inmóvil, sin zona franca física ni muros de Purga. El futuro nivel decidirá resultados multijugador; el portal publica `runner_escaped`, no concede puntaje ni créditos.
+La escena sigue siendo un prototipo de un jugador con blanco inmóvil, con zona franca alrededor del portal, pero sin muros de Purga. El futuro nivel decidirá resultados multijugador; el portal publica `runner_escaped`, no concede puntaje ni créditos.
+
+
+### Zona franca alrededor del portal
+
+En F7, el disco verde alrededor del podio protege y bloquea el láser mientras el origen del Runner esté dentro. El HUD lo indica. La Purga ignora esa protección. Salir del disco permite volver a disparar; saltar normalmente dentro conserva la protección.
+
+El volumen del ensayo tiene radio 7 m (no reproduce todavía la sala completa de Ø 40 m). Sigue `round.hub_safe_mode`: `always`, `round_start` (intro/cuenta y primeros 10 s de juego) u `off`. El temporizador usa RoundManager, por lo que respeta pausa y reinicio. Falta disipación de segmentos de barrera hasta implementar PUR-022.
