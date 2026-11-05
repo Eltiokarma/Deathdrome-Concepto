@@ -91,4 +91,4 @@ func test_round_scene_gates_controls_and_respawn() -> void:
 	assert_true(scene.runner.is_physics_processing())
 	clock.tick(300.0)
 	assert_false(scene.respawner.is_physics_processing())
-	assert_false(scene.runner.is_physics_processing())
+	assert_true(scene.runner.is_physics_processing(), "Puede escapar durante Purga")

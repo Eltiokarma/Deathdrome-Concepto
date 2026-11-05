@@ -17,6 +17,7 @@
     "warning_at_s": 30,
     "clock_yellow_at_s": 60
   },
+  "portal": {"ascent_s": 3.0, "ascent_height_m": 12.0},
   "purge": {
     "speed_mps": 3.5,
     "domain_8_speed_mult": 1.5,

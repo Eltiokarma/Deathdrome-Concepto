@@ -1,8 +1,10 @@
 extends "res://levels/_test/driving_sandbox.gd"
 ## Ensayo del ciclo; la Purga anuncia estado, todavía no genera muros letales.
 
+var _portal_driving: bool = false
 var _quota_text: String = ""
 
+@onready var portal: RoundPortal = $Portal
 @onready var round_manager: RoundManager = $RoundManager
 @onready var progress: RoundProgress = $RoundManager/RoundProgress
 @onready var round_label: Label = $UI/RoundStatus
@@ -11,10 +13,11 @@ var _quota_text: String = ""
 func _ready() -> void:
 	super._ready()
 	EventBus.round_state_changed.connect(_on_round_state)
+	EventBus.runner_escaped.connect(_on_escaped)
 	$UI/Title.text = "PURGA / ENSAYO DE RONDA"
 	$UI/Help.text = "WASD: conducir · Espacio: saltar · Clic/J: láser · Esc: pausa\n" + (
 		"Enter: terminar ensayo / siguiente ronda · F7: volver a práctica\n"
-		+ "Purga sin muros · Cuota por bajas atribuidas · Sin portal, bots ni puntaje de campaña"
+		+ "Purga sin muros · Portal a la derecha del inicio · Sin bots ni puntaje de campaña"
 	)
 	progress.register(runner)
 	progress.register(target)
@@ -41,7 +44,7 @@ func _unhandled_input(event: InputEvent) -> void:
 			get_tree().paused = false
 			get_tree().change_scene_to_file("res://levels/_test/driving_sandbox.tscn")
 			return
-		if event.keycode == KEY_ENTER and not get_tree().paused:
+		if event.keycode == KEY_ENTER and not get_tree().paused and not portal.is_ascending(runner):
 			if round_manager.state == RoundManager.State.RESULTS:
 				respawner.cancel()
 				runner.reset_at(SPAWN)
@@ -50,14 +53,16 @@ func _unhandled_input(event: InputEvent) -> void:
 			else:
 				round_manager.finish({"reason": "manual_sandbox"})
 			return
+	if portal.is_ascending(runner) and not event.is_action_pressed("pause"):
+		return
 	super._unhandled_input(event)
 
 
 func _on_round_state(state: int) -> void:
-	var playing: bool = state == RoundManager.State.PLAYING
-	runner.set_physics_process(playing)
+	var playing: bool = state in [RoundManager.State.PLAYING, RoundManager.State.PURGE]
+	runner.set_physics_process(playing and not portal.is_ascending(runner))
 	target.set_physics_process(playing)
-	respawner.set_physics_process(playing)
+	respawner.set_physics_process(state == RoundManager.State.PLAYING)
 	if not playing:
 		runner.laser.reset()
 		target.laser.reset()
@@ -70,3 +75,19 @@ func _on_quota_progress(participant: Runner, kills: int, quota: int) -> void:
 		return
 	_quota_text = "BAJAS %d / %d%s" % [kills, quota,
 		" · CUOTA CUMPLIDA" if kills >= quota else ""]
+
+
+func _on_escaped(participant: Runner, time_left: float) -> void:
+	if participant == runner:
+		round_manager.finish({"reason": "escaped", "escape_time_left": time_left})
+
+
+func _physics_process(delta: float) -> void:
+	super._physics_process(delta)
+	if get_tree().paused or "--portal-preview" not in OS.get_cmdline_user_args():
+		return
+	if progress.has_quota(runner) and not _portal_driving:
+		_portal_driving = true
+		runner.rotation.y = -PI / 2.0
+		runner.input_frame.laser = false
+		runner.input_frame.throttle = 0.5
