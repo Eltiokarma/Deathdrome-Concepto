@@ -84,7 +84,7 @@ La cuota ya cuenta bajas atribuidas de los participantes registrados, incluso du
 
 En F7, cumple la cuota y conduce hacia el podio a la derecha del inicio (`x=0, z=15`). Cerrado es sólido; al cumplir la cuota su anillo toma tu color y puedes entrar. El control pasa a un ascenso de 3 s por túnel octogonal; la salida guarda el tiempo de entrada y lleva a RESULTS. Enter inicia la siguiente ronda. Esc pausa; no se permite R/F2/Enter durante el ascenso. El podio conserva colisión para Runners sin cuota.
 
-La escena sigue siendo un prototipo de un jugador con blanco inmóvil, con zona franca alrededor del portal, pero sin muros de Purga. El futuro nivel decidirá resultados multijugador; el portal publica `runner_escaped`, no concede puntaje ni créditos.
+La escena sigue siendo un prototipo de un jugador con blanco inmóvil, con zona franca alrededor del portal, pero sin muros de Purga. El futuro nivel decidirá resultados multijugador; el portal publica `runner_escaped`, RoundScore concede el puntaje en F7; todavía no hay créditos de campaña.
 
 
 ### Zona franca alrededor del portal
@@ -98,4 +98,11 @@ El volumen del ensayo tiene radio 7 m (no reproduce todavía la sala completa de
 
 Mantén **L / Ctrl / X del mando** mientras conduces para dejar una estela de tu color. Energía según Runner; consume 30/s y regenera 10/s tras 1.5 s sin activación. El HUD muestra energía. Tus segmentos no te dañan ni bloquean; los rivales mueren al tocarlos y pueden saltarlos. Duran 3.5 s, incluso si muere el dueño. R limpia los segmentos de los Runners reiniciados.
 
-La zona franca impide emitir y disipa cualquier segmento que la toque. La comprobación de intersección es conservadora en bordes diagonales. No hay bonus de puntos todavía. Para captura reproducible: `godot --path game -- --barrier-preview`.
+La zona franca impide emitir y disipa cualquier segmento que la toque. La comprobación de intersección es conservadora en bordes diagonales. En F7, las bajas con barrera conceden su bonus de +250. Para captura reproducible: `godot --path game -- --barrier-preview`.
+
+
+### Puntaje de sesión (F7)
+
+El HUD muestra el total y el último cambio. Primera baja atribuida: 1300; las siguientes: 1000. Barrera/torre añaden 250; muerte sin atribución/suicidio resta 250. Escapar añade 2000 y 10 por segundo completo al entrar al portal; entrar durante Purga añade 1000. El tiempo de ascenso no reduce la recompensa.
+
+Enter para pasar a otra ronda conserva puntos y reinicia primera sangre. Morir o R tampoco borran el total. Salir del ensayo con F7 lo termina: no hay guardado persistente aún. Mercy kill tiene su regla y pruebas (+500 una vez por vida), pero falta el piloto y su interacción jugable.

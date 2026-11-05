@@ -4,6 +4,7 @@ extends "res://levels/_test/driving_sandbox.gd"
 var _portal_driving: bool = false
 var _quota_text: String = ""
 
+@onready var score: RoundScore = $RoundManager/RoundProgress/RoundScore
 @onready var portal: RoundPortal = $Portal
 @onready var round_manager: RoundManager = $RoundManager
 @onready var progress: RoundProgress = $RoundManager/RoundProgress
@@ -14,10 +15,11 @@ func _ready() -> void:
 	super._ready()
 	EventBus.round_state_changed.connect(_on_round_state)
 	EventBus.runner_escaped.connect(_on_escaped)
+	EventBus.score_changed.connect(_on_score_changed)
 	$UI/Title.text = "PURGA / ENSAYO DE RONDA"
 	$UI/Help.text = "WASD: conducir · Espacio: saltar · Clic/J: láser · Esc: pausa\n" + (
 		"Enter: terminar ensayo / siguiente ronda · F7: volver a práctica\n"
-		+ "Purga sin muros · Portal a la derecha del inicio · Sin bots ni puntaje de campaña"
+		+ "Purga sin muros · Portal a la derecha del inicio · Puntaje de sesión · Sin bots"
 	)
 	progress.register(runner)
 	progress.register(target)
@@ -81,7 +83,8 @@ func _on_quota_progress(participant: Runner, kills: int, quota: int) -> void:
 
 func _on_escaped(participant: Runner, time_left: float) -> void:
 	if participant == runner:
-		round_manager.finish({"reason": "escaped", "escape_time_left": time_left})
+		round_manager.finish({"reason": "escaped", "escape_time_left": time_left,
+			"score": score.points_for(runner)})
 
 
 func _physics_process(delta: float) -> void:
@@ -93,3 +96,8 @@ func _physics_process(delta: float) -> void:
 		runner.rotation.y = -PI / 2.0
 		runner.input_frame.laser = false
 		runner.input_frame.throttle = 0.5
+
+
+func _on_score_changed(participant: Runner, delta: int, _reason: StringName) -> void:
+	if participant == runner:
+		$UI/ScoreStatus.text = "PUNTAJE %d (%+d)" % [score.points_for(runner), delta]

@@ -1,5 +1,18 @@
 # Relevo de trabajo — Codex / Claude
 
+## 2026-11-05 · Codex · Puntaje de sesión en el ensayo de ronda
+
+Rama `feat/round-score` desde main tras PR #10 integrado. RoundScore vive bajo RoundProgress y consume eventos de participantes registrados; el HUD de F7 escucha score_changed.
+
+- Bajas: 1000; primera baja atribuida de cada ronda +300; weapon_id barrier/tower añade +250. Muerte sin atribución/suicidio resta 250. Mercy kill da +500 una vez por vida, sin afectar cuota; su emisor jugable/piloto sigue pendiente.
+- Escape con cuota: +2000 y 10 por segundo completo del reloj capturado al entrar. Entrada exactamente con reloj 0 da +1000 de Purga. Terminar el ascenso durante Purga no concede ese bonus si se entró antes. El resultado del ensayo incluye el total ya actualizado.
+- Se deduplican muertes por life_id, mercy kill por vida y escapes por ronda; no se puntúa en intro/cuenta/resultados. La primera sangre es compartida por todos los participantes y se reinicia entre rondas.
+- Los puntos sobreviven muerte, reset de vehículo y nuevas rondas/dominios dentro de la misma sesión/instancia. Volver con F7 y recrear la escena inicia otra sesión. No hay guardado, récords, créditos ni campaña persistente: el futuro gestor debe conservar o persistir RoundScore y la identidad de sus participantes.
+- Los bonus usan balance.json existente, sin cambiar valores. IDs de armas admitidos para bonus: barrier y tower. Fuentes externas no registradas se ignoran.
+- Ver pruebas/CI y revisión de round.avi en el PR. Siguientes bloques: muros de Purga, bots y piloto; quedan libres al cerrar esta entrega.
+
+Las entradas siguientes conservan el historial.
+
 ## 2026-11-05 · Codex · Barrera con reserva de segmentos (PUR-022)
 
 Rama `feat/PUR-022-barrier` desde main después del PR #9. Mantener L / Ctrl / botón X del mando activa la estela; el HUD muestra energía. No se cambian consumo, regeneración, altura ni duración originales.
