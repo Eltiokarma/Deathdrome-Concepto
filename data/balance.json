@@ -115,10 +115,10 @@
       "lock_reference_weapons": 3,
       "lock_time_per_weapon_point_s": -0.05,
       "lock_half_angle_deg": 20,
-      "lock_range_m": 70,
+      "lock_range_m": 175,
       "speed_mps": 32,
       "turn_rate_deg_s": 90,
-      "lifetime_s": 4.0
+      "lifetime_s": 6.0
     },
     "shockwave": {
       "unlock_domain": 2,
@@ -199,7 +199,7 @@
   "ai": {
     "think_hz": 30,
     "vision_half_angle_deg": 70,
-    "vision_range_m": 60,
+    "vision_range_m": 150,
     "hearing_range_m": 25,
     "memory_s": 4,
     "max_bots_targeting_player": 2,

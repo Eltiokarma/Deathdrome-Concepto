@@ -1,5 +1,29 @@
 # Relevo de trabajo — Codex / Claude
 
+## 2026-11-06 · Alcances a escala ×6 y salas 2–4 del Penal Altiplano
+
+**Alcances (pedido de Gerson):**
+- Visión de bots: 60 → **150 m**.
+- Radar: 60 → **150 m**, solo en docs porque el HUD aún no existe.
+- Fijación de misil: 70 → **175 m**, con vida del misil de 4 → **6 s** para que alcance a volar esa distancia.
+- Docs 02, 05, 06 y 08 actualizados.
+
+**Salas 2–4:**
+- Construidas en el greybox (`LARGE_ROOMS`); las cuatro salas y conexiones abiertas, porque las compuertas por ronda (PUR-036) siguen pendientes.
+- `room_layout(gate)`, `room_point(u, d, gate)` y `corridor_point()` generalizan la construcción.
+- Rutas `--route-2/3/4` en la escena de prueba.
+- Ficha con tabla, planos SVG por sala y resultados.
+
+**Verificado en local:** **115 pruebas / 807 aserciones**, lint, datos y paquete.
+- Recta libre máxima del dominio: 220.5 m.
+- Rutas de las salas 2/3/4: 45/50/39 s.
+
+**Siguiente bloque sugerido:**
+- compuertas por ronda (PUR-036) y AreaTracker (PUR-032) sobre esta escena;
+- después, Purga por salas (PUR-034) con 10 m/s.
+
+---
+
 ## 2026-11-06 · Escala ×6 oficial, láser 150 m y Purga 10 m/s (decisión de Gerson)
 
 **Decisión:** Gerson adoptó como oficial la sala grande (×6 en largo, hub ×3) y pidió subir láser y Purga.

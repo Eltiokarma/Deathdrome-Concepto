@@ -47,7 +47,7 @@
 | **Integridad** | `NN %` | Verde > 60 %, amarillo 30–60 %, rojo < 30 %; sacudida al recibir daño |
 | **ALERTA** | Etiqueta roja | Visible si: te fijaron un misil, integridad < 25 % o la Purga está a < 15 m |
 | **Área** | `ÁREA N` | Cambia al cruzar un umbral de área |
-| **Radar** | Cuadrado de 64×64 px, 60 m de alcance, rotado con el jugador | Enemigos como puntos de su color; fuera de rango, triángulos en el borde; pickups como cruces pequeñas; portal abierto en tu color; frente de la Purga como borde rojo |
+| **Radar** | Cuadrado de 64×64 px, 150 m de alcance (igual al láser desde la escala ×6), rotado con el jugador | Enemigos como puntos de su color; fuera de rango, triángulos en el borde; pickups como cruces pequeñas; portal abierto en tu color; frente de la Purga como borde rojo |
 | **Créditos** | Hasta 9 rombos | — |
 
 ### En el mundo (3D, sobre la escena)

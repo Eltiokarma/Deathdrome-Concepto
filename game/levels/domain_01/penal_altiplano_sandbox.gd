@@ -31,9 +31,30 @@ const LARGE_ROUTES := {
 		Vector2(0, 160), Vector2(0, 146), Vector2(-36, 140), Vector2(-36, 90),
 		Vector2(-14, 80), Vector2(-14, 12), Vector2(-3, 3),
 	],
+	# Taller: sube al anillo, recorre su lado oeste, cae al centro y vuelve por el este.
+	"2": [
+		Vector2(-20, 5), Vector2(-26, 20), Vector2(-33, 34), Vector2(-33, 48), Vector2(-45, 55),
+		Vector2(-54, 66), Vector2(-54, 95), Vector2(-40, 104), Vector2(0, 110), Vector2(0, 150),
+		Vector2(0, 172),
+		Vector2(20, 186), Vector2(45, 186), Vector2(70, 180), Vector2(75, 150), Vector2(75, 70),
+		Vector2(70, 36), Vector2(20, 36), Vector2(14, 16), Vector2(12, 5), Vector2(2, 2),
+	],
+	# Galería: plataforma oeste, galería central y canal este.
+	"3": [
+		Vector2(-20, 5), Vector2(-50, 30), Vector2(-70, 40), Vector2(-70, 70), Vector2(-70, 136),
+		Vector2(-45, 136), Vector2(-25, 136), Vector2(-25, 150), Vector2(8, 148),
+		Vector2(8, 172), Vector2(56, 172), Vector2(94, 168), Vector2(104, 150),
+		Vector2(104, 62), Vector2(90, 40), Vector2(30, 30), Vector2(14, 16), Vector2(12, 5),
+		Vector2(2, 2),
+	],
+	# Patio de vigilancia: patio sureste, torre central, patio noroeste y portón oeste.
+	"4": [
+		Vector2(20, 5), Vector2(14, 20), Vector2(14, 60), Vector2(14, 70), Vector2(4, 82),
+		Vector2(0, 90), Vector2(0, 108), Vector2(0, 128), Vector2(0, 134), Vector2(-14, 138),
+		Vector2(-35, 165), Vector2(-60, 160), Vector2(-92, 125), Vector2(-92, 95),
+		Vector2(-60, 60), Vector2(-60, 40), Vector2(-30, 16), Vector2(-12, 5), Vector2(-2, 2),
+	],
 }
-const ROUTE_ENTRY := [Vector2(2, -24), Vector2(-2, -34)]
-const ROUTE_EXIT := [Vector2(0, -26), Vector2(0, -12), Vector2(0, -2)]
 const ARRIVE_M := 3.0
 const CORNER_LOOKAHEAD_M := 10.0
 const CORNER_SPEED_MPS := 14.0
@@ -47,6 +68,7 @@ var _time: float = 0.0
 var _wall_hits: int = 0
 var _was_on_wall: bool = false
 var _overview_angle: float = 0.6
+var _gate: int = 1
 @onready var greybox: PenalAltiplanoGreybox = $Greybox
 @onready var runner: Runner = $Runner
 @onready var overview: Camera3D = $Overview
@@ -60,23 +82,27 @@ func _ready() -> void:
 		overview.make_current()
 		runner.controller = null
 		return
-	for key: String in ROUTES:
+	for key: String in LARGE_ROUTES:
 		if "--route-" + key in args:
 			start_route(key)
 	runner.get_node("RunnerCamera/SpringArm3D/Camera3D").make_current()
 
 
+## Rutas "a" y "b" recorren la sala 1; "2", "3" y "4" las salas homónimas.
 func start_route(key: String) -> void:
+	_gate = key.to_int() if key.is_valid_int() else 1
 	_reset_runner()
 	_route_name = key
 	_route = []
 	if greybox.is_large():
-		for point: Vector2 in ROUTE_ENTRY:
-			_route.append(greybox.map_point(point))
+		_route.append(greybox.corridor_point(_gate, 2, 24))
+		_route.append(greybox.corridor_point(_gate, -2, 84))
 		for point: Vector2 in LARGE_ROUTES[key]:
-			_route.append(greybox.room_point(point.x, point.y))
-		for point: Vector2 in ROUTE_EXIT:
-			_route.append(greybox.map_point(point))
+			_route.append(greybox.room_point(point.x, point.y, _gate))
+		var axis: Vector3 = greybox.GATES[_gate]
+		_route.append(greybox.corridor_point(_gate, 0, 36))
+		_route.append(Vector2(axis.x, axis.z) * 20.0)
+		_route.append(Vector2(axis.x, axis.z) * 2.0)
 	else:
 		for point: Vector2 in ROUTES[key]:
 			_route.append(greybox.map_point(point))
@@ -91,8 +117,8 @@ func start_route(key: String) -> void:
 func _physics_process(delta: float) -> void:
 	if overview.current:
 		_overview_angle += delta * 0.25
-		var focus := Vector3(0, 0, greybox.room_center_z / 2.0)
-		var reach: float = absf(greybox.room_center_z) * 1.05
+		var focus := Vector3.ZERO if greybox.is_large() else Vector3(0, 0, greybox.room_center_z / 2.0)
+		var reach: float = absf(greybox.room_center_z) * (1.6 if greybox.is_large() else 1.05)
 		overview.position = focus + Vector3(sin(_overview_angle) * reach, reach * 1.25,
 				cos(_overview_angle) * reach)
 		overview.look_at(focus)
@@ -144,16 +170,18 @@ func _corner_angle() -> float:
 
 func _track_events() -> void:
 	var p: Vector3 = runner.global_position
-	if p.z < -greybox.corridor_end:
-		_log("entra sala 1")
+	var along: float = p.dot(greybox.GATES[_gate])
+	var room_key: String = "entra sala %d" % _gate
+	if along > greybox.corridor_end:
+		_log(room_key)
 	if greybox.is_large():
-		if p.y > greybox.LARGE_LEDGE_HEIGHT - 0.3 and p.z < -greybox.corridor_end:
+		if p.y > greybox.LARGE_LEDGE_HEIGHT - 0.3 and along > greybox.corridor_end:
 			_log("sobre pasarela/plataforma")
 	else:
 		var platform: Rect2 = greybox.map_rect(greybox.PLATFORM)
 		if p.y > greybox.PLATFORM_HEIGHT - 0.2 and platform.has_point(Vector2(p.x, p.z)):
 			_log("sobre P1")
-	if route_events.has("entra sala 1") and Vector2(p.x, p.z).length() < greybox.hub_radius:
+	if route_events.has(room_key) and Vector2(p.x, p.z).length() < greybox.hub_radius:
 		_log("vuelve al hub")
 	if p.y > greybox.PODIUM_HEIGHT - 0.2 and Vector2(p.x, p.z).length() < greybox.PODIUM_RADIUS:
 		_log("sobre podio")
@@ -176,7 +204,7 @@ func _log(event: String) -> void:
 
 
 func _reset_runner() -> void:
-	var spawn: Dictionary = PenalAltiplanoGreybox.spawn_transforms()[0]
+	var spawn: Dictionary = PenalAltiplanoGreybox.spawn_transforms()[2 * (_gate - 1)]
 	runner.reset_at(spawn.position + Vector3.UP * 0.1, spawn.yaw)
 
 

@@ -114,7 +114,7 @@ Tres slots. Cada pickup llena un slot libre (se pueden repetir). Con los 3 lleno
 
 | Arma | Dominio | Daño | Efecto | Detalle |
 |---|---|---|---|---|
-| **Misil rastreador** | 1 | 40 PI directo | — | Fijación de 0.6 s en cono de ±20° a ≤ 70 m. Sin fijación sale en línea recta. 32 m/s, giro 90°/s, vida 4 s. Al iniciar la fijación el blanco recibe el aviso **"TE TIENEN FIJADO"**. Se esquiva con giros cerrados o saltando en el último momento |
+| **Misil rastreador** | 1 | 40 PI directo | — | Fijación de 0.6 s en cono de ±20° a ≤ 175 m (antes 70 m; escala ×6). Sin fijación sale en línea recta. 32 m/s, giro 90°/s, vida 6 s (antes 4 s, para que el alcance de vuelo, 192 m, cubra la fijación). Al iniciar la fijación el blanco recibe el aviso **"TE TIENEN FIJADO"**. Se esquiva con giros cerrados o saltando en el último momento |
 | **Onda de choque** | 2 | 50 PI en el centro → 15 PI en el borde | Detona torres en el radio | Radio 10 m, altura 1.6 m, requiere línea de visión, no te daña |
 | **Embestida** | 3 | 60 PI + empuje | — | Fijación de 0.3 s a ≤ 25 m. Impulso de 1.0 s a ×2.2 de tu velocidad máxima, con dirección asistida. Si fallas, quedas lento 1.5 s. Te hace 5 PI |
 | **Drenador** | 4 | 30 PI en 5 s (6 PI/s) | Vacía tu barrera y bloquea su regeneración 5 s | Proyectil de 40 m/s, alcance 50 m |

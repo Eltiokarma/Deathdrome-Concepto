@@ -51,6 +51,35 @@ Interior de la sala 1, en coordenadas locales (u = X del mundo, d = metros desde
 - disparo saltando sobre el podio;
 - torres reales, bots y rendimiento con ocho Runners en salas de 216 m.
 
+## Salas 2–4 (escala oficial, 2026-11-06)
+
+Mismo formato que la sala 1: 216 × 216 m, techo de 12 m, deflector de 18 × 2 m a 8 m de la entrada, plataformas a +3 m con rampas de 9 m (18.4°). Coordenadas locales: u a la derecha mirando desde el hub, d desde la entrada. Las listas exactas están en `LARGE_ROOMS` de `penal_altiplano_greybox.gd`. Las compuertas por ronda (R1: 1–2 / R2: +3 / R3: +4) todavía no existen (PUR-036): en el greybox las cuatro salas están abiertas.
+
+| Sala | Abre | Identidad | Altura | Coberturas | Reservas |
+|---|---|---|---|---|---|
+| 2 · Taller | R1 | Anillo elevado de 120 × 120 m (12 m de ancho) con huecos a ras de suelo en sus cuatro lados; máquinas (bloques de 6 × 6 m) alrededor | Anillo +3 m, 4 rampas exteriores | 13 pilares interiores del anillo, 11 bloques perimetrales, 2 muros bajos | 4 T, 5 M (2 en el anillo), 2 H |
+| 3 · Galería | R2 | Dos plataformas laterales de 60 × 96 m unidas por una galería central de columnas; canales de 8 m junto a los muros | 2 plataformas +3 m, 6 rampas | 23 pilares en la galería, 3 bloques centrales, 2 muros bajos, 3 bloques al fondo | 4 T, 5 M (2 en altura), 2 H |
+| 4 · Patio de vigilancia | R3 | Cruz de muros unida a una torre central de 24 × 24 m que divide cuatro patios. Se pasa entre patios por portones de 16 m junto a los muros laterales y por pasos de 9 m al pie de las rampas de la torre | Torre +3 m, 2 rampas | 18 pilares, 12 muros bajos alternados (horizontales y verticales) | 4 T, 5 M (1 en la torre), 2 H |
+
+![Sala 2 · Taller](img/01_penal_altiplano_sala2.svg)
+![Sala 3 · Galería](img/01_penal_altiplano_sala3.svg)
+![Sala 4 · Patio de vigilancia](img/01_penal_altiplano_sala4.svg)
+
+### Verificación de las salas 2–4
+
+| Comprobación | Resultado |
+|---|---|
+| Recta libre más larga (barrido 3D de todo el dominio) | **220.5 m** ≤ 225 m. Por sala, en 2D: sala 2 221.6 m, sala 3 221.6 m, sala 4 218.3 m |
+| Reservas ocultas desde el hub | Las 47 del dominio |
+| Contenido mínimo por sala (prueba) | 4–6 torres, ≥ 5 secundarias, ≥ 2 orbes de salud, zona de altura, ≥ 12 pilares |
+| Rutas de piloto automático (Amaru) | Sala 2: 45 s · Sala 3: 50 s · Sala 4: 39 s. Las tres suben a altura y vuelven al portal; la sala correspondiente queda a 7.1 s del spawn |
+
+**Cómo se diseñaron:** se iteró la planta con un cálculo 2D de rectas libres. Algunas coberturas se colocaron automáticamente en el punto medio de la recta más larga, siempre a ≥ 5 m de otros obstáculos y a ≥ 6 m de las rutas: 1 en la sala 2, 9 en la sala 3 y 2 en la sala 4. En la sala 4 no bastaba con pilares: hubo que unir la cruz de muros a la torre y llevar los portones junto a los muros laterales.
+
+**Pendiente:**
+- **Roces:** las rutas aún rozan el marco de la puerta al salir de cada sala.
+- **Juego real:** compuertas por ronda, Purga por salas, bots y playtest de escala.
+
 ## Base histórica rev. 2–3 (escala ×1, sustituida)
 Las secciones siguientes, hasta «Purga», documentan la escala anterior (sala de 36 m) y cómo se llegó a ella. El greybox todavía la construye con `--layout-scale=1 --hub-scale=1` para comparar.
 

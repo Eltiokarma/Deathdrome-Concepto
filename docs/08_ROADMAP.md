@@ -350,7 +350,7 @@ Objetivo: siete bots que completan rondas de forma creíble.
 **Depende de:** PUR-021
 
 **Criterios de aceptación**
-- [ ] Cono ±70°, 60 m, línea de visión; oído a 25 m; memoria de 4 s.
+- [ ] Cono ±70°, 150 m, línea de visión; oído a 25 m; memoria de 4 s.
 
 ### PUR-051 · BotBrain y estados base
 **Etiquetas:** `ai`  
@@ -417,7 +417,7 @@ Objetivo: el juego completo envuelto en su interfaz.
 **Depende de:** PUR-060
 
 **Criterios de aceptación**
-- [ ] Rotado con el jugador, 60 m, marcadores de borde, pickups, portal y frente de la Purga.
+- [ ] Rotado con el jugador, 150 m, marcadores de borde, pickups, portal y frente de la Purga.
 
 ### PUR-063 · Menú principal y opciones de partida
 **Etiquetas:** `ui`  

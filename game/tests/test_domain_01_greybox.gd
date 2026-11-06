@@ -74,7 +74,10 @@ func test_spawns_clear_of_podium_ramps_with_margin() -> void:
 
 func test_reserves_hidden_from_hub_at_gun_and_jump_height() -> void:
 	var reserves: Array[Node] = get_tree().get_nodes_in_group(&"design_reserve")
-	assert_eq(reserves.size(), Layout.LARGE_RESERVES.size())
+	var expected: int = 0
+	for gate: int in Layout.GATES:
+		expected += Layout.room_layout(gate).reserves.size()
+	assert_eq(reserves.size(), expected)
 	var viewpoints: Array[Vector3] = []
 	for ring: float in [8.0, 12.0, 0.5, 0.8, 0.99]:
 		var radius: float = ring if ring > 1.0 else greybox.hub_radius * ring
@@ -123,6 +126,29 @@ func test_route_b_loops_on_floor_and_returns() -> void:
 	assert_true(events.has("sobre podio"), "Ruta B vuelve al portal")
 
 
+func test_rooms_2_to_4_loops_climb_and_return() -> void:
+	for gate: int in [2, 3, 4]:
+		var events: Dictionary = await _run_route(str(gate))
+		assert_true(events.has("fin de ruta"), "Ruta de sala %d completa: %s" % [gate, events])
+		assert_lt(events.get("entra sala %d" % gate, INF), ROOM_REACH_S, "Sala %d alcanzable" % gate)
+		assert_true(events.has("sobre pasarela/plataforma"), "Sala %d tiene juego vertical" % gate)
+		assert_true(events.has("sobre podio"), "Sala %d vuelve al portal" % gate)
+
+
+func test_every_room_has_minimum_content() -> void:
+	# docs/04 §2 (escalado): torres, secundarias, salud, altura y coberturas en cada sala.
+	for gate: int in Layout.GATES:
+		var layout: Dictionary = Layout.room_layout(gate)
+		var counts := {"T": 0, "M": 0, "H": 0}
+		for id: String in layout.reserves:
+			counts[id.left(1)] += 1
+		assert_between(counts.T, 4, 6, "Sala %d: torres" % gate)
+		assert_gte(counts.M, 5, "Sala %d: secundarias" % gate)
+		assert_gte(counts.H, 2, "Sala %d: salud" % gate)
+		assert_gt(layout.ledges.size(), 0, "Sala %d: zona de altura" % gate)
+		assert_gte(layout.pillars.size(), 12, "Sala %d: coberturas" % gate)
+
+
 func _run_route(key: String) -> Dictionary:
 	sandbox.start_route(key)
 	for _second: int in range(ROUTE_LIMIT_S):
@@ -144,10 +170,11 @@ func _ground_room(u: float, d: float) -> float:
 
 func _walkable_grid(spacing: float) -> Array[Vector3]:
 	var points: Array[Vector3] = []
-	var x: float = -greybox.corridor_end
-	while x <= greybox.corridor_end:
-		var z: float = greybox.room_center_z - greybox.room_half + 0.5
-		while z <= greybox.hub_radius:
+	var reach: float = greybox.corridor_end + 2.0 * greybox.room_half
+	var x: float = -reach
+	while x <= reach:
+		var z: float = -reach
+		while z <= reach:
 			var origin := Vector3(x, GUN_HEIGHT, z)
 			if _is_open(origin):
 				points.append(origin)
@@ -179,13 +206,18 @@ func _in_layout(point: Vector3) -> bool:
 	var inset: float = 0.2
 	if flat.length() < greybox.hub_radius - inset:
 		return true
-	var half_gate: float = Layout.GATE_WIDTH / 2.0 - inset
-	if absf(point.x) < half_gate and point.z <= 0.0:
-		return point.z > -greybox.corridor_end
-	if absf(point.z) < half_gate and point.x >= 0.0:
-		return point.x < greybox.corridor_end
-	var half: float = greybox.room_half - inset
-	return absf(point.x) < half and absf(point.z - greybox.room_center_z) < half
+	for gate: int in Layout.GATES:
+		var axis: Vector3 = Layout.GATES[gate]
+		var along: float = point.dot(axis)
+		var lateral: float = absf(point.dot(axis.cross(Vector3.UP)))
+		if along > greybox.hub_radius and along < greybox.corridor_end:
+			if lateral < Layout.GATE_WIDTH / 2.0 - inset:
+				return true
+		var room_end: float = greybox.corridor_end + 2.0 * greybox.room_half
+		if along > greybox.corridor_end + inset and along < room_end - inset:
+			if lateral < greybox.room_half - inset:
+				return true
+	return false
 
 
 func _ray_length(origin: Vector3, direction: Vector3, limit: float) -> float:
