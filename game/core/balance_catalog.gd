@@ -102,6 +102,14 @@ func get_s(path: String) -> String:
 	return value
 
 
+func get_a(path: String) -> Array:
+	var value: Variant = _lookup(_balance, path)
+	if not value is Array:
+		push_error("Balance: se esperaba Array: " + path)
+		return []
+	return (value as Array).duplicate(true)
+
+
 func runner(id: StringName) -> RunnerStats:
 	if not _runners.has(id):
 		push_error("Balance: Runner desconocido: " + str(id))

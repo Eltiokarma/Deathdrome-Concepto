@@ -222,6 +222,7 @@ func _ready() -> void:
 		for gate: int in GATES:
 			_build_corridor(gate, false)
 			_build_large_room(gate)
+			_build_gate(gate)
 	else:
 		_build_corridor(1, false)
 		_build_corridor(2, true)
@@ -314,6 +315,45 @@ static func room_layout(gate: int) -> Dictionary:
 		"blocks": LARGE_BLOCKS, "ledges": LARGE_LEDGES, "ramps": LARGE_RAMPS,
 		"pillars": pillars, "reserves": LARGE_RESERVES,
 	}
+
+
+## Área de un punto (solo X/Z): 0 = hub, 1–4 = sala con su conexión, -1 = fuera del nivel.
+## `inset` encoge cada área desde sus umbrales: un punto a menos de `inset` de un umbral
+## devuelve -1. AreaTracker lo usa para no parpadear en el borde.
+func area_at(point: Vector3, inset: float = 0.0) -> int:
+	if Vector2(point.x, point.z).length() < hub_radius - inset:
+		return 0
+	var room_end: float = corridor_end + 2.0 * room_half
+	for gate: int in GATES:
+		var axis: Vector3 = GATES[gate]
+		var along: float = point.dot(axis)
+		if along <= hub_radius + inset or along >= room_end:
+			continue
+		var lateral: float = absf(point.dot(axis.cross(Vector3.UP)))
+		var half_width: float = GATE_WIDTH / 2.0 + WALL if along <= corridor_end else room_half
+		if lateral < half_width:
+			return gate
+	return -1
+
+
+## Distancia más lejana de una sala al centro del hub (borde exterior de su muro de fondo).
+func area_far_edge() -> float:
+	return corridor_end + 2.0 * room_half
+
+
+## Compuertas por ronda (PUR-036): cerrada = losa roja sólida con luz roja en el umbral.
+func set_gate_open(gate: int, open: bool) -> void:
+	var slab: StaticBody3D = get_node_or_null("Gate%d" % gate)
+	if slab == null:
+		return
+	slab.visible = not open
+	slab.get_node("Collision").disabled = open
+	slab.collision_layer = 0 if open else 1
+
+
+func is_gate_open(gate: int) -> bool:
+	var slab: StaticBody3D = get_node_or_null("Gate%d" % gate)
+	return slab == null or not slab.visible
 
 
 func set_ceilings_visible(value: bool) -> void:
@@ -435,6 +475,25 @@ func _build_corridor(gate: int, sealed: bool) -> void:
 		var end: Vector3 = axis * (corridor_end + WALL / 2.0) + Vector3.UP * GATE_HEIGHT / 2.0
 		_box(corridor, "Seal", end, _oriented(axis, Vector3(GATE_WIDTH, GATE_HEIGHT, WALL)), "wall")
 		_label(corridor, "ÁREA %d · interior pendiente" % gate, end - axis + Vector3.UP, 48)
+
+
+## Losa de compuerta en el umbral del hub; abierta por defecto (el greybox libre recorre todo).
+func _build_gate(gate: int) -> void:
+	var axis: Vector3 = GATES[gate]
+	var center: Vector3 = axis * (hub_radius + WALL / 2.0) + Vector3.UP * GATE_HEIGHT / 2.0
+	var slab := _box(self, "Gate%d" % gate, center,
+			_oriented(axis, Vector3(GATE_WIDTH, GATE_HEIGHT, WALL)), "closed")
+	slab.get_child(1).name = "Collision"
+	slab.add_to_group(&"greybox_gate")
+	var light := OmniLight3D.new()
+	light.name = "RedLight"
+	light.light_color = Color(1, 0.1, 0.05)
+	light.light_energy = 3.0
+	light.omni_range = 14.0
+	light.position = -axis * 2.0 + Vector3.UP * 1.0
+	slab.add_child(light)
+	_label(slab, "%d" % gate, -axis * 0.6, 160)
+	set_gate_open(gate, true)
 
 
 func _build_closed_gate(gate: int) -> void:

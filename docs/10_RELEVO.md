@@ -1,5 +1,28 @@
 # Relevo de trabajo — Codex / Claude
 
+## 2026-11-06 · Áreas, compuertas por ronda y Purga por salas (PUR-032, 036, 034)
+
+**Nuevo en `game/round/`:**
+- **`area_tracker.gd`:** `area_changed` una vez por cruce; hay que penetrar 1 m en el área nueva, así que oscilar en el umbral no emite nada.
+- **`gate_controller.gd`:** abre según `round.open_areas_by_round`. Añade `Balance.get_a()` para leer arrays.
+- **`domain_purge_field.gd` (+ `.tscn`):** hereda de `PurgeField`, que ahora separa `_advance()` de la aplicación del daño, sin cambio de comportamiento. Un frente por sala desde el muro de fondo, después el cierre del hub. Las salas con compuerta cerrada son letales desde el inicio.
+
+**Greybox:**
+- `area_at(point, inset)`, `area_far_edge()`.
+- Compuertas `GateN`: losa roja, luz roja, `set_gate_open`.
+- En la escena:
+  - `--round=N` activa reloj, compuertas y Purga;
+  - `--purge-preview` muestra la huida desde el fondo de la sala 1;
+  - F7 pasa a la ronda siguiente.
+
+**Verificado en local:** **120 pruebas / 873 aserciones**, lint, datos y paquete.
+
+**Pendiente:**
+- Portal real en esta escena (PUR-033 existe en el sandbox de ronda). Ahora llegar al podio en la vista previa cuenta como escapar.
+- Respawn de ronda (PUR-023/024), inventario/pickups (PUR-040), bots (PUR-050+).
+
+---
+
 ## 2026-11-06 · Alcances a escala ×6 y salas 2–4 del Penal Altiplano
 
 **Alcances (pedido de Gerson):**

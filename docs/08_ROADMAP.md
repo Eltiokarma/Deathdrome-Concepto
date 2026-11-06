@@ -226,7 +226,7 @@ Implementa D-01. Soporta `hub_safe_mode`: `always` (por defecto), `round_start` 
 **Depende de:** PUR-030
 
 **Criterios de aceptación**
-- [ ] `area_changed` se emite una sola vez al cruzar cada umbral, sin parpadeos en el borde.
+- [x] `area_changed` se emite una sola vez al cruzar cada umbral, sin parpadeos en el borde. (`round/area_tracker.gd`, margen de 1 m; `tests/test_domain_rounds.gd`)
 
 ### PUR-033 · Portal y ascenso
 **Etiquetas:** `gameplay`, `art`  
@@ -243,8 +243,8 @@ Implementa D-07: se abre solo para quien cumplió la cuota, iluminado en su colo
 **Depende de:** PUR-030
 
 **Criterios de aceptación**
-- [ ] Avance de 10 m/s desde los perímetros; cierre del Área 0 en 10 s.
-- [ ] Mata sin reaparición; cubre el 100 % del volumen jugable.
+- [x] Avance de 10 m/s desde los perímetros; cierre del Área 0 en 10 s. (`round/domain_purge_field.gd` en el Dominio 1)
+- [x] Mata sin reaparición; cubre el 100 % del volumen jugable (prueba de cobertura del Dominio 1; salas cerradas letales desde el inicio). Falta verificarlo en los dominios 2–8 cuando existan.
 - [ ] Aviso a 0:30 (sirena, reloj rojo).
 
 ### PUR-035 · Puntaje y atribución
@@ -260,7 +260,7 @@ Implementa D-07: se abre solo para quien cumplió la cuota, iluminado en su colo
 **Depende de:** PUR-030
 
 **Criterios de aceptación**
-- [ ] R1 abre áreas 1–2, R2 suma la 3, R3 suma la 4; las cerradas tienen luz roja.
+- [x] R1 abre áreas 1–2, R2 suma la 3, R3 suma la 4; las cerradas tienen luz roja. (`round/gate_controller.gd`, lee `round.open_areas_by_round`)
 
 ---
 

@@ -1,6 +1,7 @@
 extends Node3D
 ## Banco del greybox hub + sala 1. Piloto automático y vista aérea son herramientas de revisión.
-## Argumentos: --overview-preview (vista aérea sin techos), --route-a / --route-b (piloto).
+## Argumentos: --overview-preview (vista aérea sin techos), --route-a/b/2/3/4 (piloto),
+## --round=N (ronda N con compuertas, reloj y Purga), --purge-preview (huida de la Purga).
 
 ## Ruta A (alta) y B (suelo) de la ficha, como puntos de paso en X/Z del mundo.
 const ROUTES := {
@@ -55,6 +56,12 @@ const LARGE_ROUTES := {
 		Vector2(-60, 60), Vector2(-60, 40), Vector2(-30, 16), Vector2(-12, 5), Vector2(-2, 2),
 	],
 }
+## Huida de la Purga desde el fondo de la sala 1 hasta el portal (coordenadas locales).
+const ESCAPE_START := Vector2(10, 195)
+const ESCAPE_ROUTE := [
+	Vector2(8, 160), Vector2(4, 150), Vector2(28, 140), Vector2(28, 84), Vector2(28, 40),
+	Vector2(14, 16), Vector2(12, 5), Vector2(2, 2),
+]
 const ARRIVE_M := 3.0
 const CORNER_LOOKAHEAD_M := 10.0
 const CORNER_SPEED_MPS := 14.0
@@ -69,9 +76,14 @@ var _wall_hits: int = 0
 var _was_on_wall: bool = false
 var _overview_angle: float = 0.6
 var _gate: int = 1
+var _escaped: bool = false
 @onready var greybox: PenalAltiplanoGreybox = $Greybox
 @onready var runner: Runner = $Runner
 @onready var overview: Camera3D = $Overview
+@onready var clock: RoundManager = $RoundManager
+@onready var tracker: AreaTracker = $AreaTracker
+@onready var purge: DomainPurgeField = $DomainPurgeField
+@onready var status: Label = $UI/Status
 
 
 func _ready() -> void:
@@ -81,11 +93,58 @@ func _ready() -> void:
 		greybox.set_ceilings_visible(false)
 		overview.make_current()
 		runner.controller = null
+		if "--purge-preview" in args:
+			start_purge_preview()
 		return
 	for key: String in LARGE_ROUTES:
 		if "--route-" + key in args:
 			start_route(key)
+	for arg: String in args:
+		if arg.begins_with("--round="):
+			start_round(arg.get_slice("=", 1).to_int())
+	if "--purge-preview" in args:
+		start_purge_preview()
 	runner.get_node("RunnerCamera/SpringArm3D/Camera3D").make_current()
+
+
+## Ronda de prueba: compuertas por ronda, reloj y Purga del dominio. Sin portal ni cuota.
+func start_round(round_index: int) -> void:
+	if clock.state in [RoundManager.State.INTRO, RoundManager.State.COUNTDOWN]:
+		# RoundManager solo termina rondas en juego: se adelanta la intro antes de reiniciar.
+		var countdown: float = Balance.get_f("round.countdown_s")
+		clock.tick(clock.phase_left + (countdown if clock.state == RoundManager.State.INTRO
+				else 0.0) + 0.001)
+	if clock.state not in [RoundManager.State.LOADING, RoundManager.State.RESULTS]:
+		clock.finish({"reason": "sandbox_restart"})
+	clock.begin(1, round_index)
+
+
+## Coloca al Runner al fondo de la sala 1 con el reloj a punto de terminar; al empezar la
+## Purga, el piloto automático huye hacia el portal por delante del frente.
+func start_purge_preview() -> void:
+	start_round(1)
+	clock.tick(Balance.get_f("round.intro_s") + Balance.get_f("round.countdown_s")
+			+ Balance.get_f("round.duration_s") - 3.0)
+	var start: Vector2 = greybox.room_point(ESCAPE_START.x, ESCAPE_START.y)
+	runner.reset_at(Vector3(start.x, 0.1, start.y), 0.0)
+	runner.rotation.y = PI
+	runner.controller = null
+	EventBus.purge_started.connect(_start_escape, CONNECT_ONE_SHOT)
+
+
+func _start_escape() -> void:
+	_gate = 1
+	_route_name = "huida"
+	_route = []
+	for point: Vector2 in ESCAPE_ROUTE:
+		_route.append(greybox.room_point(point.x, point.y))
+	_route.append(greybox.corridor_point(1, 0, 36))
+	_route.append(Vector2(0, -20))
+	_route.append(Vector2(0, -2))
+	_waypoint = 0
+	_time = 0.0
+	route_events = {}
+	route_finished = false
 
 
 ## Rutas "a" y "b" recorren la sala 1; "2", "3" y "4" las salas homónimas.
@@ -114,6 +173,27 @@ func start_route(key: String) -> void:
 	runner.controller = null
 
 
+func _process(_delta: float) -> void:
+	var area: int = tracker.area_of(runner)
+	var text: String = "ÁREA %s" % (str(area) if area >= 0 else "—")
+	if clock.state != RoundManager.State.LOADING:
+		var phase: String = RoundManager.State.keys()[clock.state]
+		var seconds: int = ceili(clock.seconds_left)
+		text += "   |   R%d · %s · %02d:%02d" % [clock.round_index, phase, seconds / 60,
+				seconds % 60]
+		if clock.state == RoundManager.State.PURGE:
+			text += "   |   FRENTE A %.0f m DEL HUB" % purge.front_along()
+	if runner.health.destroyed:
+		text += "   |   PURGADO"
+	elif _escaped:
+		text += "   |   A SALVO EN EL PODIO (sin portal en esta escena)"
+	status.text = text
+	status.modulate = (Color(1, 0.3, 0.3) if clock.state == RoundManager.State.PURGE
+			or (clock.state == RoundManager.State.PLAYING
+			and clock.seconds_left <= Balance.get_f("round.warning_at_s"))
+			else Color(1, 0.85, 0.4))
+
+
 func _physics_process(delta: float) -> void:
 	if overview.current:
 		_overview_angle += delta * 0.25
@@ -139,6 +219,10 @@ func _drive_toward(target: Vector2) -> void:
 			runner.input_frame = InputFrame.new()
 			_log("fin de ruta")
 			route_finished = true
+			if _route_name == "huida":
+				# Esta escena no tiene portal (PUR-033): llegar al podio cuenta como escapar.
+				runner.remove_from_group("runners")
+				_escaped = true
 			print("ROUTE %s %s paredes=%d" % [
 				_route_name.to_upper(), JSON.stringify(route_events), _wall_hits])
 		return
@@ -209,7 +293,9 @@ func _reset_runner() -> void:
 
 
 func _unhandled_input(event: InputEvent) -> void:
-	if event.is_action_pressed("reset_runner"):
+	if event is InputEventKey and event.pressed and not event.echo and event.keycode == KEY_F7:
+		start_round(clock.round_index % 3 + 1 if clock.state != RoundManager.State.LOADING else 1)
+	elif event.is_action_pressed("reset_runner"):
 		_reset_runner()
 	elif event.is_action_pressed("pause"):
 		get_tree().paused = not get_tree().paused

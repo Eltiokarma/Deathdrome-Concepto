@@ -205,6 +205,8 @@ El centro contiene el portal: las rutas reales lo rodean. Medir desde spawns con
 - Retorno al portal tras cuota: entradas visibles y sin torres con línea directa al hub.
 
 ## Purga: contrato para implementación
+**Implementado (2026-11-06)** en `round/domain_purge_field.gd`, con `AreaTracker` y `GateController` en la escena del greybox (`--round=N`, `--purge-preview`). Pruebas en `tests/test_domain_rounds.gd`. La huida de prueba, desde el fondo de la sala 1 hasta el hub, tarda 17.4 s; un Runner que se queda en la sala muere.
+
 Propuesta (rev. 4):
 - Un frente por sala abierta, desde el borde exterior de la sala hasta el umbral del hub: 216 m de sala + 84 m de conexión = 300 m a 10 m/s, unos 30 s.
 - Después, cierre del hub en 10 s.
