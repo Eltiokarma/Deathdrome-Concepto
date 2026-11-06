@@ -15,6 +15,25 @@ const ROUTES := {
 		Vector2(0, -26), Vector2(0, -12), Vector2(0, -2),
 	],
 }
+## Variante grande: tramo dentro de la sala en coordenadas locales (u, d); la entrada y la
+## vuelta por conexión y hub reutilizan los puntos de la ruta normal.
+const LARGE_ROUTES := {
+	"a": [
+		Vector2(-20, 5), Vector2(-102, 10), Vector2(-102, 30), Vector2(-102, 120),
+		Vector2(-100, 208), Vector2(-40, 210), Vector2(-40, 190), Vector2(0, 160),
+		Vector2(0, 146), Vector2(0, 114), Vector2(0, 88), Vector2(0, 30), Vector2(14, 16),
+		Vector2(3, 3),
+	],
+	"b": [
+		Vector2(20, 5), Vector2(14, 20), Vector2(14, 84), Vector2(35, 92), Vector2(40, 114),
+		Vector2(40, 138),
+		Vector2(56, 146), Vector2(56, 162), Vector2(56, 178), Vector2(16, 178),
+		Vector2(0, 160), Vector2(0, 146), Vector2(-36, 140), Vector2(-36, 90),
+		Vector2(-14, 80), Vector2(-14, 12), Vector2(-3, 3),
+	],
+}
+const ROUTE_ENTRY := [Vector2(2, -24), Vector2(-2, -34)]
+const ROUTE_EXIT := [Vector2(0, -26), Vector2(0, -12), Vector2(0, -2)]
 const ARRIVE_M := 3.0
 const CORNER_LOOKAHEAD_M := 10.0
 const CORNER_SPEED_MPS := 14.0
@@ -51,8 +70,16 @@ func start_route(key: String) -> void:
 	_reset_runner()
 	_route_name = key
 	_route = []
-	for point: Vector2 in ROUTES[key]:
-		_route.append(greybox.map_point(point))
+	if greybox.is_large():
+		for point: Vector2 in ROUTE_ENTRY:
+			_route.append(greybox.map_point(point))
+		for point: Vector2 in LARGE_ROUTES[key]:
+			_route.append(greybox.room_point(point.x, point.y))
+		for point: Vector2 in ROUTE_EXIT:
+			_route.append(greybox.map_point(point))
+	else:
+		for point: Vector2 in ROUTES[key]:
+			_route.append(greybox.map_point(point))
 	_waypoint = 0
 	_time = 0.0
 	_wall_hits = 0
@@ -64,9 +91,9 @@ func start_route(key: String) -> void:
 func _physics_process(delta: float) -> void:
 	if overview.current:
 		_overview_angle += delta * 0.25
-		var focus := Vector3(0, 0, -26.0 * greybox.layout_scale)
-		var reach: float = 55.0 * greybox.layout_scale
-		overview.position = focus + Vector3(sin(_overview_angle) * reach, 70.0 * greybox.layout_scale,
+		var focus := Vector3(0, 0, greybox.room_center_z / 2.0)
+		var reach: float = absf(greybox.room_center_z) * 1.05
+		overview.position = focus + Vector3(sin(_overview_angle) * reach, reach * 1.25,
 				cos(_overview_angle) * reach)
 		overview.look_at(focus)
 	if runner.position.y < -8.0:
@@ -119,9 +146,13 @@ func _track_events() -> void:
 	var p: Vector3 = runner.global_position
 	if p.z < -greybox.corridor_end:
 		_log("entra sala 1")
-	var platform: Rect2 = greybox.map_rect(greybox.PLATFORM)
-	if p.y > greybox.PLATFORM_HEIGHT - 0.2 and platform.has_point(Vector2(p.x, p.z)):
-		_log("sobre P1")
+	if greybox.is_large():
+		if p.y > greybox.LARGE_LEDGE_HEIGHT - 0.3 and p.z < -greybox.corridor_end:
+			_log("sobre pasarela/plataforma")
+	else:
+		var platform: Rect2 = greybox.map_rect(greybox.PLATFORM)
+		if p.y > greybox.PLATFORM_HEIGHT - 0.2 and platform.has_point(Vector2(p.x, p.z)):
+			_log("sobre P1")
 	if route_events.has("entra sala 1") and Vector2(p.x, p.z).length() < greybox.hub_radius:
 		_log("vuelve al hub")
 	if p.y > greybox.PODIUM_HEIGHT - 0.2 and Vector2(p.x, p.z).length() < greybox.PODIUM_RADIUS:
@@ -140,6 +171,8 @@ func _track_events() -> void:
 func _log(event: String) -> void:
 	if not route_events.has(event):
 		route_events[event] = snappedf(_time, 0.01)
+		if "--route-log" in OS.get_cmdline_user_args():
+			print("EVENT %.2f %s wp=%d %s" % [_time, event, _waypoint, runner.global_position])
 
 
 func _reset_runner() -> void:

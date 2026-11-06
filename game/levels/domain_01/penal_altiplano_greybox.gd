@@ -32,6 +32,45 @@ const RESERVES := {
 	"M1": Vector3(-14, 2, -64), "M2": Vector3(4, 0, -68), "M3": Vector3(15, 0, -62),
 	"H1": Vector3(-1, 0, -66),
 }
+## Variante grande (prueba de escala, 2026-11-06): con `layout_scale` ≥ LARGE_FROM la sala 1 no
+## se estira, se llena con un interior propio en coordenadas locales (u = X, d = metros desde la
+## entrada hacia el fondo). Medidas en metros reales, no escaladas.
+const LARGE_FROM := 3.0
+const LARGE_ROOM_CEILING := 12.0
+const LARGE_LEDGE_HEIGHT := 3.0
+const LARGE_RAMP_RUN := 9.0
+## [u0, u1, d0, d1, altura] (altura 0 = hasta el techo).
+const LARGE_BLOCKS := [
+	[-9, 9, 8, 10, 0],
+	[-96, -64, 150, 151, 0], [-48, -8, 150, 151, 0], [8, 48, 150, 151, 0], [64, 96, 150, 151, 0],
+	[-33, -31, 151, 170, 0], [-33, -31, 186, 204, 0], [31, 33, 151, 170, 0], [31, 33, 186, 204, 0],
+	[-2, 2, 175, 179, 0], [-72, -68, 175, 179, 0], [68, 72, 175, 179, 0],
+	[-82, -78, 90, 94, 0], [78, 82, 90, 94, 0], [-82, -78, 134, 138, 0], [78, 82, 134, 138, 0],
+	[-60, -44, 100, 101, 1.2], [44, 60, 100, 101, 1.2], [-60, -44, 127, 128, 1.2],
+	[44, 60, 127, 128, 1.2], [-78, -62, 114, 115, 1.2], [62, 78, 114, 115, 1.2],
+]
+## Plataformas a LARGE_LEDGE_HEIGHT: pasarelas perimetrales y plataforma central.
+const LARGE_LEDGES := [
+	[-108, -96, 24, 216], [96, 108, 24, 216], [-96, 96, 204, 216], [-20, 20, 94, 134],
+]
+## Rampas: [u_pie, d_pie, dirección cuesta arriba (u, d), ancho].
+const LARGE_RAMPS := [
+	[-102, 15, Vector2(0, 1), 12], [102, 15, Vector2(0, 1), 12],
+	[-40, 195, Vector2(0, 1), 12], [40, 195, Vector2(0, 1), 12],
+	[0, 85, Vector2(0, 1), 10], [0, 143, Vector2(0, -1), 10],
+	[-29, 114, Vector2(1, 0), 10], [29, 114, Vector2(-1, 0), 10],
+]
+## Campo de pilares 2 × 2 m alineado: calles rectas de 12 m entre columnas.
+const LARGE_PILLAR_ROWS := [34, 48, 62, 76]
+const LARGE_PILLAR_STEP := 14.0
+const LARGE_PILLAR_SPAN := 77.0
+const LARGE_RESERVES := {
+	"T1": Vector3(-35, 0, 55), "T2": Vector3(49, 0, 41), "T3": Vector3(0, 0, 160),
+	"T4": Vector3(-70, 0, 192), "T5": Vector3(70, 0, 162), "T6": Vector3(35, 0, 100),
+	"M1": Vector3(-102, 3, 120), "M2": Vector3(102, 3, 160), "M3": Vector3(0, 3, 114),
+	"M4": Vector3(-64, 0, 177), "M5": Vector3(64, 0, 192), "M6": Vector3(-21, 0, 69),
+	"H1": Vector3(0, 0, 192), "H2": Vector3(-50, 0, 114),
+}
 ## Ejes cardinales de las compuertas: 1 norte (abierta), 2 este (abierta, sala sin interior),
 ## 3 sur y 4 oeste (cerradas en R1).
 const GATES := {
@@ -42,6 +81,9 @@ const GATES := {
 ## conexiones y sala; conserva anchos de paso, alturas, pendientes, podio y portal.
 ## 1.0 = cotas de la ficha. También con `--layout-scale=<x>` o la variable PURGA_LAYOUT_SCALE.
 @export var layout_scale: float = 1.0
+## Escala propia del hub; ≤ 0 usa layout_scale. `--hub-scale=<x>` o PURGA_HUB_SCALE.
+@export var hub_scale: float = 0.0
+var room_ceiling: float = ROOM_CEILING
 var hub_radius: float = HUB_RADIUS
 var corridor_end: float = CORRIDOR_END
 var room_half: float = ROOM_HALF
@@ -52,9 +94,17 @@ var _materials: Dictionary = {}
 func _ready() -> void:
 	if OS.has_environment("PURGA_LAYOUT_SCALE"):
 		layout_scale = OS.get_environment("PURGA_LAYOUT_SCALE").to_float()
+	if OS.has_environment("PURGA_HUB_SCALE"):
+		hub_scale = OS.get_environment("PURGA_HUB_SCALE").to_float()
 	for arg: String in OS.get_cmdline_user_args():
 		if arg.begins_with("--layout-scale="):
 			layout_scale = arg.get_slice("=", 1).to_float()
+		elif arg.begins_with("--hub-scale="):
+			hub_scale = arg.get_slice("=", 1).to_float()
+	if hub_scale <= 0.0:
+		hub_scale = layout_scale
+	if is_large():
+		room_ceiling = LARGE_ROOM_CEILING
 	hub_radius = PODIUM_RAMP_FOOT + 0.5 + (HUB_RADIUS - PODIUM_RAMP_FOOT - 0.5) * _hub_stretch()
 	corridor_end = hub_radius + (CORRIDOR_END - HUB_RADIUS) * layout_scale
 	room_half = ROOM_HALF * layout_scale
@@ -116,7 +166,17 @@ func map_rect(rect: Rect2, keep_depth: bool = false, keep_size: bool = false) ->
 
 func _hub_stretch() -> float:
 	var core: float = PODIUM_RAMP_FOOT + 0.5
-	return (HUB_RADIUS * layout_scale - core) / (HUB_RADIUS - core)
+	var scale_value: float = hub_scale if hub_scale > 0.0 else layout_scale
+	return (HUB_RADIUS * scale_value - core) / (HUB_RADIUS - core)
+
+
+func is_large() -> bool:
+	return layout_scale >= LARGE_FROM
+
+
+## Punto local de la sala 1 (u = X, d = metros desde la entrada) en X/Z del mundo.
+func room_point(u: float, d: float) -> Vector2:
+	return Vector2(u, -corridor_end - d)
 
 
 func set_ceilings_visible(value: bool) -> void:
@@ -249,31 +309,36 @@ func _build_room_1() -> void:
 	var outer: float = size + 2.0 * WALL
 	var near_z: float = room_center_z + room_half
 	var far_z: float = room_center_z - room_half
-	var wall_y: float = ROOM_CEILING / 2.0
+	var wall_y: float = room_ceiling / 2.0
 	_box(room, "Floor", Vector3(0, -0.05, room_center_z), Vector3(outer, 0.1, outer), "floor", false)
-	var ceiling := _box(room, "Ceiling", Vector3(0, ROOM_CEILING + 0.25, room_center_z),
+	var ceiling := _box(room, "Ceiling", Vector3(0, room_ceiling + 0.25, room_center_z),
 			Vector3(outer, 0.5, outer), "ceiling")
 	ceiling.add_to_group(&"greybox_ceiling")
 	_box(room, "WallNorth", Vector3(0, wall_y, far_z - WALL / 2.0),
-			Vector3(outer, ROOM_CEILING, WALL), "wall")
+			Vector3(outer, room_ceiling, WALL), "wall")
 	for sign_value: float in [-1.0, 1.0]:
 		var label: String = "West" if sign_value < 0 else "East"
 		_box(room, "Wall" + label,
 				Vector3(sign_value * (room_half + WALL / 2.0), wall_y, room_center_z),
-				Vector3(WALL, ROOM_CEILING, size), "wall")
+				Vector3(WALL, room_ceiling, size), "wall")
 		var piece: float = room_half - GATE_WIDTH / 2.0
 		_box(room, "WallSouth" + label,
 				Vector3(sign_value * (GATE_WIDTH / 2.0 + piece / 2.0), wall_y, near_z + WALL / 2.0),
-				Vector3(piece, ROOM_CEILING, WALL), "wall")
-	_box(room, "Lintel", Vector3(0, (GATE_HEIGHT + ROOM_CEILING) / 2.0, near_z + WALL / 2.0),
-			Vector3(GATE_WIDTH, ROOM_CEILING - GATE_HEIGHT, WALL), "wall")
+				Vector3(piece, room_ceiling, WALL), "wall")
+	_box(room, "Lintel", Vector3(0, (GATE_HEIGHT + room_ceiling) / 2.0, near_z + WALL / 2.0),
+			Vector3(GATE_WIDTH, room_ceiling - GATE_HEIGHT, WALL), "wall")
+	if is_large():
+		_build_room_1_large(room)
+		var large_exit := _label(room, "SALIDA ↓ 0", Vector3(0, 7.0, near_z - 0.05), 96, false)
+		large_exit.rotation.y = PI
+		return
 	var deflector: Rect2 = map_rect(DEFLECTOR, true)
-	_box(room, "Deflector", _rect_center(deflector, ROOM_CEILING / 2.0),
-			Vector3(deflector.size.x, ROOM_CEILING, deflector.size.y), "block")
+	_box(room, "Deflector", _rect_center(deflector, room_ceiling / 2.0),
+			Vector3(deflector.size.x, room_ceiling, deflector.size.y), "block")
 	for pillar: String in PILLARS:
 		var rect: Rect2 = map_rect(PILLARS[pillar], false, true)
-		_box(room, pillar, _rect_center(rect, ROOM_CEILING / 2.0),
-				Vector3(rect.size.x, ROOM_CEILING, rect.size.y), "block")
+		_box(room, pillar, _rect_center(rect, room_ceiling / 2.0),
+				Vector3(rect.size.x, room_ceiling, rect.size.y), "block")
 	var platform: Rect2 = map_rect(PLATFORM)
 	_box(room, "Platform", _rect_center(platform, PLATFORM_HEIGHT / 2.0),
 			Vector3(platform.size.x, PLATFORM_HEIGHT, platform.size.y), "platform")
@@ -285,6 +350,46 @@ func _build_room_1() -> void:
 	_label(room, "1", Vector3(0, 3.0, deflector.end.y + 0.05), 256, false)
 	var exit_label := _label(room, "SALIDA ↓ 0", Vector3(0, 5.5, near_z - 0.05), 64, false)
 	exit_label.rotation.y = PI
+
+
+func _build_room_1_large(room: Node3D) -> void:
+	var index: int = 0
+	for block: Array in LARGE_BLOCKS:
+		var height: float = block[4] if block[4] > 0.0 else room_ceiling
+		var material: String = "block" if block[4] > 0.0 or index == 0 else "wall"
+		_local_box(room, "Deflector" if index == 0 else "Block%d" % index,
+				block[0], block[1], block[2], block[3], height, material)
+		index += 1
+	index = 0
+	for ledge: Array in LARGE_LEDGES:
+		_local_box(room, "Ledge%d" % index, ledge[0], ledge[1], ledge[2], ledge[3],
+				LARGE_LEDGE_HEIGHT, "platform")
+		index += 1
+	index = 0
+	for ramp: Array in LARGE_RAMPS:
+		var foot: Vector2 = room_point(ramp[0], ramp[1])
+		var direction: Vector2 = ramp[2]
+		var uphill := Vector3(direction.x, 0, -direction.y)
+		_ramp(room, "LargeRamp%d" % index, Vector3(foot.x, 0, foot.y), uphill, ramp[3],
+				LARGE_RAMP_RUN, LARGE_LEDGE_HEIGHT, 0.0)
+		index += 1
+	for d: float in LARGE_PILLAR_ROWS:
+		var u: float = -LARGE_PILLAR_SPAN
+		while u <= LARGE_PILLAR_SPAN + 0.1:
+			_local_box(room, "Pillar_%d_%d" % [u, d], u - 1, u + 1, d - 1, d + 1, room_ceiling,
+					"block")
+			u += LARGE_PILLAR_STEP
+	var face: Vector2 = room_point(0, 8)
+	_label(room, "1", Vector3(face.x, 4.0, face.y + 0.05), 384, false)
+
+
+func _local_box(
+	parent: Node, id: String, u0: float, u1: float, d0: float, d1: float, height: float,
+	material: String,
+) -> void:
+	var center: Vector2 = room_point((u0 + u1) / 2.0, (d0 + d1) / 2.0)
+	_box(parent, id, Vector3(center.x, height / 2.0, center.y),
+			Vector3(u1 - u0, height, d1 - d0), material)
 
 
 func _build_spawns() -> void:
@@ -306,11 +411,13 @@ func _build_reserves() -> void:
 	var reserves := Node3D.new()
 	reserves.name = "DesignReserves"
 	add_child(reserves)
-	for id: String in RESERVES:
+	var table: Dictionary = LARGE_RESERVES if is_large() else RESERVES
+	for id: String in table:
 		var marker := Marker3D.new()
 		marker.name = id
-		var source: Vector3 = RESERVES[id]
-		var flat: Vector2 = map_point(Vector2(source.x, source.z))
+		var source: Vector3 = table[id]
+		var flat: Vector2 = (room_point(source.x, source.z) if is_large()
+				else map_point(Vector2(source.x, source.z)))
 		marker.position = Vector3(flat.x, source.y, flat.y)
 		marker.add_to_group(&"design_reserve")
 		reserves.add_child(marker)

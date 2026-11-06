@@ -1,5 +1,37 @@
 # Relevo de trabajo — Codex / Claude
 
+## 2026-11-06 · Prototipo grande de la sala 1 (escala ×6 en largo, pedido por Gerson)
+
+Gerson revisó la prueba a ×2.45 y pidió **otro ×2.45 (≈ ×6 en largo, ≈ ×36 en superficie)**, **llenando el espacio**. Aportó capturas del original como referencia de escala (salas-nave abiertas, techos altos, pasarelas elevadas perimetrales); se usan solo para escala, según las reglas clean-room.
+
+**Implementado:**
+- Uso: `--layout-scale=6 --hub-scale=3` (o variables `PURGA_LAYOUT_SCALE` / `PURGA_HUB_SCALE`).
+- Con escala ≥ 3 la sala 1 usa un interior propio de **216 × 216 m** con techo de 12 m:
+  - deflector a la entrada;
+  - campo de pilares 2 × 2 m con calles de 12 m;
+  - plataforma central de 40 × 40 m a +3 m con cuatro rampas;
+  - muros bajos de 1.2 m (saltables) y bloques;
+  - pasarelas perimetrales a +3 m con rampas;
+  - tres cámaras al fondo tras un muro con tres huecos de 16 m.
+- Hub Ø120 m; conexiones de 84 m.
+- Por defecto todo sigue en escala 1: ficha, pruebas y balance sin cambios.
+
+**Medido:**
+- Ruta A (pasarelas, plataforma, cámaras): 52 s.
+- Ruta B (suelo): 43 s.
+- Sala 1 a 7.1 s del spawn.
+- Sin roces salvo el pie de la rampa del podio.
+- Reservas ocultas al hub.
+- **Línea libre más larga: 223 m**, frente a 60 m del láser.
+
+**Pendiente de decisión de Gerson:** si se adopta esta escala, actualizar `docs/04` (métricas), la ficha y el balance. Afecta a:
+- alcance del láser/misil (o aceptar líneas largas sin daño);
+- velocidad de Purga (a 3.5 m/s barrer 216 m tarda ~62 s);
+- cuotas y encuentros con 8 Runners;
+- rendimiento.
+
+---
+
 ## 2026-11-06 · Prueba de escala pedida por Gerson (sin decisión todavía)
 
 Gerson recuerda los mapas del original como unas **6 veces más grandes en superficie** (≈2.45× en largo). El greybox acepta ahora `layout_scale` (`--layout-scale=2.45` o `PURGA_LAYOUT_SCALE=2.45`). Escala la planta y conserva anchos de paso, alturas, pendientes, podio y portal. Por defecto vale 1.0: ficha, pruebas y balance no cambian.
