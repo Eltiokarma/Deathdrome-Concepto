@@ -1,5 +1,34 @@
 # Relevo de trabajo — Codex / Claude
 
+## 2026-11-06 · Claude: greybox hub + sala 1 (PUR-070 rev. 3, avance de PUR-071)
+
+**Rama:** `claude/determined-heisenberg-jj3o54` (misma PR que la rev. 2).
+**Archivos nuevos:**
+- `game/levels/domain_01/penal_altiplano_greybox.gd`: geometría generada desde constantes, que son las mismas cotas de la ficha.
+- `game/levels/domain_01/penal_altiplano_sandbox.{gd,tscn}`: escena jugable, piloto automático `--route-a`/`--route-b` y vista aérea `--overview-preview`.
+- `game/tests/test_domain_01_greybox.gd`: 7 pruebas.
+
+**Archivos modificados:** ficha, SVG y CI (graba un video de la ruta A).
+
+**Hallazgos físicos que corrigieron el plano:**
+- El deflector a 6 m era imposible de esquivar a velocidad máxima (radio de giro de 10–13 m). Pasó a 8 m, que se sostiene porque las rampas del podio también cortan líneas.
+- Paso de 2 m entre el deflector y la rampa RA: P1 y RA retroceden 2 m.
+- Juntas de suelo solapadas enganchaban al Runner: ahora hay un único suelo de colisión.
+
+**Verificado:** suite completa en local con Godot 4.6.3: **112 pruebas / 679 aserciones**, lint, datos y paquete. Las cifras de líneas, rutas y spawns están en la ficha.
+
+**Sin verificar:**
+- playtest humano de la frenada ante D1;
+- salto sobre el podio;
+- torres reales, bots, rendimiento con ocho Runners;
+- salas 2–4.
+
+PUR-071 **no** está terminado.
+
+**Siguiente bloque sugerido:** interiores de las salas 2 y 3 con el mismo método (plano → comprobación 2D → greybox → pruebas). En paralelo, AreaTracker PUR-032 sobre esta escena.
+
+---
+
 ## 2026-11-06 · Claude: PUR-070 rev. 2 (hub, podio y sala 1)
 
 **Rama:** `claude/determined-heisenberg-jj3o54`, partiendo de `main` en `3dc5618`. **Archivos:** `docs/dominios/01_penal_altiplano.md`, `docs/dominios/img/01_penal_altiplano.svg` y esta nota. Entrega solo documental: no cambia código ni balance.

@@ -6,7 +6,7 @@ Cuatro patios cubiertos enseñan conducción, salto, cobertura y regreso al port
 
 ## Modificador
 Ninguno. Tutorial implícito según [diseño de dominios](../04_DOMINIOS_Y_NIVELES.md).
-**Estado: propuesta PUR-070, rev. 2 (2026-11-06).** El hub, el acceso al podio y el interior de la sala 1 tienen coordenadas; las salas 2–4 siguen siendo solo envolventes. Es un plano, no un nivel construido, y ninguna métrica de juego está certificada. No cambia balance.
+**Estado: PUR-070 rev. 3 (2026-11-06).** El hub, el podio y la sala 1 están construidos como greybox en `game/levels/domain_01/` y medidos con física real (ver «Greybox: verificación física»). La rev. 3 corrige la rev. 2 con lo aprendido al conducir. Las salas 2–4 siguen siendo solo envolventes. No cambia balance.
 
 ## Plano (imagen en docs/dominios/img/)
 ![Implantación del Penal Altiplano](img/01_penal_altiplano.svg)
@@ -57,15 +57,15 @@ Un deflector en cada sala debe cortar la recta axial antes de 60 m y ofrecer dos
 Las coordenadas concretas de la sala 1 están en la sección siguiente; las salas 2–4 se resolverán en entregas aparte.
 Compuertas cerradas sólidas y rojas; número ≥3 m visible desde hub; salida rotulada “SALIDA ↓ 0”.
 
-## Sala 1 · Patio de ingreso: interior (rev. 2)
+## Sala 1 · Patio de ingreso: interior (rev. 3)
 
 Coordenadas en metros del mundo. La sala ocupa X −18…18, Z −70…−34; su entrada (conexión de 8 m) desemboca en Z = −34, X −4…4. «Bloque» significa sólido hasta el techo (6 m), para que corte también la línea de tiro de un Runner que salta.
 
 | Elemento | Posición (X; Z) | Notas |
 |---|---|---|
-| Deflector D1 | X −10…10; Z −42…−40 (20 × 2 m, bloque) | Cara frontal a 6 m de la entrada. Deja dos pasos de 8 m: oeste X −18…−10 y este X 10…18 |
-| Plataforma P1 | X −18…−10; Z −70…−52, +2 m | Bordes este y sur abiertos (caída de 2 m), sin callejón |
-| Rampa RA | X −18…−10; Z −52…−46, sube hacia el norte | 8 m de ancho, 6 m de desarrollo, 18.4°; el paso oeste lleva recto a ella |
+| Deflector D1 | X −9…9; Z −44…−42 (18 × 2 m, bloque) | Cara frontal a 8 m de la entrada. Deja dos pasos de 9 m: oeste X −18…−9 y este X 9…18 |
+| Plataforma P1 | X −18…−10; Z −70…−54, +2 m | Bordes este y sur abiertos (caída de 2 m), sin callejón |
+| Rampa RA | X −18…−10; Z −54…−48, sube hacia el norte | 8 m de ancho, 6 m de desarrollo, 18.4°; 4 m de suelo entre D1 y su pie |
 | Pilar C1 | X −2…0; Z −59…−57 (bloque 2 × 2) | 8 m hasta el borde de P1 y 9 m hasta C2 |
 | Pilar C2 | X 9…11; Z −63…−61 (bloque 2 × 2) | 7 m hasta la pared este y 7 m hasta la pared norte |
 | Torre T1 | (−7; −50) | Junto a la rampa RA, a 17 m de la entrada |
@@ -73,27 +73,46 @@ Coordenadas en metros del mundo. La sala ocupa X −18…18, Z −70…−34; su
 | Misiles M1 / M2 / M3 | (−14; −64) en P1 · (4; −68) · (15; −62) | Reserva de diseño: el sistema de pickups (PUR-040) no existe todavía |
 | Salud H1 | (−1; −66) | Detrás de C1 |
 
-Separación entre coberturas (D1 → C1 → C2): 13.0 m y 11.7 m, dentro del rango de 10–15 m.
+Separación entre coberturas (D1 → C1 → C2): 15.0 m y 11.7 m, dentro del rango de 10–15 m.
 
 **Dos rutas de paso (lazos alrededor de D1):**
 - **Ruta A, alta:** entrada → paso oeste → rampa RA → P1 (M1) → caída por el borde este → corredor norte entre C1/C2 y la pared → paso este → salida.
-- **Ruta B, suelo:** entrada → paso este (T2) → franja Z −46…−56 entre D1 y C1 → pie de la rampa (T1) → paso oeste → salida.
+- **Ruta B, suelo:** entrada → paso este (T2) → franja Z −46…−56 entre D1 y C1 → junto a la rampa (T1) → paso oeste → salida.
 
 Desde la entrada, ambos pasos laterales vuelven a la conexión; no hay callejones a menos de 10 m de la puerta.
 
-### Comprobaciones en planta (2D, rev. 2)
-Script de muestreo sobre el hub, las cuatro conexiones (cerradas en el borde de las salas 2–4) y la sala 1 con D1, C1 y C2 como obstáculos. El podio bloquea las líneas a ras de suelo.
+### Comprobaciones en planta (2D, rev. 3)
+Script de muestreo sobre el hub, las cuatro conexiones (cerradas en el borde de las salas 2–4) y la sala 1, con D1, C1, C2, el podio y sus rampas como obstáculos a ras de suelo.
 
 | Criterio | Resultado |
 |---|---|
-| Línea recta libre más larga | **59.4 m** (cara frontal de D1 → por la conexión → pared del hub) ≤ 60 m. Con D1 a Z −44…−42 daba 61.5 m y con −43…−41 daba 60.4 m: por eso D1 queda a 6 m de la entrada |
-| Cono visible desde el hub | Cualquier línea hub→sala tiene \|ΔX/ΔZ\| ≤ 8/14; en Z = −40 alcanza \|X\| ≤ 7.4 m < 10 m (semiancho de D1). Nada al norte de D1 es visible desde el hub |
+| Línea recta libre más larga | **59.0 m** (cara frontal de D1 → por la conexión → pared del hub) ≤ 60 m. Contando las rampas del podio, D1 puede ir a 8 m de la entrada; a 10 m daba 61.2 m |
+| Cono visible desde el hub | Cualquier línea hub→sala tiene \|ΔX/ΔZ\| ≤ 8/14; en Z = −42 alcanza \|X\| ≤ 8.6 m < 9 m (semiancho de D1). Nada al norte de D1 es visible desde el hub |
 | Torres y pickups visibles desde el Área 0 | Ninguno (T1, T2, M1–M3, H1) |
-| Anchos | Pasos laterales de 8 m, entre C1 y C2 9 m, de C2 a las paredes 7 m: dentro de 7–9 m |
+| Anchos | Pasos laterales de 9 m, entre C1 y C2 9 m, de C2 a las paredes 7 m: dentro de 7–9 m |
 | Pendientes | Rampas del podio y RA: 18.4° |
 | Diagonal interior de la sala | 50.9 m ≤ 60 m |
 
-**Pendiente de verificar físicamente (blockout):** frenada y giro en los 6 m entre la entrada y D1 a 23.5 m/s; línea de tiro de un Runner que salta sobre el podio (las líneas entre compuertas opuestas cruzan el podio a \|X\| < 4 m); radio de explosión de 8 m de T1 sobre la rampa; caída desde P1 y techo de 6 m con la cámara lejana; colisión de los spawns con el volumen real del Runner; navegación de bots. Nada de esto se extrapola a las salas 2–4.
+### Greybox: verificación física (rev. 3)
+Escena `res://levels/domain_01/penal_altiplano_sandbox.tscn`, construida por código desde las constantes de `penal_altiplano_greybox.gd` (mismas cotas que esta ficha). Pruebas en `tests/test_domain_01_greybox.gd`.
+
+| Comprobación | Resultado |
+|---|---|
+| Alturas y pendientes (rayos) | Podio 1.5 m, P1 2 m, cuatro rampas del podio y RA a 18.4° |
+| Techos | Hub 6 m, conexión 5 m, sala 1 6 m; óculo libre sobre el portal más allá de los 12 m de ascenso; holgura de salto sobre P1 |
+| Spawns | Casco del Runner + 0.2 m por lado sin tocar rampas ni podio en los 8 puntos |
+| Reservas ocultas | Ningún rayo desde 192 puntos del hub, a 0.5 m y a 3.2 m (ápice de salto), alcanza T1, T2, M1–M3 ni H1 |
+| Línea libre más larga (3D, 0.5 m) | **59.1 m** < 60 m, barrido de 180 direcciones desde una malla de 2 m |
+| Rutas A y B (piloto automático, Amaru) | Ambas completas; sala 1 a **2.3–2.4 s** del spawn (objetivo ≤ 6 s); ruta A sube a P1 y las dos vuelven al podio |
+
+**Cambios respecto a la rev. 2, motivados por la prueba física:**
+- **Deflector a 6 m: inviable sin frenar del todo.** El radio de giro a velocidad máxima es de 10–13 m según el Runner; el piloto chocaba cinco veces con D1. Pasó a 8 m de la entrada y 18 m de ancho; con frenada previa a la curva (hasta 14 m/s) ya no lo toca. Entrar a la sala exige frenar: es un cambio de ritmo buscado, a validar con jugadores.
+- **Paso de 2 m entre D1 y la rampa RA:** la ruta B rozaba en él. P1 y RA retroceden 2 m (P1 queda de 8 × 16 m) y el paso es de 4 m.
+- **Juntas de suelo:** las losas solapadas del hub, la conexión y la sala enganchaban el morro del Runner. Ahora hay un único suelo de colisión.
+
+**Sigue pendiente:**
+- **Roces del piloto:** el piloto aún roza el lateral de RA (ruta B) y el borde de P1 al caer (ruta A). Biselar el lateral de la rampa o poner bordillo cuando haya kit de arte.
+- **Sin medir todavía:** disparo saltando sobre el podio, explosión real de las torres (no existen), navegación de bots, cámara lejana bajo techo de 6 m, mando físico y sensación de juego (requiere playtest humano), rendimiento con ocho Runners. Nada de esto se extrapola a las salas 2–4.
 
 ## Rutas principales (Área 0 → cada sala, tiempo a vel. 23.5 m/s)
 
@@ -128,7 +147,7 @@ D8 conserva su multiplicador previsto; no se aplica en Dominio 1.
 - Simetría: señalética y siluetas propias por sala para orientar al jugador.
 
 ## Entrega siguiente
-1. **Greybox del hub + sala 1** en una escena aparte (`game/levels/domain_01/`) con las coordenadas de rev. 2; conservar las escenas de ensayo. Medir con un Runner real los pendientes listados arriba y corregir el plano si algo falla.
+1. ~~Greybox del hub + sala 1~~: hecho en rev. 3. Falta el playtest humano de la entrada a la sala 1 (frenada ante D1).
 2. Después, interiores de las salas 2–4 con el mismo método (deflector a ≤6 m de la entrada o equivalente, comprobación de 60 m).
 3. AreaTracker PUR-032 y compuertas PUR-036 por bloques separados; después navegación y Purga del dominio.
 4. Bots, 20 partidas sin atascos y benchmark con ocho Runners siguen pendientes; no marcar PUR-071 completo antes de comprobarlos.

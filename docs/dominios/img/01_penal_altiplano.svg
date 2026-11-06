@@ -1,7 +1,7 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="840" height="1000" viewBox="0 0 840 1000" font-family="sans-serif">
 <defs><pattern id="haz" width="8" height="8" patternUnits="userSpaceOnUse" patternTransform="rotate(45)"><rect width="8" height="8" fill="#f2c94c"/><rect width="4" height="8" fill="#2a2a2a"/></pattern></defs>
 <rect width="840" height="1000" fill="#101c28"/>
-<text x="30" y="36" font-size="22" fill="#edf6fa">PENAL ALTIPLANO · hub + sala 1 (rev. 2)</text>
+<text x="30" y="36" font-size="22" fill="#edf6fa">PENAL ALTIPLANO · hub + sala 1 (rev. 3, greybox)</text>
 <text x="30" y="60" font-size="14" fill="#c3d8e5">Vista superior · cuadrícula 4 m · norte = −Z · salas 2–4 solo envolvente</text>
 <g stroke="#1c3040" stroke-width="1">
 <line x1="36" y1="104" x2="36" y2="872"/>
@@ -65,13 +65,13 @@
 <text x="180" y="649.6" font-size="11" fill="#9fb6c6" text-anchor="middle">(interior pendiente)</text>
 <rect x="276" y="120" width="288" height="288" fill="#29455a" stroke="#8ab1ce" stroke-width="1.5" />
 <rect x="388" y="408" width="64" height="112" fill="#2c4a5c" stroke="#79bfc6" stroke-width="1.5" />
-<rect x="276" y="120" width="64" height="144" fill="#4a5f73" stroke="#d8e4ee" stroke-width="1.5" />
+<rect x="276" y="120" width="64" height="128" fill="#4a5f73" stroke="#d8e4ee" stroke-width="1.5" />
 <text x="308" y="224" font-size="12" fill="#edf6fa" text-anchor="middle">P1 · +2 m</text>
-<rect x="276" y="264" width="64" height="48" fill="url(#haz)" stroke="#f2c94c" stroke-width="1.5" />
-<text x="268" y="292.0" font-size="12" fill="#f2c94c" text-anchor="end">rampa RA</text>
-<text x="268" y="308.0" font-size="11" fill="#f2c94c" text-anchor="end">8×6 m · 18.4°</text>
-<rect x="340" y="344.0" width="160" height="16.0" fill="#c55a4a" stroke="#ffd2c8" stroke-width="1.5" />
-<text x="420" y="356.0" font-size="11" fill="#fff" text-anchor="middle">DEFLECTOR 20 × 2 m · altura total</text>
+<rect x="276" y="248" width="64" height="48" fill="url(#haz)" stroke="#f2c94c" stroke-width="1.5" />
+<text x="268" y="272" font-size="12" fill="#f2c94c" text-anchor="end">rampa RA</text>
+<text x="268" y="288" font-size="11" fill="#f2c94c" text-anchor="end">8×6 m · 18.4°</text>
+<rect x="348" y="328.0" width="144" height="16.0" fill="#c55a4a" stroke="#ffd2c8" stroke-width="1.5" />
+<text x="420" y="340.0" font-size="11" fill="#fff" text-anchor="middle">DEFLECTOR 18 × 2 m · altura total</text>
 <rect x="404" y="208" width="16" height="16" fill="#c55a4a" stroke="#ffd2c8" stroke-width="1.5" />
 <text x="412" y="197.60000000000002" font-size="10" fill="#edf6fa" text-anchor="middle">C1</text>
 <rect x="492" y="176" width="16" height="16" fill="#c55a4a" stroke="#ffd2c8" stroke-width="1.5" />
@@ -122,11 +122,11 @@
 <text x="540" y="169.60000000000002" font-size="10" fill="#7fd3ff" text-anchor="middle">M3</text>
 <circle cx="412" cy="152" r="7" fill="#9be37a" stroke="#101c28"/>
 <text x="412" y="137.60000000000002" font-size="10" fill="#9be37a" text-anchor="middle">H1</text>
-<polyline points="412,504 412,384 308,376 308,216 348,168 452,168 532,232 532,336 444,384" fill="none" stroke="#f2c94c" stroke-width="2.5" stroke-dasharray="7 4"/>
-<polyline points="428,504 428,392 524,376 524,288 460,264 372,248 356,328 316,336 316,376 396,392" fill="none" stroke="#b39ddb" stroke-width="2.5" stroke-dasharray="2 4"/>
+<polyline points="412,504 412,384 308,360 308,200 348,168 452,168 532,232 532,336 444,384" fill="none" stroke="#f2c94c" stroke-width="2.5" stroke-dasharray="7 4"/>
+<polyline points="428,504 428,392 524,360 524,288 460,256 372,248 348,312 316,336 316,376 396,392" fill="none" stroke="#b39ddb" stroke-width="2.5" stroke-dasharray="2 4"/>
 <text x="420" y="464" font-size="11" fill="#cfe" text-anchor="middle">conexión 8×14 m</text>
 <text x="30" y="900" font-size="13" fill="#c3d8e5">Amarillo discontinuo: ruta A (alta) · lila punteado: ruta B (suelo); ambas son lazos sin callejón.</text>
 <text x="30" y="922" font-size="13" fill="#c3d8e5">Rojo: bloques de altura completa (6 m). Círculo naranja: radio 8 m de torre. Azul: misil · verde: salud.</text>
 <text x="30" y="944" font-size="13" fill="#c3d8e5">Rampas del podio en ejes cardinales, 4 × 4.5 m, 18.4°; spawns a 7 m y ±30°.</text>
-<text x="30" y="966" font-size="13" fill="#c3d8e5">Propuesta documental: líneas de tiro calculadas en 2D; colisiones y salto sin verificar.</text>
+<text x="30" y="966" font-size="13" fill="#c3d8e5">Verificado en greybox Godot: línea libre 59.1 m, reservas ocultas al hub, ambas rutas sin chocar el deflector.</text>
 </svg>
