@@ -1,7 +1,8 @@
 extends Node3D
 ## Banco del greybox hub + sala 1. Piloto automático y vista aérea son herramientas de revisión.
 ## Argumentos: --overview-preview (vista aérea sin techos), --route-a/b/2/3/4 (piloto),
-## --round=N (ronda N con compuertas, reloj y Purga), --purge-preview (huida de la Purga).
+## --round=N (ronda N con compuertas, reloj, Purga, portal y cuota), --quota-preview (caza de
+## dos blancos y ascenso por el portal), --purge-preview (huida de la Purga hasta el portal).
 
 ## Ruta A (alta) y B (suelo) de la ficha, como puntos de paso en X/Z del mundo.
 const ROUTES := {
@@ -62,7 +63,14 @@ const ESCAPE_ROUTE := [
 	Vector2(8, 160), Vector2(4, 150), Vector2(28, 140), Vector2(28, 84), Vector2(28, 40),
 	Vector2(14, 16), Vector2(12, 5), Vector2(2, 2),
 ]
+## Caza de prueba: el piloto se detiene en HUNT_POINT y derriba los blancos con el láser.
+const HUNT_POINT := Vector2(-20, 12)
+const QUOTA_TARGETS := [Vector2(-45, 30), Vector2(40, 30)]
+const RUNNER_SCENE := preload("res://entities/runner/runner.tscn")
+const AIM_TOLERANCE_DEG := 8.0
 const ARRIVE_M := 3.0
+## Distancia al centro donde termina una ruta de exploración: rampa del podio, junto al portal.
+const PORTAL_FOOT_M := 7.5
 const CORNER_LOOKAHEAD_M := 10.0
 const CORNER_SPEED_MPS := 14.0
 
@@ -77,6 +85,9 @@ var _was_on_wall: bool = false
 var _overview_angle: float = 0.6
 var _gate: int = 1
 var _escaped: bool = false
+var _hunt_at: int = -1
+var _hunting: bool = false
+var _prey: Array[Runner] = []
 @onready var greybox: PenalAltiplanoGreybox = $Greybox
 @onready var runner: Runner = $Runner
 @onready var overview: Camera3D = $Overview
@@ -84,10 +95,16 @@ var _escaped: bool = false
 @onready var tracker: AreaTracker = $AreaTracker
 @onready var purge: DomainPurgeField = $DomainPurgeField
 @onready var status: Label = $UI/Status
+@onready var progress: RoundProgress = $RoundManager/RoundProgress
+@onready var score: RoundScore = $RoundManager/RoundProgress/RoundScore
+@onready var portal: RoundPortal = $Portal
 
 
 func _ready() -> void:
 	var args: PackedStringArray = OS.get_cmdline_user_args()
+	$SafeZone.radius = greybox.hub_radius
+	progress.register(runner)
+	EventBus.runner_escaped.connect(_on_escaped)
 	_reset_runner()
 	if "--overview-preview" in args:
 		greybox.set_ceilings_visible(false)
@@ -104,10 +121,12 @@ func _ready() -> void:
 			start_round(arg.get_slice("=", 1).to_int())
 	if "--purge-preview" in args:
 		start_purge_preview()
+	if "--quota-preview" in args:
+		start_quota_preview()
 	runner.get_node("RunnerCamera/SpringArm3D/Camera3D").make_current()
 
 
-## Ronda de prueba: compuertas por ronda, reloj y Purga del dominio. Sin portal ni cuota.
+## Ronda de prueba: compuertas por ronda, reloj, Purga, portal y cuota del dominio.
 func start_round(round_index: int) -> void:
 	if clock.state in [RoundManager.State.INTRO, RoundManager.State.COUNTDOWN]:
 		# RoundManager solo termina rondas en juego: se adelanta la intro antes de reiniciar.
@@ -129,7 +148,54 @@ func start_purge_preview() -> void:
 	runner.reset_at(Vector3(start.x, 0.1, start.y), 0.0)
 	runner.rotation.y = PI
 	runner.controller = null
+	# Cuota cumplida de antemano por el camino normal: dos blancos derribados por este Runner.
+	for prey: Runner in spawn_targets([ESCAPE_START + Vector2(-6, 0), ESCAPE_START + Vector2(6, 0)]):
+		var hit := DamageInfo.new()
+		hit.type = Enums.DamageType.BARRIER
+		hit.source = runner
+		hit.weapon_id = &"barrier"
+		prey.health.apply(hit)
 	EventBus.purge_started.connect(_start_escape, CONNECT_ONE_SHOT)
+
+
+## Ronda 1 en juego: el piloto entra en la sala 1, derriba dos blancos con el láser para
+## cumplir la cuota y vuelve al portal, que solo entonces le deja pasar.
+func start_quota_preview() -> void:
+	start_round(1)
+	clock.tick(Balance.get_f("round.intro_s") + Balance.get_f("round.countdown_s") + 0.001)
+	_prey = spawn_targets(QUOTA_TARGETS)
+	_gate = 1
+	_reset_runner()
+	_route_name = "cuota"
+	_route = [greybox.corridor_point(1, 2, 24), greybox.corridor_point(1, -2, 84),
+			greybox.room_point(-14, 5), greybox.room_point(HUNT_POINT.x, HUNT_POINT.y)]
+	_hunt_at = _route.size() - 1
+	for point: Vector2 in [Vector2(-12, 5), Vector2(-2, 2)]:
+		_route.append(greybox.room_point(point.x, point.y))
+	_route.append(greybox.corridor_point(1, 0, 36))
+	_route.append(Vector2(0, -20))
+	_route.append(Vector2(0, -2))
+	_waypoint = 0
+	_time = 0.0
+	route_events = {}
+	route_finished = false
+	runner.controller = null
+
+
+## Blancos de práctica: Runners quietos que participan en la ronda (sus bajas cuentan).
+func spawn_targets(points: Array) -> Array[Runner]:
+	var spawned: Array[Runner] = []
+	for point: Vector2 in points:
+		var target: Runner = RUNNER_SCENE.instantiate()
+		target.name = "Target%d" % spawned.size()
+		add_child(target)
+		target.controller = null
+		target.get_node("RunnerCamera").set_physics_process(false)
+		var world: Vector2 = greybox.room_point(point.x, point.y)
+		target.reset_at(Vector3(world.x, 0.1, world.y), PI / 2.0)
+		progress.register(target)
+		spawned.append(target)
+	return spawned
 
 
 func _start_escape() -> void:
@@ -161,7 +227,8 @@ func start_route(key: String) -> void:
 		var axis: Vector3 = greybox.GATES[_gate]
 		_route.append(greybox.corridor_point(_gate, 0, 36))
 		_route.append(Vector2(axis.x, axis.z) * 20.0)
-		_route.append(Vector2(axis.x, axis.z) * 2.0)
+		# Sin cuota el portal no deja pasar: la exploración termina en la rampa, al pie del portal.
+		_route.append(Vector2(axis.x, axis.z) * PORTAL_FOOT_M)
 	else:
 		for point: Vector2 in ROUTES[key]:
 			_route.append(greybox.map_point(point))
@@ -183,10 +250,14 @@ func _process(_delta: float) -> void:
 				seconds % 60]
 		if clock.state == RoundManager.State.PURGE:
 			text += "   |   FRENTE A %.0f m DEL HUB" % purge.front_along()
+	if clock.state != RoundManager.State.LOADING:
+		text += "\nCUOTA %d / %d   |   PUNTAJE %d" % [progress.kills_for(runner), clock.quota,
+				score.points_for(runner)]
+		text += "   |   PORTAL ABIERTO" if portal.eligible(runner) else ""
 	if runner.health.destroyed:
 		text += "   |   PURGADO"
 	elif _escaped:
-		text += "   |   A SALVO EN EL PODIO (sin portal en esta escena)"
+		text += "   |   ESCAPÓ POR EL PORTAL"
 	status.text = text
 	status.modulate = (Color(1, 0.3, 0.3) if clock.state == RoundManager.State.PURGE
 			or (clock.state == RoundManager.State.PLAYING
@@ -207,22 +278,22 @@ func _physics_process(delta: float) -> void:
 	if _route.is_empty() or _waypoint >= _route.size():
 		return
 	_time += delta
-	_drive_toward(_route[_waypoint])
+	if _hunting:
+		_hunt()
+	else:
+		_drive_toward(_route[_waypoint])
 	_track_events()
 
 
 func _drive_toward(target: Vector2) -> void:
 	var here := Vector2(runner.global_position.x, runner.global_position.z)
 	if here.distance_to(target) < ARRIVE_M:
+		_hunting = _waypoint == _hunt_at
 		_waypoint += 1
 		if _waypoint >= _route.size():
 			runner.input_frame = InputFrame.new()
 			_log("fin de ruta")
 			route_finished = true
-			if _route_name == "huida":
-				# Esta escena no tiene portal (PUR-033): llegar al podio cuenta como escapar.
-				runner.remove_from_group("runners")
-				_escaped = true
 			print("ROUTE %s %s paredes=%d" % [
 				_route_name.to_upper(), JSON.stringify(route_events), _wall_hits])
 		return
@@ -242,6 +313,32 @@ func _drive_toward(target: Vector2) -> void:
 	if absf(angle) > 1.2:
 		frame.brake = 0.6
 	runner.input_frame = frame
+
+
+## Apunta al primer blanco vivo sin avanzar y dispara cuando está dentro del margen de mira.
+func _hunt() -> void:
+	var alive: Array[Runner] = _prey.filter(func(prey: Runner) -> bool:
+		return is_instance_valid(prey) and not prey.health.destroyed)
+	if alive.is_empty():
+		_hunting = false
+		_log("cuota cumplida")
+		return
+	var offset: Vector3 = alive[0].global_position - runner.global_position
+	var forward: Vector3 = -runner.global_basis.z
+	var flat := Vector3(forward.x, 0, forward.z).normalized()
+	var wanted := Vector3(offset.x, 0, offset.z).normalized()
+	var angle: float = atan2(flat.cross(wanted).y, flat.dot(wanted))
+	var frame := InputFrame.new()
+	frame.steering = clampf(-angle * 2.5, -1.0, 1.0)
+	frame.brake = 1.0
+	frame.laser = absf(angle) < deg_to_rad(AIM_TOLERANCE_DEG)
+	runner.input_frame = frame
+
+
+func _on_escaped(escapee: Runner, _time_left: float) -> void:
+	if escapee == runner:
+		_escaped = true
+		_log("escapa por el portal")
 
 
 func _corner_angle() -> float:
@@ -267,7 +364,10 @@ func _track_events() -> void:
 			_log("sobre P1")
 	if route_events.has(room_key) and Vector2(p.x, p.z).length() < greybox.hub_radius:
 		_log("vuelve al hub")
-	if p.y > greybox.PODIUM_HEIGHT - 0.2 and Vector2(p.x, p.z).length() < greybox.PODIUM_RADIUS:
+	var radial: float = Vector2(p.x, p.z).length()
+	if radial <= PORTAL_FOOT_M + ARRIVE_M + 0.5 and route_events.has(room_key):
+		_log("llega al portal")
+	if p.y > greybox.PODIUM_HEIGHT - 0.2 and radial < greybox.PODIUM_RADIUS:
 		_log("sobre podio")
 	if runner.is_on_wall() and not _was_on_wall:
 		_wall_hits += 1

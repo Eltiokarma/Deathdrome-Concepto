@@ -1,4 +1,4 @@
-[gd_scene load_steps=10 format=3]
+[gd_scene load_steps=14 format=3]
 
 [ext_resource type="Script" path="res://levels/domain_01/penal_altiplano_sandbox.gd" id="1"]
 [ext_resource type="Script" path="res://levels/domain_01/penal_altiplano_greybox.gd" id="2"]
@@ -7,6 +7,10 @@
 [ext_resource type="Script" path="res://round/gate_controller.gd" id="5"]
 [ext_resource type="Script" path="res://round/area_tracker.gd" id="6"]
 [ext_resource type="PackedScene" path="res://round/domain_purge_field.tscn" id="7"]
+[ext_resource type="Script" path="res://round/round_progress.gd" id="8"]
+[ext_resource type="Script" path="res://round/round_score.gd" id="9"]
+[ext_resource type="PackedScene" path="res://entities/portal/round_portal.tscn" id="10"]
+[ext_resource type="PackedScene" path="res://entities/zones/safe_zone.tscn" id="11"]
 
 [sub_resource type="Environment" id="Env"]
 background_mode = 1
@@ -36,6 +40,24 @@ process_mode = 1
 [node name="RoundManager" type="Node" parent="."]
 process_mode = 1
 script = ExtResource("4")
+
+[node name="RoundProgress" type="Node" parent="RoundManager"]
+script = ExtResource("8")
+
+[node name="RoundScore" type="Node" parent="RoundManager/RoundProgress"]
+script = ExtResource("9")
+
+[node name="Portal" parent="." instance=ExtResource("10")]
+process_mode = 1
+position = Vector3(0, 1.5, 0)
+manager_path = NodePath("../RoundManager")
+progress_path = NodePath("../RoundManager/RoundProgress")
+viewer_path = NodePath("../Runner")
+
+[node name="SafeZone" parent="." instance=ExtResource("11")]
+process_mode = 1
+radius = 60.0
+manager_path = NodePath("../RoundManager")
 
 [node name="GateController" type="Node" parent="."]
 script = ExtResource("5")
@@ -69,7 +91,7 @@ offset_left = 26.0
 offset_top = 54.0
 theme_override_font_sizes/font_size = 14
 text = "W/S: acelerar/frenar · A/D: girar · Espacio: salto · C: cámara · R: volver al spawn · F7: ronda siguiente
-Torres y pickups son marcadores de reserva · Sin bots ni portal · --round=N activa compuertas, reloj y Purga."
+Torres y pickups son marcadores de reserva · Sin bots · --round=N: compuertas, reloj, cuota, portal y Purga."
 
 [node name="Status" type="Label" parent="UI"]
 offset_left = 26.0

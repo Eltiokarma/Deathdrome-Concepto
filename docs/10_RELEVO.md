@@ -1,5 +1,29 @@
 # Relevo de trabajo — Codex / Claude
 
+## 2026-11-06 · Portal, cuota y puntaje en el Dominio 1
+
+**Integración en la escena del greybox:** se reutilizan sin cambios `RoundPortal` (PUR-033), `RoundProgress`, `RoundScore` (PUR-035) y `SafeZone` (PUR-031).
+- **Portal:** en la cima del podio.
+- **Zona franca:** el hub completo, Ø120 m.
+- **Cuota:** el jugador queda registrado como participante.
+
+**Blancos de práctica:** `spawn_targets()` crea Runners quietos que participan en la ronda, así que sus bajas cuentan para la cuota.
+
+**Vistas previas:**
+- `--quota-preview`: entra en la sala 1, derriba dos blancos con el láser (12.6 s), vuelve y asciende por el portal a los 29 s.
+- `--purge-preview`: la cuota se cumple de antemano por la vía normal de daño y el Runner huye por el portal (19.7 s).
+
+**Rutas de exploración:** sin cuota, la barrera del portal impide subir a la cima. Ahora terminan al pie del portal (evento «llega al portal»).
+
+**Verificado en local:** **121 pruebas / 880 aserciones**, lint, datos y paquete.
+
+**Pendiente:**
+- Respawn de ronda (PUR-023/024).
+- Inventario y pickups reales (PUR-040).
+- Bots (PUR-050+): hoy solo hay blancos quietos.
+
+---
+
 ## 2026-11-06 · Áreas, compuertas por ronda y Purga por salas (PUR-032, 036, 034)
 
 **Nuevo en `game/round/`:**

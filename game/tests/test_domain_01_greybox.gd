@@ -29,6 +29,9 @@ func test_official_scale_dimensions() -> void:
 
 func test_floor_heights_and_slopes() -> void:
 	assert_almost_eq(_ground_at(Vector3(30, 0, 20)), 0.0, 0.01, "Suelo del hub")
+	# La barrera del portal (sin cuota) cubre la cima del podio; se aparta para medir el podio.
+	sandbox.get_node("Portal/Gate/Shape").disabled = true
+	await wait_physics_frames(2)
 	assert_almost_eq(_ground_at(Vector3(3, 0, 3)), Layout.PODIUM_HEIGHT, 0.01, "Cima del podio")
 	assert_almost_eq(_ground_at(Vector3(0, 0, -100)), 0.0, 0.01, "Conexión 1")
 	var ledge: float = Layout.LARGE_LEDGE_HEIGHT
@@ -115,7 +118,7 @@ func test_route_a_climbs_ledges_and_returns_to_portal() -> void:
 	assert_true(events.has("fin de ruta"), "Ruta A completa: %s" % events)
 	assert_lt(events.get("entra sala 1", INF), ROOM_REACH_S, "Sala 1 alcanzable desde el spawn")
 	assert_true(events.has("sobre pasarela/plataforma"), "Ruta A usa la altura")
-	assert_true(events.has("sobre podio"), "Ruta A vuelve al portal")
+	assert_true(events.has("llega al portal"), "Ruta A vuelve al portal")
 
 
 func test_route_b_loops_on_floor_and_returns() -> void:
@@ -123,7 +126,7 @@ func test_route_b_loops_on_floor_and_returns() -> void:
 	assert_true(events.has("fin de ruta"), "Ruta B completa: %s" % events)
 	assert_lt(events.get("entra sala 1", INF), ROOM_REACH_S, "Sala 1 alcanzable desde el spawn")
 	assert_false(events.has("sobre pasarela/plataforma"), "Ruta B es de suelo")
-	assert_true(events.has("sobre podio"), "Ruta B vuelve al portal")
+	assert_true(events.has("llega al portal"), "Ruta B vuelve al portal")
 
 
 func test_rooms_2_to_4_loops_climb_and_return() -> void:
@@ -132,7 +135,7 @@ func test_rooms_2_to_4_loops_climb_and_return() -> void:
 		assert_true(events.has("fin de ruta"), "Ruta de sala %d completa: %s" % [gate, events])
 		assert_lt(events.get("entra sala %d" % gate, INF), ROOM_REACH_S, "Sala %d alcanzable" % gate)
 		assert_true(events.has("sobre pasarela/plataforma"), "Sala %d tiene juego vertical" % gate)
-		assert_true(events.has("sobre podio"), "Sala %d vuelve al portal" % gate)
+		assert_true(events.has("llega al portal"), "Sala %d vuelve al portal" % gate)
 
 
 func test_every_room_has_minimum_content() -> void:

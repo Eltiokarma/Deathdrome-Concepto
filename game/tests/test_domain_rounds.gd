@@ -128,10 +128,34 @@ func test_purge_kills_runner_left_in_room_and_spares_escapee() -> void:
 		await wait_physics_frames(60)
 		if sandbox.route_finished:
 			break
+	# El ascenso por el portal dura `portal.ascent_s` después de llegar al podio.
+	await wait_physics_frames(ceili((Balance.get_f("portal.ascent_s") + 0.5) * 60.0))
 	gut.p("Huida: %s" % sandbox.route_events)
 	assert_true(sandbox.route_finished, "La huida llega al portal: %s" % sandbox.route_events)
 	assert_false(runner.health.destroyed, "Quien huye a tiempo sobrevive al frente")
+	assert_true(sandbox.route_events.has("escapa por el portal"), "Con cuota, el portal lo saca")
 	assert_true(straggler.health.destroyed, "Quien se queda en la sala muere")
+
+
+func test_quota_opens_portal_and_escape_scores() -> void:
+	runner.set_physics_process(true)
+	sandbox.start_quota_preview()
+	var portal: RoundPortal = sandbox.get_node("Portal")
+	assert_false(portal.eligible(runner), "Sin cuota el portal está cerrado")
+	assert_eq(clock.state, RoundManager.State.PLAYING)
+	watch_signals(EventBus)
+	for _second: int in range(60):
+		await wait_physics_frames(60)
+		if sandbox.route_events.has("escapa por el portal"):
+			break
+	gut.p("Caza: %s" % sandbox.route_events)
+	var progress: RoundProgress = sandbox.get_node("RoundManager/RoundProgress")
+	assert_eq(progress.kills_for(runner), clock.quota, "Dos bajas atribuidas = cuota de R1")
+	assert_signal_emitted(EventBus, "quota_reached")
+	assert_true(sandbox.route_events.has("escapa por el portal"), "%s" % sandbox.route_events)
+	var score: RoundScore = sandbox.get_node("RoundManager/RoundProgress/RoundScore")
+	var expected: int = Balance.get_i("score.kill") * clock.quota
+	assert_gt(score.points_for(runner), expected, "Bajas + primera sangre + escape con tiempo")
 
 
 func _enter_purge(round_index: int) -> void:
