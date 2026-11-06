@@ -22,8 +22,6 @@ const ROOM_HALF := 18.0
 const ROOM_CENTER_Z := -52.0
 const ROOM_CEILING := 6.0
 const WALL := 1.0
-const GROUND_SIZE := Vector2(80, 116)
-const GROUND_CENTER_Z := -16.0
 const DEFLECTOR := Rect2(-9, -44, 18, 2)
 const PLATFORM := Rect2(-18, -70, 8, 16)
 const PLATFORM_HEIGHT := 2.0
@@ -40,10 +38,27 @@ const GATES := {
 	1: Vector3(0, 0, -1), 2: Vector3(1, 0, 0), 3: Vector3(0, 0, 1), 4: Vector3(-1, 0, 0),
 }
 
+## Escala de planta (PUR-070, prueba de tamaño): multiplica distancias horizontales del hub,
+## conexiones y sala; conserva anchos de paso, alturas, pendientes, podio y portal.
+## 1.0 = cotas de la ficha. También con `--layout-scale=<x>` o la variable PURGA_LAYOUT_SCALE.
+@export var layout_scale: float = 1.0
+var hub_radius: float = HUB_RADIUS
+var corridor_end: float = CORRIDOR_END
+var room_half: float = ROOM_HALF
+var room_center_z: float = ROOM_CENTER_Z
 var _materials: Dictionary = {}
 
 
 func _ready() -> void:
+	if OS.has_environment("PURGA_LAYOUT_SCALE"):
+		layout_scale = OS.get_environment("PURGA_LAYOUT_SCALE").to_float()
+	for arg: String in OS.get_cmdline_user_args():
+		if arg.begins_with("--layout-scale="):
+			layout_scale = arg.get_slice("=", 1).to_float()
+	hub_radius = PODIUM_RAMP_FOOT + 0.5 + (HUB_RADIUS - PODIUM_RAMP_FOOT - 0.5) * _hub_stretch()
+	corridor_end = hub_radius + (CORRIDOR_END - HUB_RADIUS) * layout_scale
+	room_half = ROOM_HALF * layout_scale
+	room_center_z = -(corridor_end + room_half)
 	_build_materials()
 	_build_ground()
 	_build_hub()
@@ -66,6 +81,42 @@ static func spawn_transforms() -> Array[Dictionary]:
 			var point := Vector3(sin(angle), 0, -cos(angle)) * SPAWN_RADIUS
 			result.append({"position": point, "yaw": -angle})
 	return result
+
+
+## Lleva un punto X/Z de la ficha (escala 1) a la planta escalada. El podio y su anillo
+## de spawns no cambian; el resto del hub se estira radialmente; las conexiones se alargan
+## sin ensancharse; la sala se escala desde su centro.
+func map_point(point: Vector2) -> Vector2:
+	if point.y < -CORRIDOR_END:
+		return Vector2(point.x * layout_scale,
+				room_center_z + (point.y - ROOM_CENTER_Z) * layout_scale)
+	var radius: float = point.length()
+	if radius > HUB_RADIUS:
+		var along_x: bool = absf(point.x) > absf(point.y)
+		var reach: float = absf(point.x) if along_x else absf(point.y)
+		var mapped: float = hub_radius + (reach - HUB_RADIUS) * layout_scale
+		if along_x:
+			return Vector2(signf(point.x) * mapped, point.y)
+		return Vector2(point.x, signf(point.y) * mapped)
+	var core: float = PODIUM_RAMP_FOOT + 0.5
+	if radius > core:
+		return point * (core + (radius - core) * _hub_stretch()) / radius
+	return point
+
+
+func map_rect(rect: Rect2, keep_depth: bool = false, keep_size: bool = false) -> Rect2:
+	var center: Vector2 = map_point(rect.get_center())
+	var size: Vector2 = rect.size
+	if not keep_size:
+		size.x *= layout_scale
+		if not keep_depth:
+			size.y *= layout_scale
+	return Rect2(center - size / 2.0, size)
+
+
+func _hub_stretch() -> float:
+	var core: float = PODIUM_RAMP_FOOT + 0.5
+	return (HUB_RADIUS * layout_scale - core) / (HUB_RADIUS - core)
 
 
 func set_ceilings_visible(value: bool) -> void:
@@ -102,9 +153,12 @@ func _build_ground() -> void:
 	ground.collision_mask = 0
 	var shape := CollisionShape3D.new()
 	var box := BoxShape3D.new()
-	box.size = Vector3(GROUND_SIZE.x, 1.0, GROUND_SIZE.y)
+	var margin: float = 6.0
+	var far_z: float = room_center_z - room_half - margin
+	var near_z: float = hub_radius + margin
+	box.size = Vector3(2.0 * (corridor_end + margin), 1.0, near_z - far_z)
 	shape.shape = box
-	shape.position = Vector3(0, -0.5, GROUND_CENTER_Z)
+	shape.position = Vector3(0, -0.5, (near_z + far_z) / 2.0)
 	ground.add_child(shape)
 	add_child(ground)
 
@@ -113,15 +167,15 @@ func _build_hub() -> void:
 	var hub := Node3D.new()
 	hub.name = "Hub"
 	add_child(hub)
-	var floor_disc := _cylinder(hub, "Floor", HUB_RADIUS + HUB_WALL, 0.1, "hub", false)
+	var floor_disc := _cylinder(hub, "Floor", hub_radius + HUB_WALL, 0.1, "hub", false)
 	floor_disc.position.y = 0.0
 	var wall := CSGCombiner3D.new()
 	wall.name = "Wall"
 	wall.use_collision = true
 	hub.add_child(wall)
-	var outer := _cylinder(wall, "Outer", HUB_RADIUS + HUB_WALL, HUB_CEILING, "wall", false)
+	var outer := _cylinder(wall, "Outer", hub_radius + HUB_WALL, HUB_CEILING, "wall", false)
 	outer.position.y = HUB_CEILING / 2.0
-	var inner := _cylinder(wall, "Inner", HUB_RADIUS, HUB_CEILING + 0.2, "wall", false)
+	var inner := _cylinder(wall, "Inner", hub_radius, HUB_CEILING + 0.2, "wall", false)
 	inner.position.y = HUB_CEILING / 2.0
 	inner.operation = CSGShape3D.OPERATION_SUBTRACTION
 	for gate: int in GATES:
@@ -130,14 +184,14 @@ func _build_hub() -> void:
 		cut.name = "Gate%d" % gate
 		cut.operation = CSGShape3D.OPERATION_SUBTRACTION
 		cut.size = _oriented(axis, Vector3(GATE_WIDTH, GATE_HEIGHT, 4.0))
-		cut.position = axis * (HUB_RADIUS + 0.5) + Vector3.UP * GATE_HEIGHT / 2.0
+		cut.position = axis * (hub_radius + 0.5) + Vector3.UP * GATE_HEIGHT / 2.0
 		wall.add_child(cut)
 	var ceiling := CSGCombiner3D.new()
 	ceiling.name = "Ceiling"
 	ceiling.use_collision = true
 	ceiling.add_to_group(&"greybox_ceiling")
 	hub.add_child(ceiling)
-	var slab := _cylinder(ceiling, "Slab", HUB_RADIUS + HUB_WALL, 0.5, "ceiling", false)
+	var slab := _cylinder(ceiling, "Slab", hub_radius + HUB_WALL, 0.5, "ceiling", false)
 	slab.position.y = HUB_CEILING + 0.25
 	var oculus := _cylinder(ceiling, "Oculus", OCULUS_RADIUS, 0.7, "ceiling", false)
 	oculus.position.y = HUB_CEILING + 0.25
@@ -160,8 +214,8 @@ func _build_corridor(gate: int, sealed: bool) -> void:
 	var corridor := Node3D.new()
 	corridor.name = "Corridor%d" % gate
 	add_child(corridor)
-	var length: float = CORRIDOR_END - HUB_RADIUS
-	var middle: Vector3 = axis * (HUB_RADIUS + length / 2.0)
+	var length: float = corridor_end - hub_radius
+	var middle: Vector3 = axis * (hub_radius + length / 2.0)
 	var side: Vector3 = Vector3.UP.cross(axis)
 	_box(corridor, "Floor", middle + Vector3.DOWN * 0.05,
 			_oriented(axis, Vector3(GATE_WIDTH + 2.0 * WALL, 0.1, length)), "floor", false)
@@ -173,14 +227,14 @@ func _build_corridor(gate: int, sealed: bool) -> void:
 			_oriented(axis, Vector3(GATE_WIDTH + 2.0 * WALL, 0.5, length)), "ceiling")
 	ceiling.add_to_group(&"greybox_ceiling")
 	if sealed:
-		var end: Vector3 = axis * (CORRIDOR_END + WALL / 2.0) + Vector3.UP * GATE_HEIGHT / 2.0
+		var end: Vector3 = axis * (corridor_end + WALL / 2.0) + Vector3.UP * GATE_HEIGHT / 2.0
 		_box(corridor, "Seal", end, _oriented(axis, Vector3(GATE_WIDTH, GATE_HEIGHT, WALL)), "wall")
 		_label(corridor, "ÁREA %d · interior pendiente" % gate, end - axis + Vector3.UP, 48)
 
 
 func _build_closed_gate(gate: int) -> void:
 	var axis: Vector3 = GATES[gate]
-	var center: Vector3 = axis * (HUB_RADIUS + WALL / 2.0) + Vector3.UP * GATE_HEIGHT / 2.0
+	var center: Vector3 = axis * (hub_radius + WALL / 2.0) + Vector3.UP * GATE_HEIGHT / 2.0
 	var slab := _box(self, "ClosedGate%d" % gate, center,
 			_oriented(axis, Vector3(GATE_WIDTH, GATE_HEIGHT, WALL)), "closed")
 	slab.add_to_group(&"greybox_closed_gate")
@@ -191,13 +245,13 @@ func _build_room_1() -> void:
 	var room := Node3D.new()
 	room.name = "Room1"
 	add_child(room)
-	var size: float = ROOM_HALF * 2.0
+	var size: float = room_half * 2.0
 	var outer: float = size + 2.0 * WALL
-	var near_z: float = ROOM_CENTER_Z + ROOM_HALF
-	var far_z: float = ROOM_CENTER_Z - ROOM_HALF
+	var near_z: float = room_center_z + room_half
+	var far_z: float = room_center_z - room_half
 	var wall_y: float = ROOM_CEILING / 2.0
-	_box(room, "Floor", Vector3(0, -0.05, ROOM_CENTER_Z), Vector3(outer, 0.1, outer), "floor", false)
-	var ceiling := _box(room, "Ceiling", Vector3(0, ROOM_CEILING + 0.25, ROOM_CENTER_Z),
+	_box(room, "Floor", Vector3(0, -0.05, room_center_z), Vector3(outer, 0.1, outer), "floor", false)
+	var ceiling := _box(room, "Ceiling", Vector3(0, ROOM_CEILING + 0.25, room_center_z),
 			Vector3(outer, 0.5, outer), "ceiling")
 	ceiling.add_to_group(&"greybox_ceiling")
 	_box(room, "WallNorth", Vector3(0, wall_y, far_z - WALL / 2.0),
@@ -205,28 +259,30 @@ func _build_room_1() -> void:
 	for sign_value: float in [-1.0, 1.0]:
 		var label: String = "West" if sign_value < 0 else "East"
 		_box(room, "Wall" + label,
-				Vector3(sign_value * (ROOM_HALF + WALL / 2.0), wall_y, ROOM_CENTER_Z),
+				Vector3(sign_value * (room_half + WALL / 2.0), wall_y, room_center_z),
 				Vector3(WALL, ROOM_CEILING, size), "wall")
-		var piece: float = ROOM_HALF - GATE_WIDTH / 2.0
+		var piece: float = room_half - GATE_WIDTH / 2.0
 		_box(room, "WallSouth" + label,
 				Vector3(sign_value * (GATE_WIDTH / 2.0 + piece / 2.0), wall_y, near_z + WALL / 2.0),
 				Vector3(piece, ROOM_CEILING, WALL), "wall")
 	_box(room, "Lintel", Vector3(0, (GATE_HEIGHT + ROOM_CEILING) / 2.0, near_z + WALL / 2.0),
 			Vector3(GATE_WIDTH, ROOM_CEILING - GATE_HEIGHT, WALL), "wall")
-	_box(room, "Deflector", _rect_center(DEFLECTOR, ROOM_CEILING / 2.0),
-			Vector3(DEFLECTOR.size.x, ROOM_CEILING, DEFLECTOR.size.y), "block")
+	var deflector: Rect2 = map_rect(DEFLECTOR, true)
+	_box(room, "Deflector", _rect_center(deflector, ROOM_CEILING / 2.0),
+			Vector3(deflector.size.x, ROOM_CEILING, deflector.size.y), "block")
 	for pillar: String in PILLARS:
-		var rect: Rect2 = PILLARS[pillar]
+		var rect: Rect2 = map_rect(PILLARS[pillar], false, true)
 		_box(room, pillar, _rect_center(rect, ROOM_CEILING / 2.0),
 				Vector3(rect.size.x, ROOM_CEILING, rect.size.y), "block")
-	_box(room, "Platform", _rect_center(PLATFORM, PLATFORM_HEIGHT / 2.0),
-			Vector3(PLATFORM.size.x, PLATFORM_HEIGHT, PLATFORM.size.y), "platform")
-	var platform_x: float = PLATFORM.position.x + PLATFORM.size.x / 2.0
+	var platform: Rect2 = map_rect(PLATFORM)
+	_box(room, "Platform", _rect_center(platform, PLATFORM_HEIGHT / 2.0),
+			Vector3(platform.size.x, PLATFORM_HEIGHT, platform.size.y), "platform")
+	var platform_x: float = platform.position.x + platform.size.x / 2.0
 	var ramp_run: float = RAMP_RA_FOOT_Z - PLATFORM.end.y
-	_ramp(room, "RampRA", Vector3(platform_x, 0, RAMP_RA_FOOT_Z), Vector3.FORWARD,
-			PLATFORM.size.x, ramp_run, PLATFORM_HEIGHT, 0.0)
+	_ramp(room, "RampRA", Vector3(platform_x, 0, platform.end.y + ramp_run), Vector3.FORWARD,
+			platform.size.x, ramp_run, PLATFORM_HEIGHT, 0.0)
 	# Número de área visible desde el hub a través de la conexión, sobre la cara del deflector.
-	_label(room, "1", Vector3(0, 3.0, DEFLECTOR.end.y + 0.05), 256, false)
+	_label(room, "1", Vector3(0, 3.0, deflector.end.y + 0.05), 256, false)
 	var exit_label := _label(room, "SALIDA ↓ 0", Vector3(0, 5.5, near_z - 0.05), 64, false)
 	exit_label.rotation.y = PI
 
@@ -253,7 +309,9 @@ func _build_reserves() -> void:
 	for id: String in RESERVES:
 		var marker := Marker3D.new()
 		marker.name = id
-		marker.position = RESERVES[id]
+		var source: Vector3 = RESERVES[id]
+		var flat: Vector2 = map_point(Vector2(source.x, source.z))
+		marker.position = Vector3(flat.x, source.y, flat.y)
 		marker.add_to_group(&"design_reserve")
 		reserves.add_child(marker)
 		var mesh := MeshInstance3D.new()

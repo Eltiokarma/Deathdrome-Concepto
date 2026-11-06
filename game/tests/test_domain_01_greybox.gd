@@ -76,11 +76,11 @@ func test_reserves_hidden_from_hub_at_gun_and_jump_height() -> void:
 func test_longest_ground_line_within_laser_range() -> void:
 	var longest: float = 0.0
 	var worst: Array = []
-	for origin: Vector3 in _walkable_grid(2.0):
+	for origin: Vector3 in _walkable_grid(2.0 * greybox.layout_scale):
 		for step: int in range(180):
 			var angle: float = TAU * step / 180.0
 			var direction := Vector3(sin(angle), 0, cos(angle))
-			var length: float = _ray_length(origin, direction, 120.0)
+			var length: float = _ray_length(origin, direction, 300.0)
 			if length > longest:
 				longest = length
 				worst = [origin, direction]
@@ -116,10 +116,10 @@ func _run_route(key: String) -> Dictionary:
 
 func _walkable_grid(spacing: float) -> Array[Vector3]:
 	var points: Array[Vector3] = []
-	var x: float = -Layout.CORRIDOR_END
-	while x <= Layout.CORRIDOR_END:
-		var z: float = Layout.ROOM_CENTER_Z - Layout.ROOM_HALF + 0.5
-		while z <= Layout.HUB_RADIUS:
+	var x: float = -greybox.corridor_end
+	while x <= greybox.corridor_end:
+		var z: float = greybox.room_center_z - greybox.room_half + 0.5
+		while z <= greybox.hub_radius:
 			var origin := Vector3(x, GUN_HEIGHT, z)
 			if _is_open(origin):
 				points.append(origin)
@@ -143,15 +143,15 @@ func _is_open(point: Vector3) -> bool:
 func _in_layout(point: Vector3) -> bool:
 	var flat := Vector2(point.x, point.z)
 	var inset: float = 0.2
-	if flat.length() < Layout.HUB_RADIUS - inset:
+	if flat.length() < greybox.hub_radius - inset:
 		return true
 	var half_gate: float = Layout.GATE_WIDTH / 2.0 - inset
 	if absf(point.x) < half_gate and point.z <= 0.0:
-		return point.z > -Layout.CORRIDOR_END
+		return point.z > -greybox.corridor_end
 	if absf(point.z) < half_gate and point.x >= 0.0:
-		return point.x < Layout.CORRIDOR_END
-	var half: float = Layout.ROOM_HALF - inset
-	return absf(point.x) < half and absf(point.z - Layout.ROOM_CENTER_Z) < half
+		return point.x < greybox.corridor_end
+	var half: float = greybox.room_half - inset
+	return absf(point.x) < half and absf(point.z - greybox.room_center_z) < half
 
 
 func _ray_length(origin: Vector3, direction: Vector3, limit: float) -> float:

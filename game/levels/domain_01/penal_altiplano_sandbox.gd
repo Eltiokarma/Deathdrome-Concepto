@@ -50,7 +50,9 @@ func _ready() -> void:
 func start_route(key: String) -> void:
 	_reset_runner()
 	_route_name = key
-	_route = ROUTES[key]
+	_route = []
+	for point: Vector2 in ROUTES[key]:
+		_route.append(greybox.map_point(point))
 	_waypoint = 0
 	_time = 0.0
 	_wall_hits = 0
@@ -62,8 +64,11 @@ func start_route(key: String) -> void:
 func _physics_process(delta: float) -> void:
 	if overview.current:
 		_overview_angle += delta * 0.25
-		overview.position = Vector3(sin(_overview_angle) * 55, 70, -26 + cos(_overview_angle) * 55)
-		overview.look_at(Vector3(0, 0, -26))
+		var focus := Vector3(0, 0, -26.0 * greybox.layout_scale)
+		var reach: float = 55.0 * greybox.layout_scale
+		overview.position = focus + Vector3(sin(_overview_angle) * reach, 70.0 * greybox.layout_scale,
+				cos(_overview_angle) * reach)
+		overview.look_at(focus)
 	if runner.position.y < -8.0:
 		_reset_runner()
 	if _route.is_empty() or _waypoint >= _route.size():
@@ -112,11 +117,12 @@ func _corner_angle() -> float:
 
 func _track_events() -> void:
 	var p: Vector3 = runner.global_position
-	if p.z < -34.0:
+	if p.z < -greybox.corridor_end:
 		_log("entra sala 1")
-	if p.y > greybox.PLATFORM_HEIGHT - 0.2 and p.x < -10.0 and p.z < -52.0:
+	var platform: Rect2 = greybox.map_rect(greybox.PLATFORM)
+	if p.y > greybox.PLATFORM_HEIGHT - 0.2 and platform.has_point(Vector2(p.x, p.z)):
 		_log("sobre P1")
-	if route_events.has("entra sala 1") and Vector2(p.x, p.z).length() < greybox.HUB_RADIUS:
+	if route_events.has("entra sala 1") and Vector2(p.x, p.z).length() < greybox.hub_radius:
 		_log("vuelve al hub")
 	if p.y > greybox.PODIUM_HEIGHT - 0.2 and Vector2(p.x, p.z).length() < greybox.PODIUM_RADIUS:
 		_log("sobre podio")

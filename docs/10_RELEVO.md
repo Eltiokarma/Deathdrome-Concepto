@@ -1,5 +1,19 @@
 # Relevo de trabajo — Codex / Claude
 
+## 2026-11-06 · Prueba de escala pedida por Gerson (sin decisión todavía)
+
+Gerson recuerda los mapas del original como unas **6 veces más grandes en superficie** (≈2.45× en largo). El greybox acepta ahora `layout_scale` (`--layout-scale=2.45` o `PURGA_LAYOUT_SCALE=2.45`). Escala la planta y conserva anchos de paso, alturas, pendientes, podio y portal. Por defecto vale 1.0: ficha, pruebas y balance no cambian.
+
+**Medido a ×2.45:**
+- Sala 1 a 4.4 s del spawn (antes 2.4 s); vuelta completa de las rutas en 20–22 s (antes 11).
+- Línea libre más larga: 151 m frente a 60 m de alcance del láser.
+- Reservas siguen ocultas al hub.
+- Coberturas quedan a ~30 m entre sí: la sala se ve vacía.
+
+**Pendiente de decisión de diseño de Gerson** antes de tocar `docs/04` o `balance.json`. Cosas que cambiarían: métricas de sala/hub/línea máxima, alcance del láser o cantidad de coberturas, velocidad de Purga, cuotas y rendimiento.
+
+---
+
 ## 2026-11-06 · Claude: greybox hub + sala 1 (PUR-070 rev. 3, avance de PUR-071)
 
 **Rama:** `claude/determined-heisenberg-jj3o54` (misma PR que la rev. 2).
