@@ -67,6 +67,20 @@ func _fire(period: float) -> void:
 	if target != null:
 		endpoint = target.global_position + Vector3.UP * 0.35
 	else:
+		# Sin Runner en la mira, el láser puede rematar a un piloto eyectado (mercy kill).
+		var pilot: Pilot = acquire_pilot()
+		if pilot != null:
+			endpoint = pilot.global_position + Vector3.UP * 0.5
+			var shot := DamageInfo.new()
+			shot.type = Enums.DamageType.LASER
+			shot.source = runner
+			shot.weapon_id = &"laser"
+			shot.direction = endpoint - origin
+			shot.position = endpoint
+			shot.amount = integrated_damage(period)
+			pilot.apply(shot)
+			_show_beam(origin, endpoint)
+			return
 		var hit: Dictionary = _ray(origin, endpoint)
 		if not hit.is_empty():
 			endpoint = hit.position
@@ -114,6 +128,28 @@ func acquire_target() -> Runner:
 			best = candidate
 			best_angle = angle
 			best_distance = distance
+	return best
+
+
+## Piloto eyectado más centrado en el cono de auto-apuntado, con línea de visión.
+func acquire_pilot() -> Pilot:
+	var best: Pilot
+	var best_angle: float = INF
+	var origin: Vector3 = global_position
+	var limit: float = deg_to_rad(Balance.get_f("weapons.laser.autoaim_half_angle_deg"))
+	for candidate: Pilot in get_tree().get_nodes_in_group("pilots"):
+		if candidate.destroyed or candidate.owner_runner == runner:
+			continue
+		var point: Vector3 = candidate.global_position + Vector3.UP * 0.5
+		var offset: Vector3 = point - origin
+		var angle: float = (-runner.global_basis.z).angle_to(offset)
+		if offset.length() > Balance.get_f("weapons.laser.range_m") or angle > limit:
+			continue
+		if not _ray(origin, point).is_empty():
+			continue
+		if angle < best_angle:
+			best = candidate
+			best_angle = angle
 	return best
 
 

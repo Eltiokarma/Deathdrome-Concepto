@@ -2,7 +2,8 @@ extends Node3D
 ## Banco del greybox hub + sala 1. Piloto automático y vista aérea son herramientas de revisión.
 ## Argumentos: --overview-preview (vista aérea sin techos), --route-a/b/2/3/4 (piloto),
 ## --round=N (ronda N con compuertas, reloj, Purga, portal y cuota), --quota-preview (caza de
-## dos blancos y ascenso por el portal), --purge-preview (huida de la Purga hasta el portal).
+## dos blancos y ascenso por el portal), --purge-preview (huida de la Purga hasta el portal),
+## --death-preview (un blanco artillado derriba al jugador y remata a su piloto; reaparición).
 
 ## Ruta A (alta) y B (suelo) de la ficha, como puntos de paso en X/Z del mundo.
 const ROUTES := {
@@ -68,6 +69,9 @@ const HUNT_POINT := Vector2(-20, 12)
 const QUOTA_TARGETS := [Vector2(-45, 30), Vector2(40, 30)]
 const RUNNER_SCENE := preload("res://entities/runner/runner.tscn")
 const AIM_TOLERANCE_DEG := 8.0
+## Muerte de prueba: el jugador queda quieto frente a un blanco que dispara el láser.
+const DEATH_SPOT := Vector2(0, 30)
+const GUNNER_SPOT := Vector2(0, 70)
 const ARRIVE_M := 3.0
 ## Distancia al centro donde termina una ruta de exploración: rampa del podio, junto al portal.
 const PORTAL_FOOT_M := 7.5
@@ -88,6 +92,7 @@ var _escaped: bool = false
 var _hunt_at: int = -1
 var _hunting: bool = false
 var _prey: Array[Runner] = []
+var _prey_lives: Dictionary = {}
 @onready var greybox: PenalAltiplanoGreybox = $Greybox
 @onready var runner: Runner = $Runner
 @onready var overview: Camera3D = $Overview
@@ -123,6 +128,8 @@ func _ready() -> void:
 		start_purge_preview()
 	if "--quota-preview" in args:
 		start_quota_preview()
+	if "--death-preview" in args:
+		start_death_preview()
 	runner.get_node("RunnerCamera/SpringArm3D/Camera3D").make_current()
 
 
@@ -164,6 +171,8 @@ func start_quota_preview() -> void:
 	start_round(1)
 	clock.tick(Balance.get_f("round.intro_s") + Balance.get_f("round.countdown_s") + 0.001)
 	_prey = spawn_targets(QUOTA_TARGETS)
+	for prey: Runner in _prey:
+		_prey_lives[prey] = prey.health.life_id
 	_gate = 1
 	_reset_runner()
 	_route_name = "cuota"
@@ -180,6 +189,33 @@ func start_quota_preview() -> void:
 	route_events = {}
 	route_finished = false
 	runner.controller = null
+
+
+## Ronda 1 en juego: el jugador queda quieto en la sala 1 frente a un blanco artillado que
+## dispara el láser sin parar. Muere, deja pira, su piloto huye y el blanco lo remata
+## (mercy kill, +2 s); reaparece en el hub con escudo.
+func start_death_preview() -> void:
+	start_round(1)
+	clock.tick(Balance.get_f("round.intro_s") + Balance.get_f("round.countdown_s") + 0.001)
+	var gunner: Runner = spawn_targets([GUNNER_SPOT])[0]
+	gunner.name = "Gunner"
+	# En la sala 1, d crece hacia −Z: el artillero mira al hub (yaw π) y el jugador, a él.
+	gunner.rotation.y = PI
+	gunner.input_frame.laser = true
+	var spot: Vector2 = greybox.room_point(DEATH_SPOT.x, DEATH_SPOT.y)
+	runner.reset_at(Vector3(spot.x, 0.1, spot.y), 0.0)
+	runner.controller = null
+	_route_name = "muerte"
+	route_events = {}
+	EventBus.runner_destroyed.connect(func(victim: Runner, _k: Runner, _w: StringName) -> void:
+		if victim == runner:
+			_log_at("muere"))
+	EventBus.mercy_kill.connect(func(_k: Runner, victim: Runner) -> void:
+		if victim == runner:
+			_log_at("piloto rematado"))
+	EventBus.runner_respawned.connect(func(respawned: Runner) -> void:
+		if respawned == runner:
+			_log_at("reaparece"))
 
 
 ## Blancos de práctica: Runners quietos que participan en la ronda (sus bajas cuentan).
@@ -254,8 +290,13 @@ func _process(_delta: float) -> void:
 		text += "\nCUOTA %d / %d   |   PUNTAJE %d" % [progress.kills_for(runner), clock.quota,
 				score.points_for(runner)]
 		text += "   |   PORTAL ABIERTO" if portal.eligible(runner) else ""
-	if runner.health.destroyed:
+	if runner.health.destroyed and clock.state == RoundManager.State.PURGE:
 		text += "   |   PURGADO"
+	elif runner.health.destroyed:
+		var wait: float = $RoundRespawner.time_left(runner)
+		text += "   |   DESTRUIDO" + (" · REAPARECES EN %.1f s" % wait if is_finite(wait) else "")
+	elif runner.health.spawn_shield_s > 0.0:
+		text += "   |   ESCUDO %.1f s" % runner.health.spawn_shield_s
 	elif _escaped:
 		text += "   |   ESCAPÓ POR EL PORTAL"
 	status.text = text
@@ -317,8 +358,8 @@ func _drive_toward(target: Vector2) -> void:
 
 ## Apunta al primer blanco vivo sin avanzar y dispara cuando está dentro del margen de mira.
 func _hunt() -> void:
-	var alive: Array[Runner] = _prey.filter(func(prey: Runner) -> bool:
-		return is_instance_valid(prey) and not prey.health.destroyed)
+	# Un blanco cuenta como derribado aunque luego reaparezca en el hub (otra vida).
+	var alive: Array[Runner] = _prey.filter(_prey_alive)
 	if alive.is_empty():
 		_hunting = false
 		_log("cuota cumplida")
@@ -333,6 +374,11 @@ func _hunt() -> void:
 	frame.brake = 1.0
 	frame.laser = absf(angle) < deg_to_rad(AIM_TOLERANCE_DEG)
 	runner.input_frame = frame
+
+
+func _prey_alive(prey: Runner) -> bool:
+	return is_instance_valid(prey) and not prey.health.destroyed and (
+		prey.health.life_id == _prey_lives.get(prey, prey.health.life_id))
 
 
 func _on_escaped(escapee: Runner, _time_left: float) -> void:
@@ -378,6 +424,15 @@ func _track_events() -> void:
 				hit = str(collision.get_collider().get_path()).get_slice("Greybox/", 1)
 		_log("pared %d (%.1f, %.1f) %s" % [_wall_hits, p.x, p.z, hit])
 	_was_on_wall = runner.is_on_wall()
+
+
+## Registra un evento con el reloj de juego (para escenas sin ruta de piloto automático).
+func _log_at(event: String) -> void:
+	var elapsed: float = Balance.get_f("round.duration_s") - clock.seconds_left
+	if not route_events.has(event):
+		route_events[event] = snappedf(elapsed, 0.01)
+		if "--route-log" in OS.get_cmdline_user_args():
+			print("EVENT %.2f %s" % [elapsed, event])
 
 
 func _log(event: String) -> void:

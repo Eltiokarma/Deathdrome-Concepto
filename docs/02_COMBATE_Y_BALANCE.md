@@ -164,7 +164,7 @@ Los pickups de arma reaparecen a los **20 s** de ser recogidos.
 ## 9. Muerte y reaparición
 
 1. Integridad 0 → la moto explota y queda una **pira** 6 s.
-2. El piloto se eyecta (pequeño, 10 PI, 6 m/s, sin armas) y tiene **2.5 s** para alejarse.
+2. El piloto se eyecta (pequeño, 10 PI, 6 m/s, sin armas) y tiene **2.5 s** para alejarse. *Implementado: huye en línea recta lejos del atacante; el láser solo lo apunta si no hay un Runner en la mira. El control del piloto por el jugador está pendiente.*
 3. Si alguien lo mata: **mercy kill** (+500 puntos para el atacante, no suma a la cuota) y su reaparición tarda 2 s más.
 4. Reaparición: **4 s** desde la muerte (6 s con mercy kill), en el Área 0, eyectado del portal.
 5. **Escudo de aparición:** 3 s de invulnerabilidad; se cancela si disparas.

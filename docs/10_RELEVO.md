@@ -1,5 +1,32 @@
 # Relevo de trabajo — Codex / Claude
 
+## 2026-11-06 · Muerte, pira, piloto y reaparición de ronda (PUR-023/024)
+
+**Nuevo:**
+- **`entities/pilot/pilot.gd` (+ `.tscn`):** 10 PI; huye del atacante a 6 m/s durante 2.5 s y después lo recogen. Si lo derriban emite `mercy_kill`. Sin colisión con Runners y respeta la zona franca.
+- **`entities/fx/pyre.gd`:** destello y pira animada por código durante 6 s.
+- **`round/death_sequence.gd`:** pira + piloto en cada muerte; las muertes por Purga no eyectan piloto.
+- **`round/round_respawner.gd`:**
+  - 4 s (+2 s con mercy kill) hasta un punto de aparición libre del hub, con escudo de 3 s;
+  - nada durante la Purga;
+  - los caídos vuelven al empezar cada ronda.
+- **`laser_weapon.gd`:** `acquire_pilot()`. Solo apunta pilotos si no hay Runner en la mira; los Runners no cambian.
+
+**Escena del greybox:**
+- `--death-preview`: un blanco artillado derriba al jugador y remata a su piloto.
+- La caza de blancos ignora a los que reaparecen (cuenta la vida en la que se derribaron).
+- El HUD muestra DESTRUIDO con la cuenta atrás y el escudo.
+
+**Verificado en local:** **125 pruebas / 910 aserciones**, lint, datos y paquete.
+- Muerte a los 6.5 s, piloto rematado a los 7.4 s, reaparición a los 12.5 s (+6.0 s).
+
+**Pendiente:**
+- Sprite de arte de la pira.
+- Control del piloto por el jugador.
+- Vaciado de slots, cuando exista el inventario (PUR-040).
+
+---
+
 ## 2026-11-06 · Portal, cuota y puntaje en el Dominio 1
 
 **Integración en la escena del greybox:** se reutilizan sin cambios `RoundPortal` (PUR-033), `RoundProgress`, `RoundScore` (PUR-035) y `SafeZone` (PUR-031).

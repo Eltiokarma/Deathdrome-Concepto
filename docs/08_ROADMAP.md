@@ -174,17 +174,17 @@ Implementar el orden de aplicación de daño de [02 §2.1](02_COMBATE_Y_BALANCE.
 **Depende de:** PUR-020
 
 **Criterios de aceptación**
-- [ ] Explosión + pira de fuego (sprite billboard animado) durante 6 s.
-- [ ] Piloto eyectado de 10 PI que se mueve 2.5 s; matarlo emite `mercy_kill`.
+- [ ] Explosión + pira de fuego (sprite billboard animado) durante 6 s. *Greybox hecho (`entities/fx/pyre.gd`: destello y billboard animado por código, 6 s); falta el sprite de arte.*
+- [x] Piloto eyectado de 10 PI que se mueve 2.5 s; matarlo emite `mercy_kill`. (`entities/pilot/pilot.gd`; huye solo del atacante, control del jugador pendiente)
 
 ### PUR-024 · Reaparición y escudo de aparición
 **Etiquetas:** `combat`  
 **Depende de:** PUR-023
 
 **Criterios de aceptación**
-- [ ] Reaparece en el Área 0 a los 4 s (6 s tras mercy kill).
-- [ ] Escudo de 3 s que se cancela al disparar.
-- [ ] Integridad y barrera llenas, slots vacíos.
+- [x] Reaparece en el Área 0 a los 4 s (6 s tras mercy kill). (`round/round_respawner.gd`)
+- [x] Escudo de 3 s que se cancela al disparar.
+- [ ] Integridad y barrera llenas, slots vacíos. *Integridad y barrera comprobadas; los slots esperan al inventario (PUR-040).*
 
 ### PUR-025 · HUD mínimo
 **Etiquetas:** `ui`, `good first issue`  
