@@ -1,5 +1,28 @@
 # Relevo de trabajo — Codex / Claude
 
+## 2026-11-06 · Claude: PUR-070 rev. 2 (hub, podio y sala 1)
+
+**Rama:** `claude/determined-heisenberg-jj3o54`, partiendo de `main` en `3dc5618`. **Archivos:** `docs/dominios/01_penal_altiplano.md`, `docs/dominios/img/01_penal_altiplano.svg` y esta nota. Entrega solo documental: no cambia código ni balance.
+
+**Decisiones:**
+- Rampas del podio en los cuatro ejes cardinales, 4 × 4.5 m, 18.4°.
+- Spawns pasan de ±22.5° a **±30°**: con ±22.5° la huella del Runner se solapaba con la rampa (−0.2 m); ahora quedan 0.52 m libres.
+- Hub con techo de 6 m y óculo Ø12 sobre el portal (el ascenso de 12 m no cabía bajo 5 m).
+- Sala 1: deflector de 20 × 2 m a 6 m de la entrada, plataforma oeste +2 m con rampa de 8 m, pilares C1 y C2, torres T1 y T2, reservas M1–M3 y H1, y dos rutas en lazo.
+
+**Verificado (en planta, por muestreo en 2D):**
+- Línea libre máxima de 59.4 m. Con el deflector 1–2 m más adentro daba 60.4–61.5 m.
+- Ninguna torre ni pickup visible desde el hub.
+- Anchos de 7–9 m, pendientes y separación de coberturas: valores en la ficha.
+
+No se ejecutó la suite del juego (no hay cambios de código).
+
+**Sin verificar:** giro en los 6 m antes del deflector, disparo saltando sobre el podio, colisiones reales y navegación. Salas 2–4 sin interior.
+
+**Siguiente bloque:** greybox del hub + sala 1 en una escena separada. No declarar PUR-071 terminado.
+
+---
+
 ## 2026-11-05 · Relevo para el próximo avance pequeño de Claude
 
 **Pedido de Gerson:** dejar todo anotado y permitir un avance pequeño, cuidando el consumo de tokens. Codex termina aquí; no mantiene tareas reservadas ni trabajo en segundo plano.
