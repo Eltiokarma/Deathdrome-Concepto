@@ -1,6 +1,6 @@
 class_name PenalAltiplanoGreybox
 extends Node3D
-## Greybox del hub + sala 1 del Dominio 1 (PUR-070 rev. 2).
+## Greybox del hub + sala 1 del Dominio 1 (PUR-070 rev. 4: escala oficial ×6 en largo).
 ## Las cotas copian docs/dominios/01_penal_altiplano.md; si cambian, actualizar ficha y pruebas.
 ## Torres y pickups son solo marcadores de reserva: no tienen comportamiento.
 
@@ -60,9 +60,10 @@ const LARGE_RAMPS := [
 	[0, 85, Vector2(0, 1), 10], [0, 143, Vector2(0, -1), 10],
 	[-29, 114, Vector2(1, 0), 10], [29, 114, Vector2(-1, 0), 10],
 ]
-## Campo de pilares 2 × 2 m alineado: calles rectas de 12 m entre columnas.
+## Campo de pilares 4 × 4 m alineado: calles rectas de 10 m entre columnas.
 const LARGE_PILLAR_ROWS := [34, 48, 62, 76]
 const LARGE_PILLAR_STEP := 14.0
+const LARGE_PILLAR_HALF := 2.0
 const LARGE_PILLAR_SPAN := 77.0
 const LARGE_RESERVES := {
 	"T1": Vector3(-35, 0, 55), "T2": Vector3(49, 0, 41), "T3": Vector3(0, 0, 160),
@@ -77,12 +78,14 @@ const GATES := {
 	1: Vector3(0, 0, -1), 2: Vector3(1, 0, 0), 3: Vector3(0, 0, 1), 4: Vector3(-1, 0, 0),
 }
 
-## Escala de planta (PUR-070, prueba de tamaño): multiplica distancias horizontales del hub,
+## Escala de planta respecto a las cotas base (rev. 3): multiplica distancias horizontales de
 ## conexiones y sala; conserva anchos de paso, alturas, pendientes, podio y portal.
-## 1.0 = cotas de la ficha. También con `--layout-scale=<x>` o la variable PURGA_LAYOUT_SCALE.
-@export var layout_scale: float = 1.0
-## Escala propia del hub; ≤ 0 usa layout_scale. `--hub-scale=<x>` o PURGA_HUB_SCALE.
-@export var hub_scale: float = 0.0
+## Oficial desde rev. 4: 6.0 (sala de 216 m). Con < LARGE_FROM se construye la sala base de
+## 36 m (histórica, solo para comparar). También `--layout-scale=<x>` o PURGA_LAYOUT_SCALE.
+@export var layout_scale: float = 6.0
+## Escala propia del hub (oficial 3.0 → Ø120 m); ≤ 0 usa layout_scale.
+## `--hub-scale=<x>` o PURGA_HUB_SCALE.
+@export var hub_scale: float = 3.0
 var room_ceiling: float = ROOM_CEILING
 var hub_radius: float = HUB_RADIUS
 var corridor_end: float = CORRIDOR_END
@@ -376,8 +379,9 @@ func _build_room_1_large(room: Node3D) -> void:
 	for d: float in LARGE_PILLAR_ROWS:
 		var u: float = -LARGE_PILLAR_SPAN
 		while u <= LARGE_PILLAR_SPAN + 0.1:
-			_local_box(room, "Pillar_%d_%d" % [u, d], u - 1, u + 1, d - 1, d + 1, room_ceiling,
-					"block")
+			var half: float = LARGE_PILLAR_HALF
+			_local_box(room, "Pillar_%d_%d" % [u, d], u - half, u + half, d - half, d + half,
+					room_ceiling, "block")
 			u += LARGE_PILLAR_STEP
 	var face: Vector2 = room_point(0, 8)
 	_label(room, "1", Vector3(face.x, 4.0, face.y + 0.05), 384, false)

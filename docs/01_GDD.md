@@ -84,7 +84,7 @@ Partida → Pausa (continuar / reiniciar ronda / opciones / salir)
 
 Es la pieza central de cada Dominio y la que más define el juego.
 
-- **Forma:** sala circular, Ø 40 m. En el centro, el **podio-portal** (Ø 10 m) con un anillo luminoso suspendido encima.
+- **Forma:** sala circular, Ø 120 m. En el centro, el **podio-portal** (Ø 10 m) con un anillo luminoso suspendido encima.
 - **Inicio de ronda:** los 8 Runners aparecen en el anillo exterior del podio, mirando hacia las 4 compuertas.
 - **Zona franca:** dentro del Área 0 **no se puede infligir daño de ningún tipo** (armas deshabilitadas, barrera apagada, torres ausentes). Ver D-01.
 - **Portal cerrado:** el podio es un bloque sólido con la señalización de salida apagada.
@@ -95,7 +95,7 @@ Es la pieza central de cada Dominio y la que más define el juego.
 ## 5. La Purga
 
 - Empieza cuando el reloj llega a 0:00.
-- Muros de rayos aparecen en el perímetro de cada sala y avanzan hacia las compuertas del Área 0 a 3.5 m/s.
+- Muros de rayos aparecen en el perímetro de cada sala y avanzan hacia las compuertas del Área 0 a 10 m/s.
 - Contacto = muerte inmediata, **sin reaparición** en lo que queda de ronda.
 - Al llegar a las compuertas, la Purga entra al Área 0 y se cierra como un anillo hacia el portal en 10 s. **La zona franca no protege de la Purga.**
 - Si cumples la cuota durante la Purga, el portal se abre y aún puedes escapar.

@@ -1,11 +1,14 @@
 extends GutTest
-## Greybox hub + sala 1 del Penal Altiplano contra las cotas de la ficha PUR-070 rev. 2.
+## Greybox hub + sala 1 del Penal Altiplano contra la ficha PUR-070 rev. 4 (escala oficial).
 
 const SANDBOX := preload("res://levels/domain_01/penal_altiplano_sandbox.tscn")
 const Layout := preload("res://levels/domain_01/penal_altiplano_greybox.gd")
 const GUN_HEIGHT := 0.5
 const JUMP_TOP := 3.2
-const LASER_RANGE := 60.0
+## Métrica de docs/04: ninguna recta libre supera 1.5 veces el alcance del láser.
+const LINE_LIMIT_FACTOR := 1.5
+const ROOM_REACH_S := 10.0
+const ROUTE_LIMIT_S := 80
 
 var sandbox: Node3D
 var greybox: PenalAltiplanoGreybox
@@ -17,23 +20,37 @@ func before_each() -> void:
 	await wait_physics_frames(3)
 
 
+func test_official_scale_dimensions() -> void:
+	assert_true(greybox.is_large(), "La escala oficial construye la sala grande")
+	assert_almost_eq(greybox.hub_radius, 60.0, 0.001, "Hub Ø120 m")
+	assert_almost_eq(greybox.corridor_end - greybox.hub_radius, 84.0, 0.001, "Conexión de 84 m")
+	assert_almost_eq(greybox.room_half * 2.0, 216.0, 0.001, "Sala de 216 m")
+
+
 func test_floor_heights_and_slopes() -> void:
-	assert_almost_eq(_ground_at(Vector3(12, 0, 6)), 0.0, 0.01, "Suelo del hub")
+	assert_almost_eq(_ground_at(Vector3(30, 0, 20)), 0.0, 0.01, "Suelo del hub")
 	assert_almost_eq(_ground_at(Vector3(3, 0, 3)), Layout.PODIUM_HEIGHT, 0.01, "Cima del podio")
-	assert_almost_eq(_ground_at(Vector3(-14, 0, -60)), Layout.PLATFORM_HEIGHT, 0.01, "P1")
-	assert_almost_eq(_ground_at(Vector3(0, 0, -27)), 0.0, 0.01, "Conexión 1")
+	assert_almost_eq(_ground_at(Vector3(0, 0, -100)), 0.0, 0.01, "Conexión 1")
+	var ledge: float = Layout.LARGE_LEDGE_HEIGHT
+	assert_almost_eq(_ground_room(-102, 120), ledge, 0.01, "Pasarela oeste")
+	assert_almost_eq(_ground_room(0, 210), ledge, 0.01, "Pasarela norte")
+	assert_almost_eq(_ground_room(0, 114), ledge, 0.01, "Plataforma central")
+	assert_almost_eq(_ground_room(0, 40), 0.0, 0.01, "Calle del campo de pilares")
 	for gate: int in Layout.GATES:
 		var axis: Vector3 = Layout.GATES[gate]
 		_assert_slope(axis * 9.0, axis * 6.0, 18.43, "Rampa del podio %d" % gate)
-	_assert_slope(Vector3(-14, 0, -49), Vector3(-14, 0, -53), 18.43, "Rampa RA")
+	_assert_slope(_room3(-102, 17), _room3(-102, 22), 18.43, "Rampa a pasarela oeste")
+	_assert_slope(_room3(0, 87), _room3(0, 92), 18.43, "Rampa sur de la plataforma")
 
 
 func test_ceilings_and_portal_oculus() -> void:
-	assert_almost_eq(_ceiling_above(Vector3(12, 1, 0)), Layout.HUB_CEILING, 0.01, "Techo del hub")
-	assert_almost_eq(_ceiling_above(Vector3(0, 1, -27)), Layout.GATE_HEIGHT, 0.01, "Techo conexión")
-	assert_almost_eq(_ceiling_above(Vector3(10, 1, -60)), Layout.ROOM_CEILING, 0.01, "Techo sala 1")
-	var clearance: float = _ceiling_above(Vector3(-14, 2.5, -60)) - Layout.PLATFORM_HEIGHT
-	assert_gt(clearance, Balance.get_f("movement.jump_apex_m") + 0.7, "Salto sobre P1")
+	assert_almost_eq(_ceiling_above(Vector3(30, 1, 20)), Layout.HUB_CEILING, 0.01, "Techo del hub")
+	assert_almost_eq(_ceiling_above(Vector3(0, 1, -100)), Layout.GATE_HEIGHT, 0.01, "Techo conexión")
+	var room_floor := _room3(56, 40) + Vector3.UP
+	assert_almost_eq(_ceiling_above(room_floor), Layout.LARGE_ROOM_CEILING, 0.01, "Techo sala 1")
+	var over_ledge: Vector3 = _room3(-102, 120) + Vector3.UP * (Layout.LARGE_LEDGE_HEIGHT + 0.5)
+	var clearance: float = _ceiling_above(over_ledge) - Layout.LARGE_LEDGE_HEIGHT
+	assert_gt(clearance, Balance.get_f("movement.jump_apex_m") + 0.7, "Salto sobre pasarela")
 	var ascent: float = Balance.get_f("portal.ascent_height_m")
 	assert_eq(_ceiling_above(Vector3(0, 2, 0), ascent + 2.0), INF, "Óculo libre sobre el portal")
 
@@ -57,12 +74,13 @@ func test_spawns_clear_of_podium_ramps_with_margin() -> void:
 
 func test_reserves_hidden_from_hub_at_gun_and_jump_height() -> void:
 	var reserves: Array[Node] = get_tree().get_nodes_in_group(&"design_reserve")
-	assert_eq(reserves.size(), 6)
+	assert_eq(reserves.size(), Layout.LARGE_RESERVES.size())
 	var viewpoints: Array[Vector3] = []
-	for ring: float in [8.0, 12.0, 16.0, 19.5]:
+	for ring: float in [8.0, 12.0, 0.5, 0.8, 0.99]:
+		var radius: float = ring if ring > 1.0 else greybox.hub_radius * ring
 		for step: int in range(48):
 			var angle: float = TAU * step / 48.0
-			viewpoints.append(Vector3(sin(angle) * ring, 0, -cos(angle) * ring))
+			viewpoints.append(Vector3(sin(angle) * radius, 0, -cos(angle) * radius))
 	for reserve: Marker3D in reserves:
 		for height: float in [GUN_HEIGHT, JUMP_TOP]:
 			var target: Vector3 = reserve.global_position + Vector3.UP * GUN_HEIGHT
@@ -73,45 +91,55 @@ func test_reserves_hidden_from_hub_at_gun_and_jump_height() -> void:
 			assert_eq(seen, 0, "%s oculto desde el hub a %.1f m" % [reserve.name, height])
 
 
-func test_longest_ground_line_within_laser_range() -> void:
+func test_longest_ground_line_within_metric() -> void:
+	var limit: float = Balance.get_f("weapons.laser.range_m") * LINE_LIMIT_FACTOR
 	var longest: float = 0.0
 	var worst: Array = []
-	for origin: Vector3 in _walkable_grid(2.0 * greybox.layout_scale):
+	for origin: Vector3 in _walkable_grid(4.0):
 		for step: int in range(180):
 			var angle: float = TAU * step / 180.0
 			var direction := Vector3(sin(angle), 0, cos(angle))
-			var length: float = _ray_length(origin, direction, 300.0)
+			var length: float = _ray_length(origin, direction, limit * 2.0)
 			if length > longest:
 				longest = length
 				worst = [origin, direction]
 	gut.p("Línea libre más larga a %.1f m: %.1f m desde %s" % [GUN_HEIGHT, longest, worst])
-	assert_lt(longest, LASER_RANGE, "Línea recta a ras de suelo ≤ alcance del láser")
+	assert_lt(longest, limit, "Recta a ras de suelo ≤ 1.5 × alcance del láser")
 
 
-func test_route_a_reaches_room_platform_and_portal() -> void:
+func test_route_a_climbs_ledges_and_returns_to_portal() -> void:
 	var events: Dictionary = await _run_route("a")
 	assert_true(events.has("fin de ruta"), "Ruta A completa: %s" % events)
-	assert_lt(events.get("entra sala 1", INF), 6.0, "Sala 1 en ≤ 6 s desde el spawn")
-	assert_true(events.has("sobre P1"), "Ruta A sube a P1")
+	assert_lt(events.get("entra sala 1", INF), ROOM_REACH_S, "Sala 1 alcanzable desde el spawn")
+	assert_true(events.has("sobre pasarela/plataforma"), "Ruta A usa la altura")
 	assert_true(events.has("sobre podio"), "Ruta A vuelve al portal")
 
 
 func test_route_b_loops_on_floor_and_returns() -> void:
 	var events: Dictionary = await _run_route("b")
 	assert_true(events.has("fin de ruta"), "Ruta B completa: %s" % events)
-	assert_lt(events.get("entra sala 1", INF), 6.0, "Sala 1 en ≤ 6 s desde el spawn")
-	assert_false(events.has("sobre P1"), "Ruta B es de suelo")
+	assert_lt(events.get("entra sala 1", INF), ROOM_REACH_S, "Sala 1 alcanzable desde el spawn")
+	assert_false(events.has("sobre pasarela/plataforma"), "Ruta B es de suelo")
 	assert_true(events.has("sobre podio"), "Ruta B vuelve al portal")
 
 
 func _run_route(key: String) -> Dictionary:
 	sandbox.start_route(key)
-	for _second: int in range(25):
+	for _second: int in range(ROUTE_LIMIT_S):
 		await wait_physics_frames(60)
 		if sandbox.route_finished:
 			break
 	gut.p("Ruta %s: %s" % [key, sandbox.route_events])
 	return sandbox.route_events
+
+
+func _room3(u: float, d: float) -> Vector3:
+	var point: Vector2 = greybox.room_point(u, d)
+	return Vector3(point.x, 0, point.y)
+
+
+func _ground_room(u: float, d: float) -> float:
+	return _ground_at(_room3(u, d))
 
 
 func _walkable_grid(spacing: float) -> Array[Vector3]:
@@ -134,6 +162,12 @@ func _is_open(point: Vector3) -> bool:
 	query.collision_mask = 1
 	var space := greybox.get_world_3d().direct_space_state
 	if not space.intersect_point(query).is_empty():
+		return false
+	# Excluye puntos bajo rampas o pasarelas: el primer suelo desde arriba debe ser el piso.
+	var probe := Vector3(point.x, 4.5, point.z)
+	var down := PhysicsRayQueryParameters3D.create(probe, probe + Vector3.DOWN * 6.0, 1)
+	var hit: Dictionary = space.intersect_ray(down)
+	if hit.is_empty() or hit.position.y > 0.3:
 		return false
 	return _in_layout(point)
 

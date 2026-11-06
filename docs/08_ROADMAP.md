@@ -154,7 +154,7 @@ Implementar el orden de aplicación de daño de [02 §2.1](02_COMBATE_Y_BALANCE.
 **Depende de:** PUR-020, PUR-012
 
 **Criterios de aceptación**
-- [ ] Cono de ±15°, alcance 60 m, 8 disparos/s, 1.5 PI base.
+- [ ] Cono de ±15°, alcance 150 m, 8 disparos/s, 1.5 PI base.
 - [ ] Rampa ×1.0 → ×2.0 en 2 s; se reinicia a los 0.4 s sin impacto.
 - [ ] Multiplicadores direccionales ×0.7 / ×1.0 / ×1.2.
 - [ ] Test de la curva continua de [02 §3](02_COMBATE_Y_BALANCE.md#ttk-solo-láser-impacto-continuo) con error < 2 %; el TTK observado a 8 Hz admite un intervalo de tiro más un paso de física (ver discretización en 02).
@@ -243,7 +243,7 @@ Implementa D-07: se abre solo para quien cumplió la cuota, iluminado en su colo
 **Depende de:** PUR-030
 
 **Criterios de aceptación**
-- [ ] Avance de 3.5 m/s desde los perímetros; cierre del Área 0 en 10 s.
+- [ ] Avance de 10 m/s desde los perímetros; cierre del Área 0 en 10 s.
 - [ ] Mata sin reaparición; cubre el 100 % del volumen jugable.
 - [ ] Aviso a 0:30 (sirena, reloj rojo).
 

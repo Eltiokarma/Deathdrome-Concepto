@@ -63,7 +63,7 @@ Cada impacto produce un `DamageInfo { amount, type, source, direction, position 
 |---|---|
 | Cadencia | 8 disparos/s (mantener botón) |
 | Daño base | 1.5 PI por disparo → 12 DPS |
-| Alcance | 60 m |
+| Alcance | 150 m (desde 2026-11-06; antes 60 m, ajustado a la escala de dominios ×6) |
 | Auto-apuntado | Cono de ±15° frente al Runner; elige el blanco más cercano al centro de la mira |
 | Rampa | El multiplicador sube linealmente de ×1.0 a **×2.0** en 2 s de impacto continuo sobre el **mismo** blanco |
 | Corte de rampa | Si pasan 0.4 s sin impactar a ese blanco, la rampa vuelve a ×1.0 |
@@ -194,7 +194,7 @@ Cuota por Dominio y ronda:
 |---|---|
 | Inicio | Reloj en 0:00 |
 | Aviso | Sirena y timer en rojo desde 0:30 |
-| Avance en salas | 3.5 m/s desde el perímetro hacia las compuertas del Área 0 (5.25 m/s en el Dominio 8) |
+| Avance en salas | 10 m/s desde el perímetro hacia las compuertas del Área 0 (15 m/s en el Dominio 8; siempre por debajo del Runner más lento, 18.5 m/s). Desde 2026-11-06; antes 3.5 m/s, ajustado a salas de 216 m |
 | Cierre del Área 0 | El anillo se cierra hacia el portal en 10 s |
 | Efecto | Muerte instantánea, sin reaparición en la ronda |
 | Bots | Huyen hacia el Área 0 en cuanto la Purga empieza |

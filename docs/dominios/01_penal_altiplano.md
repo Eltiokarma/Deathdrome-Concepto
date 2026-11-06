@@ -6,10 +6,53 @@ Cuatro patios cubiertos enseñan conducción, salto, cobertura y regreso al port
 
 ## Modificador
 Ninguno. Tutorial implícito según [diseño de dominios](../04_DOMINIOS_Y_NIVELES.md).
-**Estado: PUR-070 rev. 3 (2026-11-06).** El hub, el podio y la sala 1 están construidos como greybox en `game/levels/domain_01/` y medidos con física real (ver «Greybox: verificación física»). La rev. 3 corrige la rev. 2 con lo aprendido al conducir. Las salas 2–4 siguen siendo solo envolventes. No cambia balance.
+**Estado: PUR-070 rev. 4 (2026-11-06), escala oficial.** Gerson adoptó la escala ×6 en largo para salas y conexiones (×3 para el hub) y subió láser (150 m) y Purga (10 m/s). El hub, el podio y la sala 1 están construidos como greybox en `game/levels/domain_01/` y verificados con física real. Las secciones «Base histórica» describen la escala ×1 anterior y solo sirven de referencia. Las salas 2–4 siguen siendo solo envolventes.
 
-## Plano (imagen en docs/dominios/img/)
-![Implantación del Penal Altiplano](img/01_penal_altiplano.svg)
+## Escala oficial (rev. 4)
+
+![Sala 1 del Penal Altiplano, escala oficial](img/01_penal_altiplano.svg)
+
+| Elemento | Medida |
+|---|---|
+| Hub | Ø120 m, techo 6 m, óculo Ø12 sobre el portal; podio, rampas del podio y spawns sin cambios (ver «Hub y podio») |
+| Conexiones | 84 m de largo, 8 m de ancho, 5 m de alto; compuertas de 8 × 5 m |
+| Sala 1 | 216 × 216 m, techo 12 m; centro a 252 m del centro del hub |
+| Rampas interiores | 9 m de desarrollo, 3 m de subida (18.4°) |
+
+Interior de la sala 1, en coordenadas locales (u = X del mundo, d = metros desde la entrada hacia el fondo). Las listas exactas están en las constantes `LARGE_*` de `penal_altiplano_greybox.gd`.
+
+| Zona (d) | Contenido |
+|---|---|
+| Entrada (0–24) | Deflector de 18 × 2 m a 8 m de la entrada; rampas a las pasarelas oeste y este en las esquinas |
+| Campo de pilares (32–78) | Pilares de 4 × 4 m cada 14 m en 4 filas, con calles rectas de 10 m |
+| Banda central (85–143) | Plataforma de 40 × 40 m a +3 m con cuatro rampas; seis muros bajos de 1.2 m (saltables); cuatro bloques de 4 × 4 m |
+| Cámaras del fondo (150–204) | Muro a techo con tres huecos de 16 m; dos tabiques con paso de 16 m; un bloque por cámara |
+| Perímetro | Pasarelas de 12 m de ancho a +3 m en los muros oeste, este y norte; rampas de bajada desde la norte |
+
+**Reservas de diseño**, sin comportamiento hasta que existan sus sistemas:
+- 6 torres (T1–T6);
+- 6 pickups de misil (M1–M6), dos de ellos en altura;
+- 2 orbes de salud (H1–H2).
+
+### Verificación (greybox, `tests/test_domain_01_greybox.gd`)
+
+| Comprobación | Resultado |
+|---|---|
+| Dimensiones | Hub Ø120 m, conexión de 84 m y sala de 216 m, comprobados en la escena |
+| Alturas y pendientes | Pasarelas y plataforma a 3 m; rampas a 18.4° |
+| Techos | Sala 12 m, con 9 m libres sobre las pasarelas; óculo libre sobre el portal |
+| Spawns | Casco + 0.2 m sin tocar rampas ni podio |
+| Reservas ocultas | Ningún rayo desde 240 puntos del hub, a 0.5 m ni a 3.2 m, alcanza las 14 reservas |
+| Recta libre más larga (0.5 m) | **219.5 m**, bajo el límite de 225 m (1.5 × láser). Con pilares de 2 m daba 241 m: por eso son de 4 × 4 m |
+| Rutas (piloto automático, Amaru) | **A:** entrada → pasarela oeste → pasarela norte → cámaras → plataforma central → pilares → portal, en 52 s. **B:** entrada → pilares (calle este) → muros bajos → cámaras → oeste → portal, en 43 s. Sala 1 a 7.1 s del spawn |
+
+**Pendiente:**
+- playtest humano de la escala, sobre todo cuántos encuentros hay con 8 Runners;
+- disparo saltando sobre el podio;
+- torres reales, bots y rendimiento con ocho Runners en salas de 216 m.
+
+## Base histórica rev. 2–3 (escala ×1, sustituida)
+Las secciones siguientes, hasta «Purga», documentan la escala anterior (sala de 36 m) y cómo se llegó a ella. El greybox todavía la construye con `--layout-scale=1 --hub-scale=1` para comparar.
 
 Vista superior: norte = −Z, este = +X; Y vertical. Centro del hub (0,0,0).
 El dibujo fija envolventes y conexiones; coberturas, desvíos interiores y navegación quedan para blockout.
@@ -133,7 +176,11 @@ El centro contiene el portal: las rutas reales lo rodean. Medir desde spawns con
 - Retorno al portal tras cuota: entradas visibles y sin torres con línea directa al hub.
 
 ## Purga: contrato para implementación
-Propuesta: un frente por sala abierta, desde borde exterior a su umbral (50 m nominales a 3.5 m/s ≈14.29 s), seguido por cierre del hub en 10 s. Mantener aviso a 0:30.
+Propuesta (rev. 4):
+- Un frente por sala abierta, desde el borde exterior de la sala hasta el umbral del hub: 216 m de sala + 84 m de conexión = 300 m a 10 m/s, unos 30 s.
+- Después, cierre del hub en 10 s.
+- Aviso a 0:30.
+- Un Runner en el fondo de la sala necesita unos 13 s a 23.5 m/s para llegar al hub, y el frente avanza más despacio que el Runner más lento.
 Cada frente debe barrer sala y conexión completas, incluidos rampas, pisos y plataformas; delimitar su volumen para no matar prematuramente en salas vecinas.
 Salas cerradas no deben poder contener participantes ni generar refugios. El frente radial del sandbox queda separado.
 La forma exacta, sincronización y cobertura deben verificarse con geometría física; no reutilizar radio 56/7 del ensayo como dimensiones del dominio.

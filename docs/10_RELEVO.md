@@ -1,5 +1,36 @@
 # Relevo de trabajo — Codex / Claude
 
+## 2026-11-06 · Escala ×6 oficial, láser 150 m y Purga 10 m/s (decisión de Gerson)
+
+**Decisión:** Gerson adoptó como oficial la sala grande (×6 en largo, hub ×3) y pidió subir láser y Purga.
+
+**Cambios:**
+- `balance.json`:
+  - `weapons.laser.range_m` 60 → **150**;
+  - `purge.speed_mps` 3.5 → **10** (15 en D8, por debajo del Runner más lento, 18.5 m/s).
+- Greybox: `layout_scale = 6`, `hub_scale = 3` por defecto. La escala ×1 sigue disponible con `--layout-scale=1 --hub-scale=1`.
+- Pruebas reescritas para la escala oficial. `test_purge` y `test_combat` leen ahora la velocidad y el alcance de `Balance` en vez de números fijos.
+- Pilares de 4 × 4 m: con 2 × 2 m una diagonal de 241 m superaba la métrica.
+- `check_project.py` corre GUT con `--fixed-fps 60`: las rutas simuladas tardan segundos, no minutos.
+- Docs actualizados: 01, 02, 04 (métricas nuevas: línea ≤ 1.5 × láser), 08, 11, ficha y SVG. La CI graba la ruta A completa.
+
+**Verificado en local:**
+- **113 pruebas / 709 aserciones**, lint, datos y paquete.
+- Recta libre máxima: 219.5 m.
+- Rutas: A 52 s y B 43 s.
+
+**Pendiente o a decidir (no tocado):**
+- **Alcances que siguen en 60–70 m:**
+  - visión de bots (`ai.vision_range_m` 60, docs/06);
+  - radar (60 m, docs/05);
+  - fijación de misil (70 m).
+
+  Conviene revisarlos con la nueva escala; no se cambiaron porque no se pidió.
+- **Salas 2–4:** necesitan interior a la nueva escala.
+- **Playtest:** encuentros con 8 Runners y rendimiento.
+
+---
+
 ## 2026-11-06 · Prototipo grande de la sala 1 (escala ×6 en largo, pedido por Gerson)
 
 Gerson revisó la prueba a ×2.45 y pidió **otro ×2.45 (≈ ×6 en largo, ≈ ×36 en superficie)**, **llenando el espacio**. Aportó capturas del original como referencia de escala (salas-nave abiertas, techos altos, pasarelas elevadas perimetrales); se usan solo para escala, según las reglas clean-room.
