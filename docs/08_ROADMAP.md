@@ -184,7 +184,7 @@ Implementar el orden de aplicación de daño de [02 §2.1](02_COMBATE_Y_BALANCE.
 **Criterios de aceptación**
 - [x] Reaparece en el Área 0 a los 4 s (6 s tras mercy kill). (`round/round_respawner.gd`)
 - [x] Escudo de 3 s que se cancela al disparar.
-- [ ] Integridad y barrera llenas, slots vacíos. *Integridad y barrera comprobadas; los slots esperan al inventario (PUR-040).*
+- [x] Integridad y barrera llenas, slots vacíos.
 
 ### PUR-025 · HUD mínimo
 **Etiquetas:** `ui`, `good first issue`  
@@ -273,8 +273,8 @@ Objetivo: el arsenal completo funcionando en la arena de prueba.
 **Depende de:** PUR-020
 
 **Criterios de aceptación**
-- [ ] 3 slots, repetibles, ciclado con Q/E; con los slots llenos no se recoge.
-- [ ] Pickups flotando y girando; reaparecen a los 20 s.
+- [x] 3 slots, repetibles, ciclado con Q/E; con los slots llenos no se recoge. (`components/inventory_component.gd`)
+- [x] Pickups flotando y girando; reaparecen a los 20 s. (`entities/pickups/pickup.gd`; también el orbe de salud, +35 PI, 25 s)
 
 ### PUR-041 · Sistema de fijación
 **Etiquetas:** `combat`  

@@ -38,6 +38,15 @@ func reset(value: float) -> void:
 	_last_damage_at = -INF
 
 
+## Cura sin pasar del máximo (orbe de salud). Devuelve lo curado.
+func heal(amount: float) -> float:
+	if destroyed or not is_finite(amount) or amount <= 0.0:
+		return 0.0
+	var healed: float = minf(amount, maximum - current)
+	current += healed
+	return healed
+
+
 func tick(delta: float) -> void:
 	if not is_finite(delta) or delta < 0.0:
 		return

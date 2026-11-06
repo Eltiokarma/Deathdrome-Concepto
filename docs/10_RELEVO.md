@@ -1,5 +1,15 @@
 # Relevo de trabajo — Codex / Claude
 
+## 2026-11-06 · Inventario y pickups (PUR-040)
+
+- **`InventoryComponent`** en cada Runner: 3 slots repetibles, Q/E por `InputFrame.cycle_secondary`, `take_selected()` para las armas futuras. Se vacía en `reset_at`, o sea al reaparecer. Nueva señal `EventBus.inventory_changed`.
+- **`Pickup`:** flota y gira. Arma: 20 s. Orbe de salud: +35 PI sin pasar el máximo, solo si hay daño, 25 s. `HealthComponent.heal()`.
+- **Greybox:** las reservas M (misil) y H (salud) del Dominio 1 ya son pickups reales. Las torres (T) siguen como marcadores hasta PUR-044. M3 de la sala 1 pasa a la cima del mirador central.
+- **Pendiente:** el botón secundario aún no dispara nada; el misil es PUR-041/042.
+- **Verificado en local:** **135 pruebas**, lint, datos y paquete.
+
+---
+
 ## 2026-11-06 · Tres niveles de altura por sala y tiro en marcha (pedido de Gerson)
 
 **Reaparición:** Gerson recuerda que se reaparece «en el centro, donde se inicia». Ya es así: los 8 puntos de aparición están a 7 m del portal, igual que al empezar la ronda. No se cambió.

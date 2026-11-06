@@ -35,6 +35,7 @@ const RESERVES := {
 ## Variante grande (prueba de escala, 2026-11-06): con `layout_scale` ≥ LARGE_FROM la sala 1 no
 ## se estira, se llena con un interior propio en coordenadas locales (u = X, d = metros desde la
 ## entrada hacia el fondo). Medidas en metros reales, no escaladas.
+const PICKUP_SCENE := preload("res://entities/pickups/pickup.tscn")
 const LARGE_FROM := 3.0
 const LARGE_ROOM_CEILING := 12.0
 const LARGE_LEDGE_HEIGHT := 3.0
@@ -76,7 +77,7 @@ const LARGE_PILLAR_SPAN := 77.0
 const LARGE_RESERVES := {
 	"T1": Vector3(-35, 0, 55), "T2": Vector3(49, 0, 41), "T3": Vector3(0, 0, 160),
 	"T4": Vector3(-70, 0, 192), "T5": Vector3(70, 0, 162), "T6": Vector3(35, 0, 100),
-	"M1": Vector3(-102, 3, 120), "M2": Vector3(102, 3, 160), "M3": Vector3(0, 3, 114),
+	"M1": Vector3(-102, 3, 120), "M2": Vector3(102, 3, 160), "M3": Vector3(0, 6, 111),
 	"M4": Vector3(-64, 0, 177), "M5": Vector3(64, 0, 192), "M6": Vector3(-21, 0, 69),
 	"H1": Vector3(0, 0, 192), "H2": Vector3(-50, 0, 114),
 }
@@ -678,6 +679,16 @@ func _build_reserves() -> void:
 			entries.append([id, Vector3(flat.x, source.y, flat.y)])
 	for entry: Array in entries:
 		var id: String = entry[0].get_slice("-", entry[0].get_slice_count("-") - 1)
+		if not id.begins_with("T"):
+			# Misiles (M) y salud (H) ya son pickups reales; las torres esperan a PUR-044.
+			var pickup: Pickup = PICKUP_SCENE.instantiate()
+			pickup.name = entry[0]
+			pickup.kind = &"health_orb" if id.begins_with("H") else &"weapon"
+			pickup.weapon_id = &"missile"
+			pickup.position = entry[1]
+			pickup.add_to_group(&"design_reserve")
+			reserves.add_child(pickup)
+			continue
 		var marker := Marker3D.new()
 		marker.name = entry[0]
 		marker.position = entry[1]

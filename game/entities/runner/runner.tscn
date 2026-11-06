@@ -1,4 +1,4 @@
-[gd_scene load_steps=15 format=3]
+[gd_scene load_steps=16 format=3]
 [ext_resource type="Script" path="res://entities/runner/runner.gd" id="1"]
 [ext_resource type="Script" path="res://entities/runner/runner_motor.gd" id="2"]
 [ext_resource type="Script" path="res://controllers/player_input.gd" id="3"]
@@ -6,6 +6,7 @@
 [ext_resource type="Script" path="res://components/health_component.gd" id="5"]
 [ext_resource type="Script" path="res://components/laser_weapon.gd" id="6"]
 [ext_resource type="Script" path="res://components/barrier_weapon.gd" id="7"]
+[ext_resource type="Script" path="res://components/inventory_component.gd" id="8"]
 [sub_resource type="BoxShape3D" id="Hull"]
 size = Vector3(1, 0.7, 2.2)
 [sub_resource type="BoxMesh" id="Body"]
@@ -91,3 +92,6 @@ script = ExtResource("6")
 
 [node name="BarrierWeapon" type="Node" parent="."]
 script = ExtResource("7")
+
+[node name="InventoryComponent" type="Node" parent="."]
+script = ExtResource("8")

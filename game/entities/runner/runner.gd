@@ -16,6 +16,7 @@ var controller: PlayerInput
 @onready var laser: LaserWeapon = $LaserWeapon
 @onready var motor: RunnerMotor = $RunnerMotor
 @onready var model: Node3D = $Model
+@onready var inventory: InventoryComponent = $InventoryComponent
 
 
 func _ready() -> void:
@@ -60,6 +61,7 @@ func _physics_process(delta: float) -> void:
 		var segment := get_slide_collision(index).get_collider() as BarrierSegment
 		if segment != null:
 			segment.hit(self)
+	inventory.cycle(last_input.cycle_secondary)
 	barrier.tick(delta, last_input.barrier)
 	laser.tick(delta, last_input.laser)
 
@@ -74,5 +76,6 @@ func reset_at(point: Vector3, yaw: float = 0.0) -> void:
 	health.reset(stats.max_integrity)
 	laser.reset()
 	barrier.reset()
+	inventory.clear()
 	set_collision_layer_value(2, true)
 	model.visible = ($RunnerCamera as RunnerCamera).mode != 2

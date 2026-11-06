@@ -110,7 +110,7 @@ func test_reserves_hidden_from_hub_at_gun_and_jump_height() -> void:
 		for step: int in range(48):
 			var angle: float = TAU * step / 48.0
 			viewpoints.append(Vector3(sin(angle) * radius, 0, -cos(angle) * radius))
-	for reserve: Marker3D in reserves:
+	for reserve: Node3D in reserves:
 		for height: float in [GUN_HEIGHT, JUMP_TOP]:
 			var target: Vector3 = reserve.global_position + Vector3.UP * GUN_HEIGHT
 			var seen: int = 0

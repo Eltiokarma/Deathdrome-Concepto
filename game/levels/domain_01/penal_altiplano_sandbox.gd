@@ -125,6 +125,9 @@ func _ready() -> void:
 	$SafeZone.radius = greybox.hub_radius
 	progress.register(runner)
 	EventBus.runner_escaped.connect(_on_escaped)
+	EventBus.pickup_collected.connect(func(collector: Runner, id: StringName) -> void:
+		if collector == runner:
+			_log("recoge %s" % id))
 	_reset_runner()
 	if "--overview-preview" in args:
 		greybox.set_ceilings_visible(false)
@@ -348,6 +351,13 @@ func _process(_delta: float) -> void:
 		text += "\nCUOTA %d / %d   |   PUNTAJE %d" % [progress.kills_for(runner), clock.quota,
 				score.points_for(runner)]
 		text += "   |   PORTAL ABIERTO" if portal.eligible(runner) else ""
+	var slots: Array[String] = []
+	for index: int in range(runner.inventory.capacity()):
+		var name: String = (str(runner.inventory.slots[index]).to_upper()
+				if index < runner.inventory.slots.size() else "—")
+		var chosen: bool = index == runner.inventory.selected and index < runner.inventory.slots.size()
+		slots.append("[%s]" % name if chosen else " %s " % name)
+	text += "\nSECUNDARIAS %s   ·   Q/E: cambiar" % " ".join(slots)
 	if runner.health.destroyed and clock.state == RoundManager.State.PURGE:
 		text += "   |   PURGADO"
 	elif runner.health.destroyed:
