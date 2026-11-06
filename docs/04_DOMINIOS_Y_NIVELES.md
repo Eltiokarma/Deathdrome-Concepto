@@ -16,7 +16,7 @@ Basadas en las capturas del original y en el tamaño del Runner (1.0 m de ancho 
 | Podio-portal | Ø 10 m, 1.5 m de alto | Visible desde las cuatro compuertas |
 | Compuerta Área 0 ↔ sala | 8 m ancho × 5 m alto | — |
 | Rampa | Pendiente ≤ 25°, franjas amarillo/negro | Legibilidad |
-| Plataforma elevada | 2–4 m sobre el piso | Juego vertical |
+| Plataforma elevada | 2–4 m sobre el piso; desde la escala ×6, **tres niveles por sala**: suelo, +3 m (pasarelas y plataformas) y +6 m (miradores), unidos por rampas de 18.4° | Juego vertical; con 12 m de techo, el mirador conserva 6 m libres |
 | Línea recta más larga | ≤ 1.5 × alcance del láser (225 m con láser de 150 m) | Duelos largos posibles; ninguna recta cruza una sala de punta a punta |
 | Coberturas | Pilares, bloques o muros bajos cada 10–15 m dentro de cada zona | Evita salas-estacionamiento vacías |
 | Grid de construcción | 1 m; módulos de 4 m | Kits modulares reutilizables |

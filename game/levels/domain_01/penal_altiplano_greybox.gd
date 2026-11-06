@@ -39,6 +39,8 @@ const LARGE_FROM := 3.0
 const LARGE_ROOM_CEILING := 12.0
 const LARGE_LEDGE_HEIGHT := 3.0
 const LARGE_RAMP_RUN := 9.0
+## Segundo nivel: miradores a +6 m sobre pasarelas y plataformas (12 m de techo dejan 6 m).
+const LARGE_DECK_HEIGHT := 6.0
 ## [u0, u1, d0, d1, altura] (altura 0 = hasta el techo).
 const LARGE_BLOCKS := [
 	[-9, 9, 8, 10, 0],
@@ -53,13 +55,19 @@ const LARGE_BLOCKS := [
 const LARGE_LEDGES := [
 	[-108, -96, 24, 216], [96, 108, 24, 216], [-96, 96, 204, 216], [-20, 20, 94, 134],
 ]
-## Rampas: [u_pie, d_pie, dirección cuesta arriba (u, d), ancho].
+## Rampas: [u_pie, d_pie, dirección cuesta arriba (u, d), ancho, altura del pie (opcional)].
+## Todas suben 3 m en 9 m (18.4°); con pie a +3 m llevan a un mirador de +6 m.
 const LARGE_RAMPS := [
 	[-102, 15, Vector2(0, 1), 12], [102, 15, Vector2(0, 1), 12],
 	[-40, 195, Vector2(0, 1), 12], [40, 195, Vector2(0, 1), 12],
 	[0, 85, Vector2(0, 1), 10], [0, 143, Vector2(0, -1), 10],
 	[-29, 114, Vector2(1, 0), 10], [29, 114, Vector2(-1, 0), 10],
+	[-87, 110, Vector2(-1, 0), 12], [87, 110, Vector2(1, 0), 12],
+	[-33, 210, Vector2(1, 0), 12, 3], [33, 210, Vector2(-1, 0), 12, 3],
+	[0, 127, Vector2(0, -1), 12, 3],
 ]
+## Miradores a LARGE_DECK_HEIGHT: [u0, u1, d0, d1].
+const LARGE_DECKS := [[-24, -12, 204, 216], [12, 24, 204, 216], [-6, 6, 104, 118]]
 ## Campo de pilares 4 × 4 m alineado: calles rectas de 10 m entre columnas.
 const LARGE_PILLAR_ROWS := [34, 48, 62, 76]
 const LARGE_PILLAR_STEP := 14.0
@@ -89,7 +97,12 @@ const LARGE_ROOMS := {
 		"ramps": [
 			[-33, 41, Vector2(0, 1), 10], [33, 41, Vector2(0, 1), 10],
 			[-33, 179, Vector2(0, -1), 10], [33, 179, Vector2(0, -1), 10],
+			[-30, 71, Vector2(0, -1), 10], [30, 71, Vector2(0, -1), 10],
+			[-30, 149, Vector2(0, 1), 10], [30, 149, Vector2(0, 1), 10],
+			[-39, 164, Vector2(-1, 0), 12, 3], [39, 164, Vector2(1, 0), 12, 3],
+			[39, 56, Vector2(1, 0), 12, 3],
 		],
+		"decks": [[-60, -48, 158, 170], [48, 60, 158, 170], [48, 60, 50, 62]],
 		"pillars": [
 			[-32, 80, 2], [-16, 80, 2], [16, 80, 2], [32, 80, 2],
 			[-32, 140, 2], [-16, 140, 2], [16, 140, 2], [32, 140, 2],
@@ -120,7 +133,9 @@ const LARGE_ROOMS := {
 			[-31, 80, Vector2(-1, 0), 12], [-31, 136, Vector2(-1, 0), 12],
 			[31, 80, Vector2(1, 0), 12], [31, 136, Vector2(1, 0), 12],
 			[-70, 51, Vector2(0, 1), 12], [70, 51, Vector2(0, 1), 12],
+			[-75, 108, Vector2(-1, 0), 12, 3], [75, 108, Vector2(1, 0), 12, 3],
 		],
+		"decks": [[-100, -84, 84, 132], [84, 100, 84, 132]],
 		"pillars": [
 			[-20, 40, 2], [20, 40, 2], [-20, 65, 2], [20, 65, 2], [-20, 90, 2], [20, 90, 2],
 			[-20, 115, 2], [20, 115, 2], [-20, 140, 2], [20, 140, 2], [-20, 165, 2],
@@ -152,10 +167,13 @@ const LARGE_ROOMS := {
 			[-30.5, -29.5, 74, 90, 1.2], [29.5, 30.5, 74, 90, 1.2],
 			[-30.5, -29.5, 126, 142, 1.2], [29.5, 30.5, 126, 142, 1.2],
 		],
-		"ledges": [[-12, 12, 96, 120]],
+		"ledges": [[-12, 12, 96, 120], [-108, -90, 198, 216], [90, 108, 198, 216]],
 		"ramps": [
 			[0, 87, Vector2(0, 1), 8], [0, 129, Vector2(0, -1), 8],
+			[-81, 207, Vector2(-1, 0), 12], [81, 207, Vector2(1, 0), 12],
+			[-91, 207, Vector2(-1, 0), 10, 3], [91, 207, Vector2(1, 0), 10, 3],
 		],
+		"decks": [[-108, -100, 198, 216], [100, 108, 198, 216]],
 		"pillars": [
 			[-70, 30, 2], [-25, 30, 2], [25, 30, 2], [70, 30, 2],
 			[-70, 85, 2], [-25, 85, 2], [25, 85, 2], [70, 85, 2],
@@ -313,7 +331,7 @@ static func room_layout(gate: int) -> Dictionary:
 			u += LARGE_PILLAR_STEP
 	return {
 		"blocks": LARGE_BLOCKS, "ledges": LARGE_LEDGES, "ramps": LARGE_RAMPS,
-		"pillars": pillars, "reserves": LARGE_RESERVES,
+		"decks": LARGE_DECKS, "pillars": pillars, "reserves": LARGE_RESERVES,
 	}
 
 
@@ -367,6 +385,7 @@ func _build_materials() -> void:
 		"floor": Color(0.17, 0.21, 0.25), "hub": Color(0.15, 0.30, 0.27),
 		"wall": Color(0.32, 0.39, 0.44), "ceiling": Color(0.24, 0.28, 0.32),
 		"ramp": Color(0.85, 0.61, 0.17), "platform": Color(0.29, 0.37, 0.45),
+		"deck": Color(0.42, 0.52, 0.62),
 		"block": Color(0.77, 0.35, 0.29), "podium": Color(0.55, 0.80, 0.67),
 		"closed": Color(0.75, 0.08, 0.08), "reserve": Color(0.5, 0.8, 1.0, 0.45),
 		"tower": Color(1.0, 0.54, 0.4, 0.45), "health": Color(0.6, 0.9, 0.48, 0.45),
@@ -584,12 +603,17 @@ func _build_large_room(gate: int) -> void:
 		_local_box(room, "Ledge%d" % index, gate, ledge, LARGE_LEDGE_HEIGHT, "platform")
 		index += 1
 	index = 0
+	for deck: Array in layout.get("decks", []):
+		_local_box(room, "Deck%d" % index, gate, deck, LARGE_DECK_HEIGHT, "deck")
+		index += 1
+	index = 0
 	var right: Vector3 = axis.cross(Vector3.UP)
 	for ramp: Array in layout.ramps:
 		var foot: Vector2 = room_point(ramp[0], ramp[1], gate)
 		var direction: Vector2 = ramp[2]
 		var uphill: Vector3 = right * direction.x + axis * direction.y
-		_ramp(room, "LargeRamp%d" % index, Vector3(foot.x, 0, foot.y), uphill, ramp[3],
+		var base: float = ramp[4] if ramp.size() > 4 else 0.0
+		_ramp(room, "LargeRamp%d" % index, Vector3(foot.x, base, foot.y), uphill, ramp[3],
 				LARGE_RAMP_RUN, LARGE_LEDGE_HEIGHT, 0.0)
 		index += 1
 	for pillar: Array in layout.pillars:

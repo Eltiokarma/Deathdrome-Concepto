@@ -167,3 +167,19 @@ func _enter_purge(round_index: int) -> void:
 
 func _place(point: Vector3) -> void:
 	runner.global_position = point + Vector3.UP * 0.1
+
+
+func test_strafe_kills_targets_while_moving_and_meets_round_two_quota() -> void:
+	runner.set_physics_process(true)
+	sandbox.start_strafe_preview()
+	assert_eq(clock.quota, 3, "Cuota de la ronda 2 en el Dominio 1")
+	for _second: int in range(70):
+		await wait_physics_frames(60)
+		if sandbox.route_events.has("escapa por el portal"):
+			break
+	var events: Dictionary = sandbox.route_events
+	gut.p("Tiro en marcha: %s" % events)
+	assert_gte(events.get("bajas en marcha", 0), 3, "Las tres bajas, disparando en marcha")
+	var progress: RoundProgress = sandbox.get_node("RoundManager/RoundProgress")
+	assert_eq(progress.kills_for(runner), 3)
+	assert_true(events.has("escapa por el portal"), "%s" % events)

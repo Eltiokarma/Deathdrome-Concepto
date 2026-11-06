@@ -1,5 +1,27 @@
 # Relevo de trabajo — Codex / Claude
 
+## 2026-11-06 · Tres niveles de altura por sala y tiro en marcha (pedido de Gerson)
+
+**Reaparición:** Gerson recuerda que se reaparece «en el centro, donde se inicia». Ya es así: los 8 puntos de aparición están a 7 m del portal, igual que al empezar la ronda. No se cambió.
+
+**Alturas:**
+- Miradores a +6 m en las cuatro salas (`decks`), con rampas que arrancan a +3 m.
+- Más rampas suelo → +3.
+- Sala 4: puestos de vigilancia nuevos en las esquinas del fondo.
+- Prueba nueva `test_three_height_levels_per_room_with_continuous_ramps`.
+
+**Tiro en marcha:**
+- `--strafe-preview`: ronda 2, sala 3, tres blancos.
+- El piloto automático dispara mientras conduce cuando el auto-apuntado tiene blanco y modera el acelerador a 0.6. Solo frena para rematar si un blanco sobrevive a la pasada.
+- Las tres bajas, a 12–14 m/s.
+- Prueba nueva en `test_domain_rounds.gd`.
+
+**Láser:** el rayo se dibuja como prisma de 0.12 m; la línea de 1 px no se veía en video. Dura un periodo de disparo, así que el fuego sostenido se ve continuo. Solo visual.
+
+**Verificado en local:** **127 pruebas**, lint, datos y paquete.
+
+---
+
 ## 2026-11-06 · Muerte, pira, piloto y reaparición de ronda (PUR-023/024)
 
 **Nuevo:**

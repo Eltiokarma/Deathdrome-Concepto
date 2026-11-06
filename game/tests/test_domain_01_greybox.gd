@@ -46,6 +46,29 @@ func test_floor_heights_and_slopes() -> void:
 	_assert_slope(_room3(0, 87), _room3(0, 92), 18.43, "Rampa sur de la plataforma")
 
 
+func test_three_height_levels_per_room_with_continuous_ramps() -> void:
+	for gate: int in Layout.GATES:
+		var layout: Dictionary = Layout.room_layout(gate)
+		assert_gt(layout.ledges.size(), 0, "Sala %d: nivel +3" % gate)
+		assert_gt(layout.get("decks", []).size(), 0, "Sala %d: nivel +6" % gate)
+		for deck: Array in layout.decks:
+			var center: Vector3 = _room3((deck[0] + deck[1]) / 2.0, (deck[2] + deck[3]) / 2.0,
+					gate)
+			assert_almost_eq(_ground_at(center, 8.0), Layout.LARGE_DECK_HEIGHT, 0.01,
+					"Sala %d: mirador a +6 m" % gate)
+		for ramp: Array in layout.ramps:
+			var base: float = ramp[4] if ramp.size() > 4 else 0.0
+			var direction: Vector2 = ramp[2]
+			var low: Vector2 = Vector2(ramp[0], ramp[1]) + direction * 1.0
+			var high: Vector2 = Vector2(ramp[0], ramp[1]) + direction * (Layout.LARGE_RAMP_RUN - 1.0)
+			var rise: float = Layout.LARGE_LEDGE_HEIGHT
+			assert_almost_eq(_ground_at(_room3(low.x, low.y, gate), 8.0),
+					base + rise / Layout.LARGE_RAMP_RUN, 0.05, "Sala %d: pie de rampa" % gate)
+			assert_almost_eq(_ground_at(_room3(high.x, high.y, gate), 8.0),
+					base + rise * (1.0 - 1.0 / Layout.LARGE_RAMP_RUN), 0.05,
+					"Sala %d: cima de rampa" % gate)
+
+
 func test_ceilings_and_portal_oculus() -> void:
 	assert_almost_eq(_ceiling_above(Vector3(30, 1, 20)), Layout.HUB_CEILING, 0.01, "Techo del hub")
 	assert_almost_eq(_ceiling_above(Vector3(0, 1, -100)), Layout.GATE_HEIGHT, 0.01, "Techo conexión")
@@ -118,6 +141,7 @@ func test_route_a_climbs_ledges_and_returns_to_portal() -> void:
 	assert_true(events.has("fin de ruta"), "Ruta A completa: %s" % events)
 	assert_lt(events.get("entra sala 1", INF), ROOM_REACH_S, "Sala 1 alcanzable desde el spawn")
 	assert_true(events.has("sobre pasarela/plataforma"), "Ruta A usa la altura")
+	assert_true(events.has("sobre mirador"), "Ruta A cruza el mirador de +6 m")
 	assert_true(events.has("llega al portal"), "Ruta A vuelve al portal")
 
 
@@ -162,8 +186,8 @@ func _run_route(key: String) -> Dictionary:
 	return sandbox.route_events
 
 
-func _room3(u: float, d: float) -> Vector3:
-	var point: Vector2 = greybox.room_point(u, d)
+func _room3(u: float, d: float, gate: int = 1) -> Vector3:
+	var point: Vector2 = greybox.room_point(u, d, gate)
 	return Vector3(point.x, 0, point.y)
 
 
@@ -241,8 +265,8 @@ func _assert_slope(low_point: Vector3, high_point: Vector3, degrees: float, labe
 	assert_almost_eq(rad_to_deg(atan((high - low) / run)), degrees, 0.2, label)
 
 
-func _ground_at(point: Vector3) -> float:
-	var origin := Vector3(point.x, 4.5, point.z)
+func _ground_at(point: Vector3, from_height: float = 4.5) -> float:
+	var origin := Vector3(point.x, from_height, point.z)
 	var query := PhysicsRayQueryParameters3D.create(origin, origin + Vector3.DOWN * 10.0, 1)
 	var hit: Dictionary = greybox.get_world_3d().direct_space_state.intersect_ray(query)
 	assert_false(hit.is_empty(), "Debe existir suelo en %s" % point)

@@ -80,6 +80,27 @@ Mismo formato que la sala 1: 216 × 216 m, techo de 12 m, deflector de 18 × 2 m
 - **Roces:** las rutas aún rozan el marco de la puerta al salir de cada sala.
 - **Juego real:** compuertas por ronda, Purga por salas, bots y playtest de escala.
 
+## Niveles de altura (2026-11-06, pedido de Gerson)
+
+Cada sala tiene tres niveles:
+- **suelo;**
+- **+3 m:** pasarelas, anillo, plataformas o torre;
+- **+6 m:** miradores sobre el nivel +3.
+
+Todas las rampas suben 3 m en 9 m (18.4°). Las que llevan a un mirador arrancan a +3 m (quinto valor de la rampa en `LARGE_RAMPS` / `LARGE_ROOMS`). Los miradores están en `LARGE_DECKS` / `"decks"`.
+
+| Sala | Miradores (+6 m) | Rampas nuevas |
+|---|---|---|
+| 1 | Dos sobre la pasarela norte (u ±12…24) y uno de 12 × 14 m sobre la plataforma central, en el camino de la ruta A | Suelo → pasarelas oeste y este a mitad de sala; pasarela norte → miradores; plataforma → mirador central |
+| 2 | Tres esquinas del anillo (NO, NE, SE) | Cuatro rampas interiores del hueco del anillo al anillo; anillo → miradores |
+| 3 | Uno sobre cada plataforma lateral (16 × 48 m) | Plataforma → mirador |
+| 4 | Dos sobre los puestos de vigilancia de las esquinas del fondo (nuevos, +3 m) | Suelo → puesto → mirador, en línea |
+
+**Verificado:**
+- Cada mirador está a 6 m y cada rampa es continua de su base a su cima (prueba por sala).
+- La ruta A cruza el mirador central.
+- Las cinco rutas siguen completas, la recta libre máxima sigue en 220.5 m y las reservas siguen ocultas.
+
 ## Base histórica rev. 2–3 (escala ×1, sustituida)
 Las secciones siguientes, hasta «Purga», documentan la escala anterior (sala de 36 m) y cómo se llegó a ella. El greybox todavía la construye con `--layout-scale=1 --hub-scale=1` para comparar.
 

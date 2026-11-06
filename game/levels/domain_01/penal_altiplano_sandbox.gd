@@ -3,7 +3,8 @@ extends Node3D
 ## Argumentos: --overview-preview (vista aérea sin techos), --route-a/b/2/3/4 (piloto),
 ## --round=N (ronda N con compuertas, reloj, Purga, portal y cuota), --quota-preview (caza de
 ## dos blancos y ascenso por el portal), --purge-preview (huida de la Purga hasta el portal),
-## --death-preview (un blanco artillado derriba al jugador y remata a su piloto; reaparición).
+## --death-preview (un blanco artillado derriba al jugador y remata a su piloto; reaparición),
+## --strafe-preview (ronda 2: tres blancos derribados disparando en marcha en la sala 3).
 
 ## Ruta A (alta) y B (suelo) de la ficha, como puntos de paso en X/Z del mundo.
 const ROUTES := {
@@ -71,6 +72,17 @@ const RUNNER_SCENE := preload("res://entities/runner/runner.tscn")
 const AIM_TOLERANCE_DEG := 8.0
 ## Muerte de prueba: el jugador queda quieto frente a un blanco que dispara el láser.
 const DEATH_SPOT := Vector2(0, 30)
+## Tiro en marcha (sala 3, ronda 2, cuota 3): blancos al fondo de las calles de la galería.
+const STRAFE_GATE := 3
+const STRAFE_TARGETS := [Vector2(10, 195), Vector2(-96, 175), Vector2(-10, 16)]
+## [punto, índice del blanco que se remata quieto si sobrevive a la pasada, o -1].
+const STRAFE_ROUTE := [
+	[Vector2(16, 6), -1], [Vector2(10, 24), -1], [Vector2(10, 170), 0], [Vector2(60, 172), -1],
+	[Vector2(-40, 175), 1], [Vector2(-30, 158), -1], [Vector2(-10, 150), -1],
+	[Vector2(-10, 40), 2], [Vector2(-22, 28), -1], [Vector2(-12, 5), -1], [Vector2(-2, 2), -1],
+]
+## Acelerador mientras dispara en marcha: más tiempo de fuego por pasada sin detenerse.
+const STRAFE_THROTTLE := 0.6
 const GUNNER_SPOT := Vector2(0, 70)
 const ARRIVE_M := 3.0
 ## Distancia al centro donde termina una ruta de exploración: rampa del podio, junto al portal.
@@ -90,6 +102,9 @@ var _overview_angle: float = 0.6
 var _gate: int = 1
 var _escaped: bool = false
 var _hunt_at: int = -1
+var _hunt_points: Dictionary = {}
+var _strafing: bool = false
+var _prey_focus: Array = []
 var _hunting: bool = false
 var _prey: Array[Runner] = []
 var _prey_lives: Dictionary = {}
@@ -130,6 +145,8 @@ func _ready() -> void:
 		start_quota_preview()
 	if "--death-preview" in args:
 		start_death_preview()
+	if "--strafe-preview" in args:
+		start_strafe_preview()
 	runner.get_node("RunnerCamera/SpringArm3D/Camera3D").make_current()
 
 
@@ -218,8 +235,49 @@ func start_death_preview() -> void:
 			_log_at("reaparece"))
 
 
+## Ronda 2: el piloto entra en la sala 3 y derriba tres blancos disparando el láser sin
+## detenerse; solo frena para rematar si un blanco sobrevive a la pasada. Luego, al portal.
+func start_strafe_preview() -> void:
+	start_round(2)
+	clock.tick(Balance.get_f("round.intro_s") + Balance.get_f("round.countdown_s") + 0.001)
+	_gate = STRAFE_GATE
+	_prey = spawn_targets(STRAFE_TARGETS, STRAFE_GATE)
+	for prey: Runner in _prey:
+		_prey_lives[prey] = prey.health.life_id
+	_reset_runner()
+	_route_name = "tiro en marcha"
+	_route = [greybox.corridor_point(_gate, 2, 24), greybox.corridor_point(_gate, -2, 84)]
+	_hunt_points = {}
+	for step: Array in STRAFE_ROUTE:
+		var point: Vector2 = step[0]
+		if step[1] >= 0:
+			_hunt_points[_route.size()] = [_prey[step[1]]]
+		_route.append(greybox.room_point(point.x, point.y, _gate))
+	var axis: Vector3 = greybox.GATES[_gate]
+	_route.append(greybox.corridor_point(_gate, 0, 36))
+	_route.append(Vector2(axis.x, axis.z) * 20.0)
+	_route.append(Vector2(axis.x, axis.z) * 2.0)
+	_strafing = true
+	_waypoint = 0
+	_time = 0.0
+	route_events = {}
+	route_finished = false
+	runner.controller = null
+	EventBus.runner_destroyed.connect(_on_strafe_kill)
+
+
+func _on_strafe_kill(victim: Runner, killer: Runner, _weapon: StringName) -> void:
+	if killer != runner or victim not in _prey:
+		return
+	var speed: float = Vector2(runner.velocity.x, runner.velocity.z).length()
+	var index: int = _prey.find(victim)
+	_log("blanco %d a %.0f m/s" % [index + 1, speed])
+	if speed > 1.0:
+		route_events["bajas en marcha"] = route_events.get("bajas en marcha", 0) + 1
+
+
 ## Blancos de práctica: Runners quietos que participan en la ronda (sus bajas cuentan).
-func spawn_targets(points: Array) -> Array[Runner]:
+func spawn_targets(points: Array, gate: int = 1) -> Array[Runner]:
 	var spawned: Array[Runner] = []
 	for point: Vector2 in points:
 		var target: Runner = RUNNER_SCENE.instantiate()
@@ -227,7 +285,7 @@ func spawn_targets(points: Array) -> Array[Runner]:
 		add_child(target)
 		target.controller = null
 		target.get_node("RunnerCamera").set_physics_process(false)
-		var world: Vector2 = greybox.room_point(point.x, point.y)
+		var world: Vector2 = greybox.room_point(point.x, point.y, gate)
 		target.reset_at(Vector3(world.x, 0.1, world.y), PI / 2.0)
 		progress.register(target)
 		spawned.append(target)
@@ -330,6 +388,9 @@ func _drive_toward(target: Vector2) -> void:
 	var here := Vector2(runner.global_position.x, runner.global_position.z)
 	if here.distance_to(target) < ARRIVE_M:
 		_hunting = _waypoint == _hunt_at
+		if _hunt_points.has(_waypoint):
+			_prey_focus = _hunt_points[_waypoint]
+			_hunting = _prey_focus.any(_prey_alive)
 		_waypoint += 1
 		if _waypoint >= _route.size():
 			runner.input_frame = InputFrame.new()
@@ -353,16 +414,22 @@ func _drive_toward(target: Vector2) -> void:
 		frame.brake = 0.5 if speed > CORNER_SPEED_MPS else 0.0
 	if absf(angle) > 1.2:
 		frame.brake = 0.6
+	if _strafing and runner.laser.acquire_target() != null:
+		frame.laser = true
+		frame.throttle = minf(frame.throttle, STRAFE_THROTTLE)
 	runner.input_frame = frame
 
 
 ## Apunta al primer blanco vivo sin avanzar y dispara cuando está dentro del margen de mira.
 func _hunt() -> void:
 	# Un blanco cuenta como derribado aunque luego reaparezca en el hub (otra vida).
-	var alive: Array[Runner] = _prey.filter(_prey_alive)
+	var pool: Array = _prey_focus if not _prey_focus.is_empty() else _prey
+	var alive: Array = pool.filter(_prey_alive)
 	if alive.is_empty():
 		_hunting = false
-		_log("cuota cumplida")
+		if _prey_focus.is_empty():
+			_log("cuota cumplida")
+		_prey_focus = []
 		return
 	var offset: Vector3 = alive[0].global_position - runner.global_position
 	var forward: Vector3 = -runner.global_basis.z
@@ -404,6 +471,8 @@ func _track_events() -> void:
 	if greybox.is_large():
 		if p.y > greybox.LARGE_LEDGE_HEIGHT - 0.3 and along > greybox.corridor_end:
 			_log("sobre pasarela/plataforma")
+		if p.y > greybox.LARGE_DECK_HEIGHT - 0.3 and along > greybox.corridor_end:
+			_log("sobre mirador")
 	else:
 		var platform: Rect2 = greybox.map_rect(greybox.PLATFORM)
 		if p.y > greybox.PLATFORM_HEIGHT - 0.2 and platform.has_point(Vector2(p.x, p.z)):
