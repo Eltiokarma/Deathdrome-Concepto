@@ -1,5 +1,287 @@
 # Relevo de trabajo — Codex / Claude
 
+## 2026-11-06 · Puentes, túneles y rampas de salto (pedido de Gerson: «motos con poderes»)
+
+**Greybox:**
+- `slabs`: puentes y techos de túnel.
+- `kickers`: rampas de salto de 23°.
+- Los miradores se apoyan ahora sobre el nivel +3 (de 3 a 6 m), no desde el suelo.
+
+**Por sala:**
+- Sala 1: puentes a +3 desde la plataforma a las pasarelas y a +6 entre los miradores norte.
+- Sala 2: puente sobre el hueco del anillo y 2 rampas de salto.
+- Sala 3: túneles bajo las plataformas.
+- Sala 4: 4 rampas de salto a la torre.
+
+**Piloto automático:** pulsa salto en el labio de las rampas de salto. Nuevos eventos «vuelo», «aterriza en altura», «cruza un puente» y «pasa bajo puente o túnel», y rutas `1p`, `2s`, `3t` y `4s`.
+
+**Verificado en local:** **137 pruebas**, lint, datos y paquete.
+
+**Pendiente:**
+- Más elementos en las salas 2–4: puentes a +6 y túneles largos.
+- Revisar con playtest humano la dificultad de las rampas de salto.
+
+---
+
+## 2026-11-06 · Inventario y pickups (PUR-040)
+
+- **`InventoryComponent`** en cada Runner: 3 slots repetibles, Q/E por `InputFrame.cycle_secondary`, `take_selected()` para las armas futuras. Se vacía en `reset_at`, o sea al reaparecer. Nueva señal `EventBus.inventory_changed`.
+- **`Pickup`:** flota y gira. Arma: 20 s. Orbe de salud: +35 PI sin pasar el máximo, solo si hay daño, 25 s. `HealthComponent.heal()`.
+- **Greybox:** las reservas M (misil) y H (salud) del Dominio 1 ya son pickups reales. Las torres (T) siguen como marcadores hasta PUR-044. M3 de la sala 1 pasa a la cima del mirador central.
+- **Pendiente:** el botón secundario aún no dispara nada; el misil es PUR-041/042.
+- **Verificado en local:** **135 pruebas**, lint, datos y paquete.
+
+---
+
+## 2026-11-06 · Tres niveles de altura por sala y tiro en marcha (pedido de Gerson)
+
+**Reaparición:** Gerson recuerda que se reaparece «en el centro, donde se inicia». Ya es así: los 8 puntos de aparición están a 7 m del portal, igual que al empezar la ronda. No se cambió.
+
+**Alturas:**
+- Miradores a +6 m en las cuatro salas (`decks`), con rampas que arrancan a +3 m.
+- Más rampas suelo → +3.
+- Sala 4: puestos de vigilancia nuevos en las esquinas del fondo.
+- Prueba nueva `test_three_height_levels_per_room_with_continuous_ramps`.
+
+**Tiro en marcha:**
+- `--strafe-preview`: ronda 2, sala 3, tres blancos.
+- El piloto automático dispara mientras conduce cuando el auto-apuntado tiene blanco y modera el acelerador a 0.6. Solo frena para rematar si un blanco sobrevive a la pasada.
+- Las tres bajas, a 12–14 m/s.
+- Prueba nueva en `test_domain_rounds.gd`.
+
+**Láser:** el rayo se dibuja como prisma de 0.12 m; la línea de 1 px no se veía en video. Dura un periodo de disparo, así que el fuego sostenido se ve continuo. Solo visual.
+
+**Verificado en local:** **127 pruebas**, lint, datos y paquete.
+
+---
+
+## 2026-11-06 · Muerte, pira, piloto y reaparición de ronda (PUR-023/024)
+
+**Nuevo:**
+- **`entities/pilot/pilot.gd` (+ `.tscn`):** 10 PI; huye del atacante a 6 m/s durante 2.5 s y después lo recogen. Si lo derriban emite `mercy_kill`. Sin colisión con Runners y respeta la zona franca.
+- **`entities/fx/pyre.gd`:** destello y pira animada por código durante 6 s.
+- **`round/death_sequence.gd`:** pira + piloto en cada muerte; las muertes por Purga no eyectan piloto.
+- **`round/round_respawner.gd`:**
+  - 4 s (+2 s con mercy kill) hasta un punto de aparición libre del hub, con escudo de 3 s;
+  - nada durante la Purga;
+  - los caídos vuelven al empezar cada ronda.
+- **`laser_weapon.gd`:** `acquire_pilot()`. Solo apunta pilotos si no hay Runner en la mira; los Runners no cambian.
+
+**Escena del greybox:**
+- `--death-preview`: un blanco artillado derriba al jugador y remata a su piloto.
+- La caza de blancos ignora a los que reaparecen (cuenta la vida en la que se derribaron).
+- El HUD muestra DESTRUIDO con la cuenta atrás y el escudo.
+
+**Verificado en local:** **125 pruebas / 910 aserciones**, lint, datos y paquete.
+- Muerte a los 6.5 s, piloto rematado a los 7.4 s, reaparición a los 12.5 s (+6.0 s).
+
+**Pendiente:**
+- Sprite de arte de la pira.
+- Control del piloto por el jugador.
+- Vaciado de slots, cuando exista el inventario (PUR-040).
+
+---
+
+## 2026-11-06 · Portal, cuota y puntaje en el Dominio 1
+
+**Integración en la escena del greybox:** se reutilizan sin cambios `RoundPortal` (PUR-033), `RoundProgress`, `RoundScore` (PUR-035) y `SafeZone` (PUR-031).
+- **Portal:** en la cima del podio.
+- **Zona franca:** el hub completo, Ø120 m.
+- **Cuota:** el jugador queda registrado como participante.
+
+**Blancos de práctica:** `spawn_targets()` crea Runners quietos que participan en la ronda, así que sus bajas cuentan para la cuota.
+
+**Vistas previas:**
+- `--quota-preview`: entra en la sala 1, derriba dos blancos con el láser (12.6 s), vuelve y asciende por el portal a los 29 s.
+- `--purge-preview`: la cuota se cumple de antemano por la vía normal de daño y el Runner huye por el portal (19.7 s).
+
+**Rutas de exploración:** sin cuota, la barrera del portal impide subir a la cima. Ahora terminan al pie del portal (evento «llega al portal»).
+
+**Verificado en local:** **121 pruebas / 880 aserciones**, lint, datos y paquete.
+
+**Pendiente:**
+- Respawn de ronda (PUR-023/024).
+- Inventario y pickups reales (PUR-040).
+- Bots (PUR-050+): hoy solo hay blancos quietos.
+
+---
+
+## 2026-11-06 · Áreas, compuertas por ronda y Purga por salas (PUR-032, 036, 034)
+
+**Nuevo en `game/round/`:**
+- **`area_tracker.gd`:** `area_changed` una vez por cruce; hay que penetrar 1 m en el área nueva, así que oscilar en el umbral no emite nada.
+- **`gate_controller.gd`:** abre según `round.open_areas_by_round`. Añade `Balance.get_a()` para leer arrays.
+- **`domain_purge_field.gd` (+ `.tscn`):** hereda de `PurgeField`, que ahora separa `_advance()` de la aplicación del daño, sin cambio de comportamiento. Un frente por sala desde el muro de fondo, después el cierre del hub. Las salas con compuerta cerrada son letales desde el inicio.
+
+**Greybox:**
+- `area_at(point, inset)`, `area_far_edge()`.
+- Compuertas `GateN`: losa roja, luz roja, `set_gate_open`.
+- En la escena:
+  - `--round=N` activa reloj, compuertas y Purga;
+  - `--purge-preview` muestra la huida desde el fondo de la sala 1;
+  - F7 pasa a la ronda siguiente.
+
+**Verificado en local:** **120 pruebas / 873 aserciones**, lint, datos y paquete.
+
+**Pendiente:**
+- Portal real en esta escena (PUR-033 existe en el sandbox de ronda). Ahora llegar al podio en la vista previa cuenta como escapar.
+- Respawn de ronda (PUR-023/024), inventario/pickups (PUR-040), bots (PUR-050+).
+
+---
+
+## 2026-11-06 · Alcances a escala ×6 y salas 2–4 del Penal Altiplano
+
+**Alcances (pedido de Gerson):**
+- Visión de bots: 60 → **150 m**.
+- Radar: 60 → **150 m**, solo en docs porque el HUD aún no existe.
+- Fijación de misil: 70 → **175 m**, con vida del misil de 4 → **6 s** para que alcance a volar esa distancia.
+- Docs 02, 05, 06 y 08 actualizados.
+
+**Salas 2–4:**
+- Construidas en el greybox (`LARGE_ROOMS`); las cuatro salas y conexiones abiertas, porque las compuertas por ronda (PUR-036) siguen pendientes.
+- `room_layout(gate)`, `room_point(u, d, gate)` y `corridor_point()` generalizan la construcción.
+- Rutas `--route-2/3/4` en la escena de prueba.
+- Ficha con tabla, planos SVG por sala y resultados.
+
+**Verificado en local:** **115 pruebas / 807 aserciones**, lint, datos y paquete.
+- Recta libre máxima del dominio: 220.5 m.
+- Rutas de las salas 2/3/4: 45/50/39 s.
+
+**Siguiente bloque sugerido:**
+- compuertas por ronda (PUR-036) y AreaTracker (PUR-032) sobre esta escena;
+- después, Purga por salas (PUR-034) con 10 m/s.
+
+---
+
+## 2026-11-06 · Escala ×6 oficial, láser 150 m y Purga 10 m/s (decisión de Gerson)
+
+**Decisión:** Gerson adoptó como oficial la sala grande (×6 en largo, hub ×3) y pidió subir láser y Purga.
+
+**Cambios:**
+- `balance.json`:
+  - `weapons.laser.range_m` 60 → **150**;
+  - `purge.speed_mps` 3.5 → **10** (15 en D8, por debajo del Runner más lento, 18.5 m/s).
+- Greybox: `layout_scale = 6`, `hub_scale = 3` por defecto. La escala ×1 sigue disponible con `--layout-scale=1 --hub-scale=1`.
+- Pruebas reescritas para la escala oficial. `test_purge` y `test_combat` leen ahora la velocidad y el alcance de `Balance` en vez de números fijos.
+- Pilares de 4 × 4 m: con 2 × 2 m una diagonal de 241 m superaba la métrica.
+- `check_project.py` corre GUT con `--fixed-fps 60`: las rutas simuladas tardan segundos, no minutos.
+- Docs actualizados: 01, 02, 04 (métricas nuevas: línea ≤ 1.5 × láser), 08, 11, ficha y SVG. La CI graba la ruta A completa.
+
+**Verificado en local:**
+- **113 pruebas / 709 aserciones**, lint, datos y paquete.
+- Recta libre máxima: 219.5 m.
+- Rutas: A 52 s y B 43 s.
+
+**Pendiente o a decidir (no tocado):**
+- **Alcances que siguen en 60–70 m:**
+  - visión de bots (`ai.vision_range_m` 60, docs/06);
+  - radar (60 m, docs/05);
+  - fijación de misil (70 m).
+
+  Conviene revisarlos con la nueva escala; no se cambiaron porque no se pidió.
+- **Salas 2–4:** necesitan interior a la nueva escala.
+- **Playtest:** encuentros con 8 Runners y rendimiento.
+
+---
+
+## 2026-11-06 · Prototipo grande de la sala 1 (escala ×6 en largo, pedido por Gerson)
+
+Gerson revisó la prueba a ×2.45 y pidió **otro ×2.45 (≈ ×6 en largo, ≈ ×36 en superficie)**, **llenando el espacio**. Aportó capturas del original como referencia de escala (salas-nave abiertas, techos altos, pasarelas elevadas perimetrales); se usan solo para escala, según las reglas clean-room.
+
+**Implementado:**
+- Uso: `--layout-scale=6 --hub-scale=3` (o variables `PURGA_LAYOUT_SCALE` / `PURGA_HUB_SCALE`).
+- Con escala ≥ 3 la sala 1 usa un interior propio de **216 × 216 m** con techo de 12 m:
+  - deflector a la entrada;
+  - campo de pilares 2 × 2 m con calles de 12 m;
+  - plataforma central de 40 × 40 m a +3 m con cuatro rampas;
+  - muros bajos de 1.2 m (saltables) y bloques;
+  - pasarelas perimetrales a +3 m con rampas;
+  - tres cámaras al fondo tras un muro con tres huecos de 16 m.
+- Hub Ø120 m; conexiones de 84 m.
+- Por defecto todo sigue en escala 1: ficha, pruebas y balance sin cambios.
+
+**Medido:**
+- Ruta A (pasarelas, plataforma, cámaras): 52 s.
+- Ruta B (suelo): 43 s.
+- Sala 1 a 7.1 s del spawn.
+- Sin roces salvo el pie de la rampa del podio.
+- Reservas ocultas al hub.
+- **Línea libre más larga: 223 m**, frente a 60 m del láser.
+
+**Pendiente de decisión de Gerson:** si se adopta esta escala, actualizar `docs/04` (métricas), la ficha y el balance. Afecta a:
+- alcance del láser/misil (o aceptar líneas largas sin daño);
+- velocidad de Purga (a 3.5 m/s barrer 216 m tarda ~62 s);
+- cuotas y encuentros con 8 Runners;
+- rendimiento.
+
+---
+
+## 2026-11-06 · Prueba de escala pedida por Gerson (sin decisión todavía)
+
+Gerson recuerda los mapas del original como unas **6 veces más grandes en superficie** (≈2.45× en largo). El greybox acepta ahora `layout_scale` (`--layout-scale=2.45` o `PURGA_LAYOUT_SCALE=2.45`). Escala la planta y conserva anchos de paso, alturas, pendientes, podio y portal. Por defecto vale 1.0: ficha, pruebas y balance no cambian.
+
+**Medido a ×2.45:**
+- Sala 1 a 4.4 s del spawn (antes 2.4 s); vuelta completa de las rutas en 20–22 s (antes 11).
+- Línea libre más larga: 151 m frente a 60 m de alcance del láser.
+- Reservas siguen ocultas al hub.
+- Coberturas quedan a ~30 m entre sí: la sala se ve vacía.
+
+**Pendiente de decisión de diseño de Gerson** antes de tocar `docs/04` o `balance.json`. Cosas que cambiarían: métricas de sala/hub/línea máxima, alcance del láser o cantidad de coberturas, velocidad de Purga, cuotas y rendimiento.
+
+---
+
+## 2026-11-06 · Claude: greybox hub + sala 1 (PUR-070 rev. 3, avance de PUR-071)
+
+**Rama:** `claude/determined-heisenberg-jj3o54` (misma PR que la rev. 2).
+**Archivos nuevos:**
+- `game/levels/domain_01/penal_altiplano_greybox.gd`: geometría generada desde constantes, que son las mismas cotas de la ficha.
+- `game/levels/domain_01/penal_altiplano_sandbox.{gd,tscn}`: escena jugable, piloto automático `--route-a`/`--route-b` y vista aérea `--overview-preview`.
+- `game/tests/test_domain_01_greybox.gd`: 7 pruebas.
+
+**Archivos modificados:** ficha, SVG y CI (graba un video de la ruta A).
+
+**Hallazgos físicos que corrigieron el plano:**
+- El deflector a 6 m era imposible de esquivar a velocidad máxima (radio de giro de 10–13 m). Pasó a 8 m, que se sostiene porque las rampas del podio también cortan líneas.
+- Paso de 2 m entre el deflector y la rampa RA: P1 y RA retroceden 2 m.
+- Juntas de suelo solapadas enganchaban al Runner: ahora hay un único suelo de colisión.
+
+**Verificado:** suite completa en local con Godot 4.6.3: **112 pruebas / 679 aserciones**, lint, datos y paquete. Las cifras de líneas, rutas y spawns están en la ficha.
+
+**Sin verificar:**
+- playtest humano de la frenada ante D1;
+- salto sobre el podio;
+- torres reales, bots, rendimiento con ocho Runners;
+- salas 2–4.
+
+PUR-071 **no** está terminado.
+
+**Siguiente bloque sugerido:** interiores de las salas 2 y 3 con el mismo método (plano → comprobación 2D → greybox → pruebas). En paralelo, AreaTracker PUR-032 sobre esta escena.
+
+---
+
+## 2026-11-06 · Claude: PUR-070 rev. 2 (hub, podio y sala 1)
+
+**Rama:** `claude/determined-heisenberg-jj3o54`, partiendo de `main` en `3dc5618`. **Archivos:** `docs/dominios/01_penal_altiplano.md`, `docs/dominios/img/01_penal_altiplano.svg` y esta nota. Entrega solo documental: no cambia código ni balance.
+
+**Decisiones:**
+- Rampas del podio en los cuatro ejes cardinales, 4 × 4.5 m, 18.4°.
+- Spawns pasan de ±22.5° a **±30°**: con ±22.5° la huella del Runner se solapaba con la rampa (−0.2 m); ahora quedan 0.52 m libres.
+- Hub con techo de 6 m y óculo Ø12 sobre el portal (el ascenso de 12 m no cabía bajo 5 m).
+- Sala 1: deflector de 20 × 2 m a 6 m de la entrada, plataforma oeste +2 m con rampa de 8 m, pilares C1 y C2, torres T1 y T2, reservas M1–M3 y H1, y dos rutas en lazo.
+
+**Verificado (en planta, por muestreo en 2D):**
+- Línea libre máxima de 59.4 m. Con el deflector 1–2 m más adentro daba 60.4–61.5 m.
+- Ninguna torre ni pickup visible desde el hub.
+- Anchos de 7–9 m, pendientes y separación de coberturas: valores en la ficha.
+
+No se ejecutó la suite del juego (no hay cambios de código).
+
+**Sin verificar:** giro en los 6 m antes del deflector, disparo saltando sobre el podio, colisiones reales y navegación. Salas 2–4 sin interior.
+
+**Siguiente bloque:** greybox del hub + sala 1 en una escena separada. No declarar PUR-071 terminado.
+
+---
+
 ## 2026-11-05 · Relevo para el próximo avance pequeño de Claude
 
 **Pedido de Gerson:** dejar todo anotado y permitir un avance pequeño, cuidando el consumo de tokens. Codex termina aquí; no mantiene tareas reservadas ni trabajo en segundo plano.

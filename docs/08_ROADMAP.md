@@ -154,7 +154,7 @@ Implementar el orden de aplicación de daño de [02 §2.1](02_COMBATE_Y_BALANCE.
 **Depende de:** PUR-020, PUR-012
 
 **Criterios de aceptación**
-- [ ] Cono de ±15°, alcance 60 m, 8 disparos/s, 1.5 PI base.
+- [ ] Cono de ±15°, alcance 150 m, 8 disparos/s, 1.5 PI base.
 - [ ] Rampa ×1.0 → ×2.0 en 2 s; se reinicia a los 0.4 s sin impacto.
 - [ ] Multiplicadores direccionales ×0.7 / ×1.0 / ×1.2.
 - [ ] Test de la curva continua de [02 §3](02_COMBATE_Y_BALANCE.md#ttk-solo-láser-impacto-continuo) con error < 2 %; el TTK observado a 8 Hz admite un intervalo de tiro más un paso de física (ver discretización en 02).
@@ -174,17 +174,17 @@ Implementar el orden de aplicación de daño de [02 §2.1](02_COMBATE_Y_BALANCE.
 **Depende de:** PUR-020
 
 **Criterios de aceptación**
-- [ ] Explosión + pira de fuego (sprite billboard animado) durante 6 s.
-- [ ] Piloto eyectado de 10 PI que se mueve 2.5 s; matarlo emite `mercy_kill`.
+- [ ] Explosión + pira de fuego (sprite billboard animado) durante 6 s. *Greybox hecho (`entities/fx/pyre.gd`: destello y billboard animado por código, 6 s); falta el sprite de arte.*
+- [x] Piloto eyectado de 10 PI que se mueve 2.5 s; matarlo emite `mercy_kill`. (`entities/pilot/pilot.gd`; huye solo del atacante, control del jugador pendiente)
 
 ### PUR-024 · Reaparición y escudo de aparición
 **Etiquetas:** `combat`  
 **Depende de:** PUR-023
 
 **Criterios de aceptación**
-- [ ] Reaparece en el Área 0 a los 4 s (6 s tras mercy kill).
-- [ ] Escudo de 3 s que se cancela al disparar.
-- [ ] Integridad y barrera llenas, slots vacíos.
+- [x] Reaparece en el Área 0 a los 4 s (6 s tras mercy kill). (`round/round_respawner.gd`)
+- [x] Escudo de 3 s que se cancela al disparar.
+- [x] Integridad y barrera llenas, slots vacíos.
 
 ### PUR-025 · HUD mínimo
 **Etiquetas:** `ui`, `good first issue`  
@@ -226,7 +226,7 @@ Implementa D-01. Soporta `hub_safe_mode`: `always` (por defecto), `round_start` 
 **Depende de:** PUR-030
 
 **Criterios de aceptación**
-- [ ] `area_changed` se emite una sola vez al cruzar cada umbral, sin parpadeos en el borde.
+- [x] `area_changed` se emite una sola vez al cruzar cada umbral, sin parpadeos en el borde. (`round/area_tracker.gd`, margen de 1 m; `tests/test_domain_rounds.gd`)
 
 ### PUR-033 · Portal y ascenso
 **Etiquetas:** `gameplay`, `art`  
@@ -243,8 +243,8 @@ Implementa D-07: se abre solo para quien cumplió la cuota, iluminado en su colo
 **Depende de:** PUR-030
 
 **Criterios de aceptación**
-- [ ] Avance de 3.5 m/s desde los perímetros; cierre del Área 0 en 10 s.
-- [ ] Mata sin reaparición; cubre el 100 % del volumen jugable.
+- [x] Avance de 10 m/s desde los perímetros; cierre del Área 0 en 10 s. (`round/domain_purge_field.gd` en el Dominio 1)
+- [x] Mata sin reaparición; cubre el 100 % del volumen jugable (prueba de cobertura del Dominio 1; salas cerradas letales desde el inicio). Falta verificarlo en los dominios 2–8 cuando existan.
 - [ ] Aviso a 0:30 (sirena, reloj rojo).
 
 ### PUR-035 · Puntaje y atribución
@@ -260,7 +260,7 @@ Implementa D-07: se abre solo para quien cumplió la cuota, iluminado en su colo
 **Depende de:** PUR-030
 
 **Criterios de aceptación**
-- [ ] R1 abre áreas 1–2, R2 suma la 3, R3 suma la 4; las cerradas tienen luz roja.
+- [x] R1 abre áreas 1–2, R2 suma la 3, R3 suma la 4; las cerradas tienen luz roja. (`round/gate_controller.gd`, lee `round.open_areas_by_round`)
 
 ---
 
@@ -273,8 +273,8 @@ Objetivo: el arsenal completo funcionando en la arena de prueba.
 **Depende de:** PUR-020
 
 **Criterios de aceptación**
-- [ ] 3 slots, repetibles, ciclado con Q/E; con los slots llenos no se recoge.
-- [ ] Pickups flotando y girando; reaparecen a los 20 s.
+- [x] 3 slots, repetibles, ciclado con Q/E; con los slots llenos no se recoge. (`components/inventory_component.gd`)
+- [x] Pickups flotando y girando; reaparecen a los 20 s. (`entities/pickups/pickup.gd`; también el orbe de salud, +35 PI, 25 s)
 
 ### PUR-041 · Sistema de fijación
 **Etiquetas:** `combat`  
@@ -350,7 +350,7 @@ Objetivo: siete bots que completan rondas de forma creíble.
 **Depende de:** PUR-021
 
 **Criterios de aceptación**
-- [ ] Cono ±70°, 60 m, línea de visión; oído a 25 m; memoria de 4 s.
+- [ ] Cono ±70°, 150 m, línea de visión; oído a 25 m; memoria de 4 s.
 
 ### PUR-051 · BotBrain y estados base
 **Etiquetas:** `ai`  
@@ -417,7 +417,7 @@ Objetivo: el juego completo envuelto en su interfaz.
 **Depende de:** PUR-060
 
 **Criterios de aceptación**
-- [ ] Rotado con el jugador, 60 m, marcadores de borde, pickups, portal y frente de la Purga.
+- [ ] Rotado con el jugador, 150 m, marcadores de borde, pickups, portal y frente de la Purga.
 
 ### PUR-063 · Menú principal y opciones de partida
 **Etiquetas:** `ui`  

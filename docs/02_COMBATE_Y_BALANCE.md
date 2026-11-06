@@ -63,7 +63,7 @@ Cada impacto produce un `DamageInfo { amount, type, source, direction, position 
 |---|---|
 | Cadencia | 8 disparos/s (mantener botón) |
 | Daño base | 1.5 PI por disparo → 12 DPS |
-| Alcance | 60 m |
+| Alcance | 150 m (desde 2026-11-06; antes 60 m, ajustado a la escala de dominios ×6) |
 | Auto-apuntado | Cono de ±15° frente al Runner; elige el blanco más cercano al centro de la mira |
 | Rampa | El multiplicador sube linealmente de ×1.0 a **×2.0** en 2 s de impacto continuo sobre el **mismo** blanco |
 | Corte de rampa | Si pasan 0.4 s sin impactar a ese blanco, la rampa vuelve a ×1.0 |
@@ -114,7 +114,7 @@ Tres slots. Cada pickup llena un slot libre (se pueden repetir). Con los 3 lleno
 
 | Arma | Dominio | Daño | Efecto | Detalle |
 |---|---|---|---|---|
-| **Misil rastreador** | 1 | 40 PI directo | — | Fijación de 0.6 s en cono de ±20° a ≤ 70 m. Sin fijación sale en línea recta. 32 m/s, giro 90°/s, vida 4 s. Al iniciar la fijación el blanco recibe el aviso **"TE TIENEN FIJADO"**. Se esquiva con giros cerrados o saltando en el último momento |
+| **Misil rastreador** | 1 | 40 PI directo | — | Fijación de 0.6 s en cono de ±20° a ≤ 175 m (antes 70 m; escala ×6). Sin fijación sale en línea recta. 32 m/s, giro 90°/s, vida 6 s (antes 4 s, para que el alcance de vuelo, 192 m, cubra la fijación). Al iniciar la fijación el blanco recibe el aviso **"TE TIENEN FIJADO"**. Se esquiva con giros cerrados o saltando en el último momento |
 | **Onda de choque** | 2 | 50 PI en el centro → 15 PI en el borde | Detona torres en el radio | Radio 10 m, altura 1.6 m, requiere línea de visión, no te daña |
 | **Embestida** | 3 | 60 PI + empuje | — | Fijación de 0.3 s a ≤ 25 m. Impulso de 1.0 s a ×2.2 de tu velocidad máxima, con dirección asistida. Si fallas, quedas lento 1.5 s. Te hace 5 PI |
 | **Drenador** | 4 | 30 PI en 5 s (6 PI/s) | Vacía tu barrera y bloquea su regeneración 5 s | Proyectil de 40 m/s, alcance 50 m |
@@ -164,7 +164,7 @@ Los pickups de arma reaparecen a los **20 s** de ser recogidos.
 ## 9. Muerte y reaparición
 
 1. Integridad 0 → la moto explota y queda una **pira** 6 s.
-2. El piloto se eyecta (pequeño, 10 PI, 6 m/s, sin armas) y tiene **2.5 s** para alejarse.
+2. El piloto se eyecta (pequeño, 10 PI, 6 m/s, sin armas) y tiene **2.5 s** para alejarse. *Implementado: huye en línea recta lejos del atacante; el láser solo lo apunta si no hay un Runner en la mira. El control del piloto por el jugador está pendiente.*
 3. Si alguien lo mata: **mercy kill** (+500 puntos para el atacante, no suma a la cuota) y su reaparición tarda 2 s más.
 4. Reaparición: **4 s** desde la muerte (6 s con mercy kill), en el Área 0, eyectado del portal.
 5. **Escudo de aparición:** 3 s de invulnerabilidad; se cancela si disparas.
@@ -194,7 +194,7 @@ Cuota por Dominio y ronda:
 |---|---|
 | Inicio | Reloj en 0:00 |
 | Aviso | Sirena y timer en rojo desde 0:30 |
-| Avance en salas | 3.5 m/s desde el perímetro hacia las compuertas del Área 0 (5.25 m/s en el Dominio 8) |
+| Avance en salas | 10 m/s desde el perímetro hacia las compuertas del Área 0 (15 m/s en el Dominio 8; siempre por debajo del Runner más lento, 18.5 m/s). Desde 2026-11-06; antes 3.5 m/s, ajustado a salas de 216 m |
 | Cierre del Área 0 | El anillo se cierra hacia el portal en 10 s |
 | Efecto | Muerte instantánea, sin reaparición en la ronda |
 | Bots | Huyen hacia el Área 0 en cuanto la Purga empieza |

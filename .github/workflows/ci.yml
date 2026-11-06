@@ -64,6 +64,11 @@ jobs:
           xvfb-run -a godot --path game --scene res://levels/_test/round_sandbox.tscn --audio-driver Dummy --fixed-fps 30 --write-movie "$RUNNER_TEMP/arena-preview/round.avi" --quit-after 1050 -- --combat-preview --portal-preview
           xvfb-run -a godot --path game --audio-driver Dummy --fixed-fps 30 --write-movie "$RUNNER_TEMP/arena-preview/barrier.avi" --quit-after 300 -- --barrier-preview
           xvfb-run -a godot --path game --scene res://levels/_test/round_sandbox.tscn --audio-driver Dummy --fixed-fps 30 --write-movie "$RUNNER_TEMP/arena-preview/purge.avi" --quit-after 540 -- --purge-preview
+          xvfb-run -a godot --path game --scene res://levels/domain_01/penal_altiplano_sandbox.tscn --audio-driver Dummy --fixed-fps 30 --write-movie "$RUNNER_TEMP/arena-preview/domain01_route_a.avi" --quit-after 1650 -- --route-a
+          xvfb-run -a godot --path game --scene res://levels/domain_01/penal_altiplano_sandbox.tscn --audio-driver Dummy --fixed-fps 30 --write-movie "$RUNNER_TEMP/arena-preview/domain01_purge.avi" --quit-after 1350 -- --overview-preview --purge-preview
+          xvfb-run -a godot --path game --scene res://levels/domain_01/penal_altiplano_sandbox.tscn --audio-driver Dummy --fixed-fps 30 --write-movie "$RUNNER_TEMP/arena-preview/domain01_quota.avi" --quit-after 1020 -- --quota-preview
+          xvfb-run -a godot --path game --scene res://levels/domain_01/penal_altiplano_sandbox.tscn --audio-driver Dummy --fixed-fps 30 --write-movie "$RUNNER_TEMP/arena-preview/domain01_death.avi" --quit-after 480 -- --death-preview
+          xvfb-run -a godot --path game --scene res://levels/domain_01/penal_altiplano_sandbox.tscn --audio-driver Dummy --fixed-fps 30 --write-movie "$RUNNER_TEMP/arena-preview/domain01_strafe.avi" --quit-after 1560 -- --strafe-preview
       - uses: actions/upload-artifact@v4
         with:
           name: combat-prototype-preview

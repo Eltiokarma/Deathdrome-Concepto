@@ -91,7 +91,7 @@ La escena sigue siendo un prototipo de un jugador con blanco inmóvil, con zona 
 
 En F7, el disco verde alrededor del podio protege y bloquea el láser mientras el origen del Runner esté dentro. El HUD lo indica. La Purga ignora esa protección. Salir del disco permite volver a disparar; saltar normalmente dentro conserva la protección.
 
-El volumen del ensayo tiene radio 7 m (no reproduce todavía la sala completa de Ø 40 m). Sigue `round.hub_safe_mode`: `always`, `round_start` (intro/cuenta y primeros 10 s de juego) u `off`. El temporizador usa RoundManager, por lo que respeta pausa y reinicio. Los segmentos de barrera que intersectan el volumen se disipan completos.
+El volumen del ensayo tiene radio 7 m (no reproduce todavía el hub completo de Ø 120 m). Sigue `round.hub_safe_mode`: `always`, `round_start` (intro/cuenta y primeros 10 s de juego) u `off`. El temporizador usa RoundManager, por lo que respeta pausa y reinicio. Los segmentos de barrera que intersectan el volumen se disipan completos.
 
 
 ### Barrera
@@ -110,7 +110,7 @@ Enter para pasar a otra ronda conserva puntos y reinicia primera sangre. Morir o
 
 ### Purga radial (F7)
 
-A 0:30 el reloj se vuelve rojo y suena una sirena breve. A 0:00 aparece un frente rojo que avanza hacia el portal a 3.5 m/s (5.25 en D8). Al alcanzar el disco del portal, lo cierra en 10 s. La zona franca, escudo, coraza y salto no protegen; morir termina el ensayo y no permite reaparición. R/F2 y recuperación automática por caída quedan deshabilitados en esa fase.
+A 0:30 el reloj se vuelve rojo y suena una sirena breve. A 0:00 aparece un frente rojo que avanza hacia el portal a 10 m/s (15 en D8; valor de `purge.speed_mps`). Al alcanzar el disco del portal, lo cierra en 10 s. La zona franca, escudo, coraza y salto no protegen; morir termina el ensayo y no permite reaparición. R/F2 y recuperación automática por caída quedan deshabilitados en esa fase.
 
 Si ya entraste al portal, puedes terminar el ascenso. Enter reinicia otro ensayo desde RESULTS. Para probar sin esperar cinco minutos, F8 adelanta a 0:30 y una segunda pulsación a 0:00. La captura `--purge-preview` comienza a 0:02 exclusivamente para pruebas; no cambia duración de balance.
 

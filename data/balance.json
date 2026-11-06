@@ -19,7 +19,7 @@
   },
   "portal": {"ascent_s": 3.0, "ascent_height_m": 12.0},
   "purge": {
-    "speed_mps": 3.5,
+    "speed_mps": 10.0,
     "domain_8_speed_mult": 1.5,
     "hub_close_s": 10,
     "lethal": true,
@@ -86,7 +86,7 @@
     "laser": {
       "fire_rate_hz": 8,
       "damage_per_shot": 1.5,
-      "range_m": 60,
+      "range_m": 150,
       "autoaim_half_angle_deg": 15,
       "ramp_max_mult": 2.0,
       "ramp_time_s": 2.0,
@@ -115,10 +115,10 @@
       "lock_reference_weapons": 3,
       "lock_time_per_weapon_point_s": -0.05,
       "lock_half_angle_deg": 20,
-      "lock_range_m": 70,
+      "lock_range_m": 175,
       "speed_mps": 32,
       "turn_rate_deg_s": 90,
-      "lifetime_s": 4.0
+      "lifetime_s": 6.0
     },
     "shockwave": {
       "unlock_domain": 2,
@@ -199,7 +199,7 @@
   "ai": {
     "think_hz": 30,
     "vision_half_angle_deg": 70,
-    "vision_range_m": 60,
+    "vision_range_m": 150,
     "hearing_range_m": 25,
     "memory_s": 4,
     "max_bots_targeting_player": 2,

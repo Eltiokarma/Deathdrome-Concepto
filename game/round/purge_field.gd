@@ -36,15 +36,7 @@ func tick(delta: float) -> void:
 		return
 	if not is_finite(delta) or delta < 0.0:
 		return
-	var remaining: float = delta
-	var speed: float = Balance.get_f("purge.speed_mps")
-	if manager.domain_id == 8:
-		speed *= Balance.get_f("purge.domain_8_speed_mult")
-	if radius > hub_radius:
-		var travel: float = minf(remaining, (radius - hub_radius) / speed)
-		radius = maxf(hub_radius, radius - speed * travel)
-		remaining -= travel
-	radius = maxf(0.0, radius - remaining * hub_radius / Balance.get_f("purge.hub_close_s"))
+	_advance(delta, _speed())
 	$Wall.visible = radius > 0.0
 	$Wall.scale = Vector3(maxf(radius, 0.001), visual_height, maxf(radius, 0.001))
 	$Wall.position.y = visual_height * 0.5
@@ -66,6 +58,24 @@ func contains(point: Vector3) -> bool:
 	# Columna letal sin límite vertical: saltar/esconderse bajo la arena no evita el cierre.
 	var local: Vector3 = to_local(point)
 	return radius <= 0.0 or Vector2(local.x, local.z).length() >= radius
+
+
+## Velocidad de los frentes según Balance (×1.5 en el Dominio 8).
+func _speed() -> float:
+	var speed: float = Balance.get_f("purge.speed_mps")
+	if manager.domain_id == 8:
+		speed *= Balance.get_f("purge.domain_8_speed_mult")
+	return speed
+
+
+## Avanza los frentes `delta` segundos. Las subclases (frentes por sala) lo sustituyen.
+func _advance(delta: float, speed: float) -> void:
+	var remaining: float = delta
+	if radius > hub_radius:
+		var travel: float = minf(remaining, (radius - hub_radius) / speed)
+		radius = maxf(hub_radius, radius - speed * travel)
+		remaining -= travel
+	radius = maxf(0.0, radius - remaining * hub_radius / Balance.get_f("purge.hub_close_s"))
 
 
 func _on_state(state: int) -> void:

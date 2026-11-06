@@ -2,6 +2,8 @@ class_name LaserWeapon
 extends Node3D
 ## Hitscan a cadencia fija, selección angular y rampa integrada por intervalo de tiro.
 
+const BEAM_WIDTH_M := 0.12
+
 var target: Runner
 var _ramp_target: WeakRef
 var _ramp_time: float = 0.0
@@ -15,6 +17,7 @@ var _marker := Label3D.new()
 
 func _ready() -> void:
 	add_child(_beam)
+	_beam.top_level = true
 	add_child(_marker)
 	_marker.text = "▼"
 	_marker.billboard = BaseMaterial3D.BILLBOARD_ENABLED
@@ -67,6 +70,20 @@ func _fire(period: float) -> void:
 	if target != null:
 		endpoint = target.global_position + Vector3.UP * 0.35
 	else:
+		# Sin Runner en la mira, el láser puede rematar a un piloto eyectado (mercy kill).
+		var pilot: Pilot = acquire_pilot()
+		if pilot != null:
+			endpoint = pilot.global_position + Vector3.UP * 0.5
+			var shot := DamageInfo.new()
+			shot.type = Enums.DamageType.LASER
+			shot.source = runner
+			shot.weapon_id = &"laser"
+			shot.direction = endpoint - origin
+			shot.position = endpoint
+			shot.amount = integrated_damage(period)
+			pilot.apply(shot)
+			_show_beam(origin, endpoint)
+			return
 		var hit: Dictionary = _ray(origin, endpoint)
 		if not hit.is_empty():
 			endpoint = hit.position
@@ -117,6 +134,28 @@ func acquire_target() -> Runner:
 	return best
 
 
+## Piloto eyectado más centrado en el cono de auto-apuntado, con línea de visión.
+func acquire_pilot() -> Pilot:
+	var best: Pilot
+	var best_angle: float = INF
+	var origin: Vector3 = global_position
+	var limit: float = deg_to_rad(Balance.get_f("weapons.laser.autoaim_half_angle_deg"))
+	for candidate: Pilot in get_tree().get_nodes_in_group("pilots"):
+		if candidate.destroyed or candidate.owner_runner == runner:
+			continue
+		var point: Vector3 = candidate.global_position + Vector3.UP * 0.5
+		var offset: Vector3 = point - origin
+		var angle: float = (-runner.global_basis.z).angle_to(offset)
+		if offset.length() > Balance.get_f("weapons.laser.range_m") or angle > limit:
+			continue
+		if not _ray(origin, point).is_empty():
+			continue
+		if angle < best_angle:
+			best = candidate
+			best_angle = angle
+	return best
+
+
 func integrated_damage(seconds: float) -> float:
 	var duration: float = Balance.get_f("weapons.laser.ramp_time_s")
 	var multiplier: float = Balance.get_f("weapons.laser.ramp_max_mult")
@@ -133,12 +172,17 @@ func _ray(origin: Vector3, endpoint: Vector3) -> Dictionary:
 	return get_world_3d().direct_space_state.intersect_ray(query)
 
 
+## Rayo visible como prisma fino (una línea de 1 px desaparece a resolución de video).
+## Dura un periodo de disparo para que el fuego sostenido se vea continuo.
 func _show_beam(origin: Vector3, endpoint: Vector3) -> void:
-	var mesh := ImmediateMesh.new()
-	mesh.surface_begin(Mesh.PRIMITIVE_LINES)
-	mesh.surface_add_vertex(to_local(origin))
-	mesh.surface_add_vertex(to_local(endpoint))
-	mesh.surface_end()
-	_beam.mesh = mesh
-	_beam_life = 0.06
+	var length: float = origin.distance_to(endpoint)
+	if length < 0.01:
+		return
+	var box := BoxMesh.new()
+	box.size = Vector3(BEAM_WIDTH_M, BEAM_WIDTH_M, length)
+	_beam.mesh = box
+	_beam.global_position = origin.lerp(endpoint, 0.5)
+	_beam.look_at(endpoint, Vector3.UP if absf((endpoint - origin).normalized().y) < 0.99
+			else Vector3.RIGHT)
+	_beam_life = 1.0 / Balance.get_f("weapons.laser.fire_rate_hz") + 0.01
 	_beam.show()

@@ -28,11 +28,12 @@ func before_each() -> void:
 
 
 func test_speed_and_ten_second_hub_closure() -> void:
+	var speed: float = Balance.get_f("purge.speed_mps")
 	clock.tick(300.0)
 	field.tick(2.0)
-	assert_eq(field.radius, 35.0)
-	field.tick(8.0)
-	assert_eq(field.radius, 7.0)
+	assert_almost_eq(field.radius, 42.0 - 2.0 * speed, 0.00001)
+	field.tick(35.0 / speed - 2.0)
+	assert_almost_eq(field.radius, 7.0, 0.00001)
 	field.tick(9.99)
 	assert_gt(field.radius, 0.0)
 	assert_false(player.health.destroyed)
@@ -44,10 +45,12 @@ func test_speed_and_ten_second_hub_closure() -> void:
 func test_domain_eight_speed_keeps_ten_second_hub_closure() -> void:
 	clock.finish({})
 	clock.begin(8, 1)
+	var speed: float = (Balance.get_f("purge.speed_mps")
+			* Balance.get_f("purge.domain_8_speed_mult"))
 	clock.tick(307.0)
-	field.tick(2.0)
-	assert_eq(field.radius, 31.5)
-	field.tick(35.0 / 5.25 - 2.0)
+	field.tick(1.0)
+	assert_almost_eq(field.radius, 42.0 - speed, 0.00001)
+	field.tick(35.0 / speed - 1.0)
 	assert_almost_eq(field.radius, 7.0, 0.00001)
 	field.tick(5.0)
 	assert_almost_eq(field.radius, 3.5, 0.00001)
@@ -55,10 +58,13 @@ func test_domain_eight_speed_keeps_ten_second_hub_closure() -> void:
 
 func test_large_step_matches_partitioned_time_and_closes_once() -> void:
 	clock.tick(300.0)
-	field.tick(15.0)
+	# Paso grande que cruza el cambio de fase (frente → cierre del hub) sin terminar la Purga.
+	var step: float = 35.0 / Balance.get_f("purge.speed_mps") + 2.0
+	field.tick(step)
 	var expected: float = field.radius
+	assert_between(expected, 0.001, 6.999, "El paso termina en mitad del cierre del hub")
 	field.reset()
-	for index: int in range(60):
+	for index: int in range(roundi(step / 0.25)):
 		field.tick(0.25)
 	assert_almost_eq(field.radius, expected, 0.00001)
 	watch_signals(EventBus)
