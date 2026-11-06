@@ -51,6 +51,33 @@ const LARGE_ROUTES := {
 		Vector2(104, 62), Vector2(90, 40), Vector2(30, 30), Vector2(14, 16), Vector2(12, 5),
 		Vector2(2, 2),
 	],
+	# Sala 1: plataforma central, puente oeste a +3, pasarela oeste y bajada por la esquina.
+	"1p": [
+		Vector2(-20, 5), Vector2(0, 24), Vector2(0, 80), Vector2(0, 90), Vector2(-12, 98),
+		Vector2(-14, 124), Vector2(-60, 124), Vector2(-102, 124),
+		Vector2(-102, 30), Vector2(-102, 8), Vector2(-30, 6), Vector2(-12, 5), Vector2(-2, 2),
+	],
+	# Sala 2: rampa de salto al anillo, puente sobre el hueco y salida por el hueco sur.
+	"2s": [
+		Vector2(20, 5), Vector2(90, 20), Vector2(104, 40), Vector2(104, 80), Vector2(88, 80),
+		Vector2(54, 80),
+		Vector2(54, 110), Vector2(-54, 110), Vector2(-54, 140), Vector2(-40, 140),
+		Vector2(-40, 100), Vector2(0, 70), Vector2(0, 45), Vector2(14, 30), Vector2(12, 5),
+		Vector2(2, 2),
+	],
+	# Sala 3: túnel bajo la plataforma oeste hasta el canal y vuelta por el canal.
+	"3t": [
+		Vector2(-20, 5), Vector2(-15, 30), Vector2(-15, 96), Vector2(-40, 101),
+		Vector2(-104, 102), Vector2(-104, 60), Vector2(-90, 40), Vector2(-30, 20),
+		Vector2(-12, 5), Vector2(-2, 2),
+	],
+	# Sala 4: rampa de salto desde el patio sureste a la torre y bajada por su rampa sur.
+	"4s": [
+		Vector2(20, 5), Vector2(14, 20), Vector2(40, 24), Vector2(55, 40), Vector2(75, 70),
+		Vector2(75, 98), Vector2(70, 102), Vector2(27.5, 102), Vector2(0, 102),
+		Vector2(0, 92), Vector2(0, 85),
+		Vector2(6, 80), Vector2(14, 60), Vector2(14, 20), Vector2(12, 5), Vector2(2, 2),
+	],
 	# Patio de vigilancia: patio sureste, torre central, patio noroeste y portón oeste.
 	"4": [
 		Vector2(20, 5), Vector2(14, 20), Vector2(14, 60), Vector2(14, 70), Vector2(4, 82),
@@ -105,6 +132,7 @@ var _hunt_at: int = -1
 var _hunt_points: Dictionary = {}
 var _strafing: bool = false
 var _prey_focus: Array = []
+var _airborne_s: float = 0.0
 var _hunting: bool = false
 var _prey: Array[Runner] = []
 var _prey_lives: Dictionary = {}
@@ -312,7 +340,7 @@ func _start_escape() -> void:
 
 ## Rutas "a" y "b" recorren la sala 1; "2", "3" y "4" las salas homónimas.
 func start_route(key: String) -> void:
-	_gate = key.to_int() if key.is_valid_int() else 1
+	_gate = key.left(1).to_int() if key.left(1).is_valid_int() else 1
 	_reset_runner()
 	_route_name = key
 	_route = []
@@ -424,6 +452,12 @@ func _drive_toward(target: Vector2) -> void:
 		frame.brake = 0.5 if speed > CORNER_SPEED_MPS else 0.0
 	if absf(angle) > 1.2:
 		frame.brake = 0.6
+	# Poder de la moto: saltar sobre la rampa de salto suma el impulso del salto al de la rampa.
+	if _floor_name().begins_with("Kicker"):
+		# Saltar en el labio (último tercio), no al pisar el pie: ahí la rampa ya aportó su altura.
+		frame.jump = runner.global_position.y > greybox.KICKER_RISE * 0.66
+		frame.throttle = 1.0
+		frame.brake = 0.0
 	if _strafing and runner.laser.acquire_target() != null:
 		frame.laser = true
 		frame.throttle = minf(frame.throttle, STRAFE_THROTTLE)
@@ -464,6 +498,13 @@ func _on_escaped(escapee: Runner, _time_left: float) -> void:
 		_log("escapa por el portal")
 
 
+func _floor_name() -> String:
+	var p: Vector3 = runner.global_position
+	var down := PhysicsRayQueryParameters3D.create(p + Vector3.UP * 0.5, p + Vector3.DOWN * 0.6, 1)
+	var hit: Dictionary = runner.get_world_3d().direct_space_state.intersect_ray(down)
+	return str(hit.collider.name) if not hit.is_empty() else ""
+
+
 func _corner_angle() -> float:
 	if _waypoint == 0 or _waypoint + 1 >= _route.size():
 		return 0.0
@@ -494,6 +535,21 @@ func _track_events() -> void:
 		_log("llega al portal")
 	if p.y > greybox.PODIUM_HEIGHT - 0.2 and radial < greybox.PODIUM_RADIUS:
 		_log("sobre podio")
+	# Vuelos (rampas de salto) y pasos bajo puentes o túneles, para verificar el recorrido.
+	if runner.is_on_floor():
+		if _airborne_s >= 0.4:
+			_log("vuelo %.1f s" % _airborne_s)
+			if p.y > greybox.LARGE_LEDGE_HEIGHT - 0.3:
+				_log("aterriza en altura")
+			route_events["vuelos"] = route_events.get("vuelos", 0) + 1
+		_airborne_s = 0.0
+	else:
+		_airborne_s += get_physics_process_delta_time()
+	if _floor_name().begins_with("Slab"):
+		_log("cruza un puente")
+	var up := PhysicsRayQueryParameters3D.create(p + Vector3.UP * 0.8, p + Vector3.UP * 3.0, 1)
+	if not runner.get_world_3d().direct_space_state.intersect_ray(up).is_empty():
+		_log("pasa bajo puente o túnel")
 	if runner.is_on_wall() and not _was_on_wall:
 		_wall_hits += 1
 		var hit: String = ""

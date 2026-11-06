@@ -101,6 +101,29 @@ Todas las rampas suben 3 m en 9 m (18.4°). Las que llevan a un mirador arrancan
 - La ruta A cruza el mirador central.
 - Las cinco rutas siguen completas, la recta libre máxima sigue en 220.5 m y las reservas siguen ocultas.
 
+## Puentes, túneles y rampas de salto (2026-11-06, pedido de Gerson)
+
+«Son como motos con poderes»: el nivel debe premiar el salto y el movimiento en tres dimensiones. Elementos nuevos del greybox:
+
+- **Losas** (`slabs`, `LARGE_SLABS`): puentes y techos de túnel de 0.5 m de grosor. Por debajo se puede circular: en losas a +3 quedan 2.5 m libres; un Runner mide 0.7 m, pero ahí no se puede saltar.
+- **Rampas de salto** (`kickers`): 1.5 m en 3.5 m (23°), en naranja. Lanzar desde una rampa de salto y pulsar salto en el labio sube a un Runner a +3 sin rampa, con 0.7 s de vuelo. Solo con la rampa, sin saltar, no llega: el salto es parte del poder.
+
+| Sala | Puentes | Túneles | Rampas de salto |
+|---|---|---|---|
+| 1 | Plataforma central ↔ pasarelas oeste y este a +3 (d 120…128); entre los miradores norte a +6 | Bajo los puentes (paso de 2.5 m) | — |
+| 2 | Cruza el hueco del anillo a +3 (u −60…60, d 104…116) y une los lados del anillo | Los pasos laterales del anillo quedan bajo el puente | Dos, desde la banda exterior al anillo |
+| 3 | — | Uno bajo cada plataforma lateral, de la galería al canal (d 100…108) | — |
+| 4 | — | — | Cuatro, desde los patios a la torre central |
+
+**Verificado:**
+- **Geometría (prueba):** cada losa está a su altura y deja paso por debajo; cada rampa de salto tiene 23°.
+- **Rutas del piloto automático:**
+  - `1p` cruza el puente a +3;
+  - `2s` salta al anillo, recorre el puente y pasa por debajo de él;
+  - `3t` atraviesa el túnel;
+  - `4s` salta a la torre.
+- **Lo anterior se mantiene:** las rutas previas siguen completas, la recta libre máxima no cambia y las reservas siguen ocultas.
+
 ## Base histórica rev. 2–3 (escala ×1, sustituida)
 Las secciones siguientes, hasta «Purga», documentan la escala anterior (sala de 36 m) y cómo se llegó a ella. El greybox todavía la construye con `--layout-scale=1 --hub-scale=1` para comparar.
 

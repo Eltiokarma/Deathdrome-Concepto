@@ -55,6 +55,10 @@
 <rect x="210.0" y="231.0" width="42.0" height="42.0" fill="#8fa7bd" stroke="#ffffff" stroke-width="1.6"/>
 <rect x="588.0" y="231.0" width="42.0" height="42.0" fill="#8fa7bd" stroke="#ffffff" stroke-width="1.6"/>
 <rect x="588.0" y="609.0" width="42.0" height="42.0" fill="#8fa7bd" stroke="#ffffff" stroke-width="1.6"/>
+<rect x="210.0" y="420.0" width="420.0" height="42.0" fill="#8fa7bd" stroke="#ffffff" stroke-width="1.6"/>
+<rect x="210.0" y="420.0" width="420.0" height="42.0" fill="none" stroke="#ffffff" stroke-width="2.2"/>
+<rect x="665.0" y="532.0" width="12.2" height="28.0" fill="#ff7a1a" stroke="#ffd0a0" stroke-width="1.0"/>
+<rect x="162.8" y="322.0" width="12.2" height="28.0" fill="#ff7a1a" stroke="#ffd0a0" stroke-width="1.0"/>
 <rect x="287.0" y="651.0" width="35.0" height="31.5" fill="url(#haz)" stroke="#f2c94c" stroke-width="1.0"/>
 <rect x="518.0" y="651.0" width="35.0" height="31.5" fill="url(#haz)" stroke="#f2c94c" stroke-width="1.0"/>
 <rect x="287.0" y="199.5" width="35.0" height="31.5" fill="url(#haz)" stroke="#f2c94c" stroke-width="1.0"/>
@@ -120,7 +124,8 @@
 <circle cx="84.0" cy="126.0" r="5" fill="#9be37a" stroke="#101c28"/>
 <text x="84.0" y="115.5" font-size="10" fill="#9be37a" text-anchor="middle">H2</text>
 <text x="420.0" y="815.5" font-size="11" fill="#f2c94c" text-anchor="middle">ENTRADA ↓ conexión 84 m → hub</text>
-<text x="30" y="856.0" font-size="12" fill="#c3d8e5">Gris: muros a techo · rojo: deflector, pilares y bloques · naranja: muros bajos de 1.2 m · gris azulado: plataformas +3 m · claro: miradores +6 m.</text>
-<text x="30" y="876.0" font-size="12" fill="#c3d8e5">Rampas (amarillo) de 9 m y 18.4°. Torres T (radio 8 m), misiles M y salud H: reservas de diseño, ocultas desde el hub.</text>
-<text x="30" y="896.0" font-size="12" fill="#c3d8e5">Greybox Godot: recta libre máxima 221.6 m (≤ 225 m); ruta de piloto automático completa sin quedar atascada.</text>
+<text x="30" y="856.0" font-size="12" fill="#c3d8e5">Gris: muros a techo · rojo: deflector, pilares y bloques · naranja claro: muros bajos de 1.2 m.</text>
+<text x="30" y="876.0" font-size="12" fill="#c3d8e5">Gris azulado: +3 m · claro: miradores +6 m · contorno blanco: puentes y techos de túnel.</text>
+<text x="30" y="896.0" font-size="12" fill="#c3d8e5">Naranja: rampas de salto (23°) · amarillo: rampas de 18.4° · T/M/H: torres, misiles y salud.</text>
+<text x="30" y="916.0" font-size="12" fill="#c3d8e5">Greybox Godot: recta libre máxima 221.6 m (≤ 225 m); rutas de piloto completas.</text>
 </svg>

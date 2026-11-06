@@ -42,6 +42,12 @@ const LARGE_LEDGE_HEIGHT := 3.0
 const LARGE_RAMP_RUN := 9.0
 ## Segundo nivel: miradores a +6 m sobre pasarelas y plataformas (12 m de techo dejan 6 m).
 const LARGE_DECK_HEIGHT := 6.0
+## Rampas de salto: 1.5 m en 3.5 m (23°). A 23 m/s lanzan unos 14 m y 2 m por encima del
+## labio: suficiente para subir a un nivel +3 sin rampa (motos con poderes).
+const KICKER_RISE := 1.5
+const KICKER_RUN := 3.5
+## Grosor de puentes y techos de túnel.
+const SLAB_THICKNESS := 0.5
 ## [u0, u1, d0, d1, altura] (altura 0 = hasta el techo).
 const LARGE_BLOCKS := [
 	[-9, 9, 8, 10, 0],
@@ -69,6 +75,10 @@ const LARGE_RAMPS := [
 ]
 ## Miradores a LARGE_DECK_HEIGHT: [u0, u1, d0, d1].
 const LARGE_DECKS := [[-24, -12, 204, 216], [12, 24, 204, 216], [-6, 6, 104, 118]]
+## Losas suspendidas (puentes y techos de túnel): [u0, u1, d0, d1, altura de la cara superior].
+## Puentes a +3 desde la plataforma central a las pasarelas laterales (se pasa por debajo con
+## 2.5 m libres) y puente a +6 entre los dos miradores norte.
+const LARGE_SLABS := [[-96, -20, 120, 128, 3], [20, 96, 120, 128, 3], [-12, 12, 206, 214, 6]]
 ## Campo de pilares 4 × 4 m alineado: calles rectas de 10 m entre columnas.
 const LARGE_PILLAR_ROWS := [34, 48, 62, 76]
 const LARGE_PILLAR_STEP := 14.0
@@ -104,6 +114,10 @@ const LARGE_ROOMS := {
 			[39, 56, Vector2(1, 0), 12, 3],
 		],
 		"decks": [[-60, -48, 158, 170], [48, 60, 158, 170], [48, 60, 50, 62]],
+		# Puente a +3 que cruza el hueco del anillo sobre sus pasos laterales (que quedan
+		# como túneles cortos) y rampas de salto que lanzan desde fuera al anillo.
+		"slabs": [[-60, 60, 104, 116, 3]],
+		"kickers": [[73.5, 80, Vector2(-1, 0), 8], [-73.5, 140, Vector2(1, 0), 8]],
 		"pillars": [
 			[-32, 80, 2], [-16, 80, 2], [16, 80, 2], [32, 80, 2],
 			[-32, 140, 2], [-16, 140, 2], [16, 140, 2], [32, 140, 2],
@@ -129,7 +143,11 @@ const LARGE_ROOMS := {
 			# Bloques centrales: cortan las diagonales entre las dos plataformas.
 			[-3, 3, 81, 87, 0], [-3, 3, 105, 111, 0], [-3, 3, 129, 135, 0],
 		],
-		"ledges": [[-100, -40, 60, 156], [40, 100, 60, 156]],
+		# Cada plataforma tiene un túnel a ras de suelo (d 100…108) entre la galería y el canal.
+		"ledges": [
+			[-100, -40, 60, 100], [-100, -40, 108, 156], [40, 100, 60, 100], [40, 100, 108, 156],
+		],
+		"slabs": [[-100, -40, 100, 108, 3], [40, 100, 100, 108, 3]],
 		"ramps": [
 			[-31, 80, Vector2(-1, 0), 12], [-31, 136, Vector2(-1, 0), 12],
 			[31, 80, Vector2(1, 0), 12], [31, 136, Vector2(1, 0), 12],
@@ -175,6 +193,11 @@ const LARGE_ROOMS := {
 			[-91, 207, Vector2(-1, 0), 10, 3], [91, 207, Vector2(1, 0), 10, 3],
 		],
 		"decks": [[-108, -100, 198, 216], [100, 108, 198, 216]],
+		# Rampas de salto desde los cuatro patios hacia la torre central.
+		"kickers": [
+			[27.5, 112, Vector2(-1, 0), 8], [-27.5, 112, Vector2(1, 0), 8],
+			[27.5, 104, Vector2(-1, 0), 8], [-27.5, 104, Vector2(1, 0), 8],
+		],
 		"pillars": [
 			[-70, 30, 2], [-25, 30, 2], [25, 30, 2], [70, 30, 2],
 			[-70, 85, 2], [-25, 85, 2], [25, 85, 2], [70, 85, 2],
@@ -332,7 +355,8 @@ static func room_layout(gate: int) -> Dictionary:
 			u += LARGE_PILLAR_STEP
 	return {
 		"blocks": LARGE_BLOCKS, "ledges": LARGE_LEDGES, "ramps": LARGE_RAMPS,
-		"decks": LARGE_DECKS, "pillars": pillars, "reserves": LARGE_RESERVES,
+		"decks": LARGE_DECKS, "slabs": LARGE_SLABS, "pillars": pillars,
+		"reserves": LARGE_RESERVES,
 	}
 
 
@@ -386,7 +410,8 @@ func _build_materials() -> void:
 		"floor": Color(0.17, 0.21, 0.25), "hub": Color(0.15, 0.30, 0.27),
 		"wall": Color(0.32, 0.39, 0.44), "ceiling": Color(0.24, 0.28, 0.32),
 		"ramp": Color(0.85, 0.61, 0.17), "platform": Color(0.29, 0.37, 0.45),
-		"deck": Color(0.42, 0.52, 0.62),
+		"deck": Color(0.42, 0.52, 0.62), "bridge": Color(0.55, 0.62, 0.70),
+		"kicker": Color(1.0, 0.45, 0.1),
 		"block": Color(0.77, 0.35, 0.29), "podium": Color(0.55, 0.80, 0.67),
 		"closed": Color(0.75, 0.08, 0.08), "reserve": Color(0.5, 0.8, 1.0, 0.45),
 		"tower": Color(1.0, 0.54, 0.4, 0.45), "health": Color(0.6, 0.9, 0.48, 0.45),
@@ -605,7 +630,14 @@ func _build_large_room(gate: int) -> void:
 		index += 1
 	index = 0
 	for deck: Array in layout.get("decks", []):
-		_local_box(room, "Deck%d" % index, gate, deck, LARGE_DECK_HEIGHT, "deck")
+		# Los miradores se apoyan sobre el nivel +3: el espacio bajo ellos puede ser un túnel.
+		_local_box(room, "Deck%d" % index, gate, deck, LARGE_DECK_HEIGHT - LARGE_LEDGE_HEIGHT,
+				"deck", LARGE_LEDGE_HEIGHT)
+		index += 1
+	index = 0
+	for slab: Array in layout.get("slabs", []):
+		_local_box(room, "Slab%d" % index, gate, slab.slice(0, 4), SLAB_THICKNESS, "bridge",
+				slab[4] - SLAB_THICKNESS)
 		index += 1
 	index = 0
 	var right: Vector3 = axis.cross(Vector3.UP)
@@ -616,6 +648,14 @@ func _build_large_room(gate: int) -> void:
 		var base: float = ramp[4] if ramp.size() > 4 else 0.0
 		_ramp(room, "LargeRamp%d" % index, Vector3(foot.x, base, foot.y), uphill, ramp[3],
 				LARGE_RAMP_RUN, LARGE_LEDGE_HEIGHT, 0.0)
+		index += 1
+	index = 0
+	for kicker: Array in layout.get("kickers", []):
+		var kick_foot: Vector2 = room_point(kicker[0], kicker[1], gate)
+		var kick_dir: Vector2 = kicker[2]
+		_ramp(room, "Kicker%d" % index, Vector3(kick_foot.x, 0, kick_foot.y),
+				right * kick_dir.x + axis * kick_dir.y, kicker[3], KICKER_RUN, KICKER_RISE, 0.0,
+				"kicker")
 		index += 1
 	for pillar: Array in layout.pillars:
 		var half: float = pillar[2]
@@ -755,7 +795,7 @@ func _cylinder(
 ## `overlap` prolonga la parte alta en plano para enrasar con el elemento al que llega.
 func _ramp(
 	parent: Node, id: String, foot: Vector3, uphill: Vector3, width: float, run: float,
-	rise: float, overlap: float,
+	rise: float, overlap: float, material: String = "ramp",
 ) -> CSGPolygon3D:
 	var ramp := CSGPolygon3D.new()
 	ramp.name = id
@@ -766,7 +806,7 @@ func _ramp(
 		Vector2(0, 0), Vector2(run, rise), Vector2(run + overlap, rise), Vector2(run + overlap, 0),
 	])
 	ramp.depth = width
-	ramp.material = _materials["ramp"]
+	ramp.material = _materials[material]
 	ramp.use_collision = true
 	ramp.collision_layer = 1
 	ramp.collision_mask = 0

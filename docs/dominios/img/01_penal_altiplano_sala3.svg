@@ -44,10 +44,18 @@
 <line x1="42.0" y1="112.0" x2="798.0" y2="112.0"/>
 <line x1="42.0" y1="70.0" x2="798.0" y2="70.0"/>
 </g>
-<rect x="70.0" y="280.0" width="210.0" height="336.0" fill="#4a5f73" stroke="#d8e4ee" stroke-width="1.0"/>
-<rect x="560.0" y="280.0" width="210.0" height="336.0" fill="#4a5f73" stroke="#d8e4ee" stroke-width="1.0"/>
+<rect x="70.0" y="476.0" width="210.0" height="140.0" fill="#4a5f73" stroke="#d8e4ee" stroke-width="1.0"/>
+<rect x="70.0" y="280.0" width="210.0" height="168.0" fill="#4a5f73" stroke="#d8e4ee" stroke-width="1.0"/>
+<rect x="560.0" y="476.0" width="210.0" height="140.0" fill="#4a5f73" stroke="#d8e4ee" stroke-width="1.0"/>
+<rect x="560.0" y="280.0" width="210.0" height="168.0" fill="#4a5f73" stroke="#d8e4ee" stroke-width="1.0"/>
+<rect x="70.0" y="448.0" width="210.0" height="28.0" fill="#4a5f73" stroke="#d8e4ee" stroke-width="1.0"/>
+<rect x="560.0" y="448.0" width="210.0" height="28.0" fill="#4a5f73" stroke="#d8e4ee" stroke-width="1.0"/>
 <rect x="70.0" y="364.0" width="56.0" height="168.0" fill="#8fa7bd" stroke="#ffffff" stroke-width="1.6"/>
 <rect x="714.0" y="364.0" width="56.0" height="168.0" fill="#8fa7bd" stroke="#ffffff" stroke-width="1.6"/>
+<rect x="70.0" y="448.0" width="210.0" height="28.0" fill="none" stroke="#ffffff" stroke-width="2.2"/>
+<rect x="560.0" y="448.0" width="210.0" height="28.0" fill="none" stroke="#ffffff" stroke-width="2.2"/>
+<rect x="70.0" y="364.0" width="56.0" height="168.0" fill="none" stroke="#ffffff" stroke-width="2.2"/>
+<rect x="714.0" y="364.0" width="56.0" height="168.0" fill="none" stroke="#ffffff" stroke-width="2.2"/>
 <rect x="280.0" y="525.0" width="31.5" height="42.0" fill="url(#haz)" stroke="#f2c94c" stroke-width="1.0"/>
 <rect x="280.0" y="329.0" width="31.5" height="42.0" fill="url(#haz)" stroke="#f2c94c" stroke-width="1.0"/>
 <rect x="528.5" y="525.0" width="31.5" height="42.0" fill="url(#haz)" stroke="#f2c94c" stroke-width="1.0"/>
@@ -115,7 +123,8 @@
 <circle cx="420.0" cy="91.0" r="5" fill="#9be37a" stroke="#101c28"/>
 <text x="420.0" y="80.5" font-size="10" fill="#9be37a" text-anchor="middle">H2</text>
 <text x="420.0" y="815.5" font-size="11" fill="#f2c94c" text-anchor="middle">ENTRADA ↓ conexión 84 m → hub</text>
-<text x="30" y="856.0" font-size="12" fill="#c3d8e5">Gris: muros a techo · rojo: deflector, pilares y bloques · naranja: muros bajos de 1.2 m · gris azulado: plataformas +3 m · claro: miradores +6 m.</text>
-<text x="30" y="876.0" font-size="12" fill="#c3d8e5">Rampas (amarillo) de 9 m y 18.4°. Torres T (radio 8 m), misiles M y salud H: reservas de diseño, ocultas desde el hub.</text>
-<text x="30" y="896.0" font-size="12" fill="#c3d8e5">Greybox Godot: recta libre máxima 221.6 m (≤ 225 m); ruta de piloto automático completa sin quedar atascada.</text>
+<text x="30" y="856.0" font-size="12" fill="#c3d8e5">Gris: muros a techo · rojo: deflector, pilares y bloques · naranja claro: muros bajos de 1.2 m.</text>
+<text x="30" y="876.0" font-size="12" fill="#c3d8e5">Gris azulado: +3 m · claro: miradores +6 m · contorno blanco: puentes y techos de túnel.</text>
+<text x="30" y="896.0" font-size="12" fill="#c3d8e5">Naranja: rampas de salto (23°) · amarillo: rampas de 18.4° · T/M/H: torres, misiles y salud.</text>
+<text x="30" y="916.0" font-size="12" fill="#c3d8e5">Greybox Godot: recta libre máxima 221.6 m (≤ 225 m); rutas de piloto completas.</text>
 </svg>

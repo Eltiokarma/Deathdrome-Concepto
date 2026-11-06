@@ -51,6 +51,9 @@
 <rect x="336.0" y="70.0" width="42.0" height="42.0" fill="#8fa7bd" stroke="#ffffff" stroke-width="1.6"/>
 <rect x="462.0" y="70.0" width="42.0" height="42.0" fill="#8fa7bd" stroke="#ffffff" stroke-width="1.6"/>
 <rect x="399.0" y="413.0" width="42.0" height="49.0" fill="#8fa7bd" stroke="#ffffff" stroke-width="1.6"/>
+<rect x="84.0" y="378.0" width="266.0" height="28.0" fill="none" stroke="#ffffff" stroke-width="2.2"/>
+<rect x="490.0" y="378.0" width="266.0" height="28.0" fill="none" stroke="#ffffff" stroke-width="2.2"/>
+<rect x="378.0" y="77.0" width="84.0" height="28.0" fill="none" stroke="#ffffff" stroke-width="2.2"/>
 <rect x="42.0" y="742.0" width="42.0" height="31.5" fill="url(#haz)" stroke="#f2c94c" stroke-width="1.2"/>
 <rect x="756.0" y="742.0" width="42.0" height="31.5" fill="url(#haz)" stroke="#f2c94c" stroke-width="1.2"/>
 <rect x="259.0" y="112.0" width="42.0" height="31.5" fill="url(#haz)" stroke="#f2c94c" stroke-width="1.2"/>
@@ -174,7 +177,7 @@
 <text x="420.0" y="161.0" font-size="11" fill="#edf6fa" text-anchor="middle">cámaras</text>
 <text x="196.0" y="441.0" font-size="10" fill="#ffe0c0" text-anchor="middle">muros bajos 1.2 m</text>
 <text x="30" y="856.0" font-size="13" fill="#c3d8e5">Gris: muros a techo · rojo: deflector y pilares · naranja: muros bajos saltables (1.2 m).</text>
-<text x="30" y="876.0" font-size="13" fill="#c3d8e5">Rampas (amarillo) de 9 m y 18.4°: pasarelas y plataforma (+3 m), miradores (claro, +6 m).</text>
+<text x="30" y="876.0" font-size="13" fill="#c3d8e5">Rampas (amarillo) de 9 m y 18.4°: pasarelas y plataforma (+3 m), miradores (claro, +6 m); puentes con contorno blanco.</text>
 <text x="30" y="896.0" font-size="13" fill="#c3d8e5">Torres T (radio 8 m), misiles M y salud H son reservas de diseño, ocultas desde el hub.</text>
 <text x="30" y="916.0" font-size="13" fill="#c3d8e5">Greybox Godot: recta libre máx. 219.5 m (≤ 225 m), rutas A 52 s (pasa por el mirador) y B 43 s.</text>
 </svg>

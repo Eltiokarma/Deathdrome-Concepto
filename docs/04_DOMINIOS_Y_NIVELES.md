@@ -19,6 +19,8 @@ Basadas en las capturas del original y en el tamaño del Runner (1.0 m de ancho 
 | Plataforma elevada | 2–4 m sobre el piso; desde la escala ×6, **tres niveles por sala**: suelo, +3 m (pasarelas y plataformas) y +6 m (miradores), unidos por rampas de 18.4° | Juego vertical; con 12 m de techo, el mirador conserva 6 m libres |
 | Línea recta más larga | ≤ 1.5 × alcance del láser (225 m con láser de 150 m) | Duelos largos posibles; ninguna recta cruza una sala de punta a punta |
 | Coberturas | Pilares, bloques o muros bajos cada 10–15 m dentro de cada zona | Evita salas-estacionamiento vacías |
+| Rampa de salto | 1.5 m en 3.5 m (23°), en naranja; a 10–12 m del borde del nivel al que lanza | Con salto en el labio sube a +3 sin rampa: movimiento con poderes |
+| Puente / túnel | Losa de 0.5 m; bajo una losa a +3 quedan 2.5 m libres (se pasa, no se salta) | Rutas por encima y por debajo del mismo punto |
 | Grid de construcción | 1 m; módulos de 4 m | Kits modulares reutilizables |
 
 ## 2. Estructura de un Dominio

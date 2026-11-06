@@ -1,5 +1,28 @@
 # Relevo de trabajo — Codex / Claude
 
+## 2026-11-06 · Puentes, túneles y rampas de salto (pedido de Gerson: «motos con poderes»)
+
+**Greybox:**
+- `slabs`: puentes y techos de túnel.
+- `kickers`: rampas de salto de 23°.
+- Los miradores se apoyan ahora sobre el nivel +3 (de 3 a 6 m), no desde el suelo.
+
+**Por sala:**
+- Sala 1: puentes a +3 desde la plataforma a las pasarelas y a +6 entre los miradores norte.
+- Sala 2: puente sobre el hueco del anillo y 2 rampas de salto.
+- Sala 3: túneles bajo las plataformas.
+- Sala 4: 4 rampas de salto a la torre.
+
+**Piloto automático:** pulsa salto en el labio de las rampas de salto. Nuevos eventos «vuelo», «aterriza en altura», «cruza un puente» y «pasa bajo puente o túnel», y rutas `1p`, `2s`, `3t` y `4s`.
+
+**Verificado en local:** **137 pruebas**, lint, datos y paquete.
+
+**Pendiente:**
+- Más elementos en las salas 2–4: puentes a +6 y túneles largos.
+- Revisar con playtest humano la dificultad de las rampas de salto.
+
+---
+
 ## 2026-11-06 · Inventario y pickups (PUR-040)
 
 - **`InventoryComponent`** en cada Runner: 3 slots repetibles, Q/E por `InputFrame.cycle_secondary`, `take_selected()` para las armas futuras. Se vacía en `reset_at`, o sea al reaparecer. Nueva señal `EventBus.inventory_changed`.

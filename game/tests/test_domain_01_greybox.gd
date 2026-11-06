@@ -69,6 +69,51 @@ func test_three_height_levels_per_room_with_continuous_ramps() -> void:
 					"Sala %d: cima de rampa" % gate)
 
 
+func test_bridges_tunnels_and_kickers_geometry() -> void:
+	var slab_count: int = 0
+	var kicker_count: int = 0
+	for gate: int in Layout.GATES:
+		var layout: Dictionary = Layout.room_layout(gate)
+		for slab: Array in layout.get("slabs", []):
+			slab_count += 1
+			var center: Vector3 = _room3((slab[0] + slab[1]) / 2.0, (slab[2] + slab[3]) / 2.0,
+					gate)
+			var top: float = slab[4]
+			var under: float = _ceiling_above(center + Vector3.UP * 0.5) if _ground_at(
+					center, top - Layout.SLAB_THICKNESS - 0.1) < 0.1 else INF
+			assert_almost_eq(_ground_at(center, top + 2.0), top, 0.01, "Sala %d: losa" % gate)
+			if is_finite(under):
+				assert_almost_eq(under, top - Layout.SLAB_THICKNESS, 0.01,
+						"Sala %d: paso bajo la losa" % gate)
+				assert_gt(under, 1.5, "Sala %d: cabe un Runner bajo la losa" % gate)
+		for kicker: Array in layout.get("kickers", []):
+			kicker_count += 1
+			var direction: Vector2 = kicker[2]
+			var low: Vector2 = Vector2(kicker[0], kicker[1]) + direction * 0.5
+			var high: Vector2 = Vector2(kicker[0], kicker[1]) + direction * (Layout.KICKER_RUN - 0.5)
+			var rise: float = (_ground_at(_room3(high.x, high.y, gate))
+					- _ground_at(_room3(low.x, low.y, gate)))
+			assert_almost_eq(rad_to_deg(atan(rise / (Layout.KICKER_RUN - 1.0))),
+					rad_to_deg(atan(Layout.KICKER_RISE / Layout.KICKER_RUN)), 0.3,
+					"Sala %d: rampa de salto" % gate)
+	assert_gte(slab_count, 5, "Puentes y techos de túnel")
+	assert_gte(kicker_count, 6, "Rampas de salto")
+
+
+func test_bridge_tunnel_and_kicker_routes() -> void:
+	var checks := {
+		"1p": "cruza un puente", "2s": "aterriza en altura", "3t": "pasa bajo puente o túnel",
+		"4s": "aterriza en altura",
+	}
+	for key: String in checks:
+		var events: Dictionary = await _run_route(key)
+		assert_true(events.has("fin de ruta"), "Ruta %s completa: %s" % [key, events])
+		assert_true(events.has(checks[key]), "Ruta %s: %s" % [key, checks[key]])
+	var jump: Dictionary = await _run_route("2s")
+	assert_true(jump.has("cruza un puente") and jump.has("pasa bajo puente o túnel"),
+			"La sala 2 se cruza por encima y por debajo del puente")
+
+
 func test_ceilings_and_portal_oculus() -> void:
 	assert_almost_eq(_ceiling_above(Vector3(30, 1, 20)), Layout.HUB_CEILING, 0.01, "Techo del hub")
 	assert_almost_eq(_ceiling_above(Vector3(0, 1, -100)), Layout.GATE_HEIGHT, 0.01, "Techo conexión")
