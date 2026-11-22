@@ -95,6 +95,10 @@ func _process(_delta: float) -> void:
 
 
 func _unhandled_input(event: InputEvent) -> void:
+	if event is InputEventKey and event.pressed and not event.echo and event.keycode == KEY_F9:
+		get_tree().paused = false
+		get_tree().change_scene_to_file("res://levels/_test/weapons_sandbox.tscn")
+		return
 	if event is InputEventKey and event.pressed and not event.echo and event.keycode == KEY_F7:
 		get_tree().paused = false
 		get_tree().change_scene_to_file("res://levels/_test/round_sandbox.tscn")
@@ -115,3 +119,4 @@ func _unhandled_input(event: InputEvent) -> void:
 func _on_destroyed(victim: Runner, killer: Runner, _weapon: StringName) -> void:
 	if victim == target and killer == runner:
 		_kills += 1
+

@@ -2,19 +2,25 @@
 
 ## 1. Métricas (no negociables sin issue)
 
+**Escala revisada el 2026-11-06 por decisión de diseño (Gerson):** los mapas del original se recuerdan unas 36 veces más grandes en superficie que la primera estimación. Salas y conexiones pasan a ×6 en largo y el hub a ×3. Las medidas que dependen del tamaño del Runner (pasillos, compuertas, alturas de salto, pendientes, podio) no cambian. Validado en el greybox del [Penal Altiplano](dominios/01_penal_altiplano.md).
+
 Basadas en las capturas del original y en el tamaño del Runner (1.0 m de ancho × 0.7 m de alto × 2.2 m de largo).
 
 | Elemento | Medida | Razón |
 |---|---|---|
-| Ancho de pasillo | 7–9 m (≈ 7–9 Runners de ancho) | Espacio para esquivar, angosto para que el misil encuentre |
-| Altura de techo | 4.5–6 m | Salto (2.5 m) + margen; techo siempre visible (sensación de túnel) |
-| Sala de combate | 30–45 m de lado | ~1.5 s cruzarla a velocidad máxima |
-| Área 0 (hub) | Ø 40 m | Ocho Runners en el anillo con espacio |
+| Ancho de pasillo | 7–9 m en conexiones; calles interiores de 7–12 m | Espacio para esquivar, angosto para que el misil encuentre |
+| Altura de techo | Conexiones 4.5–6 m (túnel); salas 10–12 m; hub 6 m con óculo sobre el portal | Salto (2.5 m) + margen; las salas-nave necesitan aire |
+| Sala de combate | 180–220 m de lado (D1: 216 m), subdividida en zonas | ~9 s cruzarla a velocidad máxima; varios combates simultáneos por sala |
+| Área 0 (hub) | Ø 120 m | Escenario amplio sin coberturas; zona franca |
+| Conexión hub ↔ sala | ~84 m de largo, 8 m de ancho | Sensación de viaje; ~7 s del spawn a la sala |
 | Podio-portal | Ø 10 m, 1.5 m de alto | Visible desde las cuatro compuertas |
 | Compuerta Área 0 ↔ sala | 8 m ancho × 5 m alto | — |
 | Rampa | Pendiente ≤ 25°, franjas amarillo/negro | Legibilidad |
-| Plataforma elevada | 2–4 m sobre el piso | Juego vertical |
-| Línea recta más larga | ≤ 60 m (= alcance del láser) | Duelos a distancia posibles, no dominantes |
+| Plataforma elevada | 2–4 m sobre el piso; desde la escala ×6, **tres niveles por sala**: suelo, +3 m (pasarelas y plataformas) y +6 m (miradores), unidos por rampas de 18.4° | Juego vertical; con 12 m de techo, el mirador conserva 6 m libres |
+| Línea recta más larga | ≤ 1.5 × alcance del láser (225 m con láser de 150 m) | Duelos largos posibles; ninguna recta cruza una sala de punta a punta |
+| Coberturas | Pilares, bloques o muros bajos cada 10–15 m dentro de cada zona | Evita salas-estacionamiento vacías |
+| Rampa de salto | 1.5 m en 3.5 m (23°), en naranja; a 10–12 m del borde del nivel al que lanza | Con salto en el labio sube a +3 sin rampa: movimiento con poderes |
+| Puente / túnel | Losa de 0.5 m; bajo una losa a +3 quedan 2.5 m libres (se pasa, no se salta) | Rutas por encima y por debajo del mismo punto |
 | Grid de construcción | 1 m; módulos de 4 m | Kits modulares reutilizables |
 
 ## 2. Estructura de un Dominio

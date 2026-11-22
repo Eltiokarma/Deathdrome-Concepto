@@ -27,5 +27,9 @@ func get_s(path: String) -> String:
 	return _catalog.get_s(path)
 
 
+func get_a(path: String) -> Array:
+	return _catalog.get_a(path)
+
+
 func runner(id: StringName) -> RunnerStats:
 	return _catalog.runner(id)

@@ -127,7 +127,7 @@ func test_autoaim_rejects_outside_cone_and_range() -> void:
 	victim.position = Vector3(10, 0, 0)
 	await wait_physics_frames(2)
 	assert_null(attacker.laser.acquire_target())
-	victim.position = Vector3(0, 0, -70)
+	victim.position = Vector3(0, 0, -Balance.get_f("weapons.laser.range_m") - 10.0)
 	await wait_physics_frames(2)
 	assert_null(attacker.laser.acquire_target())
 

@@ -63,7 +63,7 @@ Cada impacto produce un `DamageInfo { amount, type, source, direction, position 
 |---|---|
 | Cadencia | 8 disparos/s (mantener botón) |
 | Daño base | 1.5 PI por disparo → 12 DPS |
-| Alcance | 60 m |
+| Alcance | 150 m (desde 2026-11-06; antes 60 m, ajustado a la escala de dominios ×6) |
 | Auto-apuntado | Cono de ±15° frente al Runner; elige el blanco más cercano al centro de la mira |
 | Rampa | El multiplicador sube linealmente de ×1.0 a **×2.0** en 2 s de impacto continuo sobre el **mismo** blanco |
 | Corte de rampa | Si pasan 0.4 s sin impactar a ese blanco, la rampa vuelve a ×1.0 |
@@ -114,11 +114,21 @@ Tres slots. Cada pickup llena un slot libre (se pueden repetir). Con los 3 lleno
 
 | Arma | Dominio | Daño | Efecto | Detalle |
 |---|---|---|---|---|
-| **Misil rastreador** | 1 | 40 PI directo | — | Fijación de 0.6 s en cono de ±20° a ≤ 70 m. Sin fijación sale en línea recta. 32 m/s, giro 90°/s, vida 4 s. Al iniciar la fijación el blanco recibe el aviso **"TE TIENEN FIJADO"**. Se esquiva con giros cerrados o saltando en el último momento |
+| **Misil rastreador** | 1 | 40 PI directo | Sin daño radial | Fijación base de 0.6 s, modificada por la estadística de armas del Runner, en cono de ±20° hasta 175 m. Sin fijación sale recto. Velocidad 60 m/s, giro máximo 90°/s, vida 6 s. El HUD del Dominio 1 muestra el progreso y avisa al blanco desde que empieza la fijación. La eficacia de giros y saltos para esquivarlo requiere playtest |
 | **Onda de choque** | 2 | 50 PI en el centro → 15 PI en el borde | Detona torres en el radio | Radio 10 m, altura 1.6 m, requiere línea de visión, no te daña |
 | **Embestida** | 3 | 60 PI + empuje | — | Fijación de 0.3 s a ≤ 25 m. Impulso de 1.0 s a ×2.2 de tu velocidad máxima, con dirección asistida. Si fallas, quedas lento 1.5 s. Te hace 5 PI |
 | **Drenador** | 4 | 30 PI en 5 s (6 PI/s) | Vacía tu barrera y bloquea su regeneración 5 s | Proyectil de 40 m/s, alcance 50 m |
 | **Látigo iónico** | 6 | 20 PI | Aturde 1.5 s: sin dirección ni disparo, conserva el impulso | Rayo instantáneo de 15 m. Tras un aturdimiento, el blanco es inmune al aturdimiento 3 s |
+
+### Implementación de misil y onda (2026-11-22)
+
+- K/clic derecho consume una carga del slot seleccionado; Q/E cambia de slot. La espera compartida es `inventory.secondary_cooldown_s = 0.6`. Mantener pulsado dispara otra carga al terminar la espera. Zona franca, muerte, ascenso y fases sin combate impiden disparar y consumir cargas.
+- La fijación exige un blanco vivo, visible, fuera de zona franca y no camuflado. Perder cono, alcance o línea de visión, cambiar a otra arma, morir o reaparecer reinicia el progreso. Una vez lanzado, el misil conserva su blanco mientras sea válido; si deja de serlo sigue recto, sin elegir otro automáticamente.
+- El misil comprueba por rayos todo el tramo recorrido en cada paso de física para no atravesar paredes o barreras. Solo causa daño directo. Al golpear una torre la detona; el daño de esa explosión pertenece a la torre.
+- La velocidad pasó de **32 a 60 m/s**. Contra Kuntur a 28.5 m/s, seis segundos permitían cerrar solo 21 m; ahora permiten cerrar 189 m y cubrir una persecución recta desde 175 m. Recorre como máximo 360 m respecto al mundo, sin heredar velocidad de la moto. Es un ajuste provisional comprobado en una persecución recta, no una medición de dificultad para esquivarlo.
+- Las explosiones usan un cilindro analítico: distancia horizontal al centro del vehículo, solapamiento vertical de su colisionador y comprobación de visión. Suelo, plataformas y barreras pueden bloquearlas. Onda: 50 → 15 PI lineales, sin autodaño; torre: 70 → 25 PI, incluido el detonador. Ambas tienen 1.6 m de altura. Saltar evita el daño cuando el colisionador queda entero por encima.
+- Disparar rompe escudo de aparición y camuflaje. El indicador `cloaked` ya es respetado por las armas, pero el ítem y sus efectos visuales siguen pendientes de PUR-048.
+- En el Dominio 1 están disponibles misil y torres. La onda se prueba en `weapons_sandbox.tscn`; su desbloqueo de campaña sigue en Dominio 2. Embestida, drenador y látigo siguen siendo diseño pendiente.
 
 Combinaciones de referencia contra 100 PI:
 - Misil + misil + ~1.5 s de láser.
@@ -164,7 +174,7 @@ Los pickups de arma reaparecen a los **20 s** de ser recogidos.
 ## 9. Muerte y reaparición
 
 1. Integridad 0 → la moto explota y queda una **pira** 6 s.
-2. El piloto se eyecta (pequeño, 10 PI, 6 m/s, sin armas) y tiene **2.5 s** para alejarse.
+2. El piloto se eyecta (pequeño, 10 PI, 6 m/s, sin armas) y tiene **2.5 s** para alejarse. *Implementado: huye en línea recta lejos del atacante; el láser solo lo apunta si no hay un Runner en la mira. El control del piloto por el jugador está pendiente.*
 3. Si alguien lo mata: **mercy kill** (+500 puntos para el atacante, no suma a la cuota) y su reaparición tarda 2 s más.
 4. Reaparición: **4 s** desde la muerte (6 s con mercy kill), en el Área 0, eyectado del portal.
 5. **Escudo de aparición:** 3 s de invulnerabilidad; se cancela si disparas.
@@ -194,7 +204,7 @@ Cuota por Dominio y ronda:
 |---|---|
 | Inicio | Reloj en 0:00 |
 | Aviso | Sirena y timer en rojo desde 0:30 |
-| Avance en salas | 3.5 m/s desde el perímetro hacia las compuertas del Área 0 (5.25 m/s en el Dominio 8) |
+| Avance en salas | 10 m/s desde el perímetro hacia las compuertas del Área 0 (15 m/s en el Dominio 8; siempre por debajo del Runner más lento, 18.5 m/s). Desde 2026-11-06; antes 3.5 m/s, ajustado a salas de 216 m |
 | Cierre del Área 0 | El anillo se cierra hacia el portal en 10 s |
 | Efecto | Muerte instantánea, sin reaparición en la ronda |
 | Bots | Huyen hacia el Área 0 en cuanto la Purga empieza |
@@ -226,3 +236,4 @@ El puntaje se acumula entre rondas y Dominios. El bonus temporal cuenta segundos
 ### Parámetros del ascenso de prototipo
 
 `portal.ascent_s = 3` conserva la duración del GDD. `portal.ascent_height_m = 12` define únicamente el recorrido visual de ensayo. El tiempo restante de salida se captura al entrar al portal, antes del ascenso.
+

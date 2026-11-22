@@ -84,7 +84,7 @@ Partida → Pausa (continuar / reiniciar ronda / opciones / salir)
 
 Es la pieza central de cada Dominio y la que más define el juego.
 
-- **Forma:** sala circular, Ø 40 m. En el centro, el **podio-portal** (Ø 10 m) con un anillo luminoso suspendido encima.
+- **Forma:** sala circular, Ø 120 m. En el centro, el **podio-portal** (Ø 10 m) con un anillo luminoso suspendido encima.
 - **Inicio de ronda:** los 8 Runners aparecen en el anillo exterior del podio, mirando hacia las 4 compuertas.
 - **Zona franca:** dentro del Área 0 **no se puede infligir daño de ningún tipo** (armas deshabilitadas, barrera apagada, torres ausentes). Ver D-01.
 - **Portal cerrado:** el podio es un bloque sólido con la señalización de salida apagada.
@@ -95,7 +95,7 @@ Es la pieza central de cada Dominio y la que más define el juego.
 ## 5. La Purga
 
 - Empieza cuando el reloj llega a 0:00.
-- Muros de rayos aparecen en el perímetro de cada sala y avanzan hacia las compuertas del Área 0 a 3.5 m/s.
+- Muros de rayos aparecen en el perímetro de cada sala y avanzan hacia las compuertas del Área 0 a 10 m/s.
 - Contacto = muerte inmediata, **sin reaparición** en lo que queda de ronda.
 - Al llegar a las compuertas, la Purga entra al Área 0 y se cierra como un anillo hacia el portal en 10 s. **La zona franca no protege de la Purga.**
 - Si cumples la cuota durante la Purga, el portal se abre y aún puedes escapar.
@@ -114,7 +114,7 @@ Registro de decisiones. Para cambiar una, abrir un issue con etiqueta `design-de
 | **D-03** | Morir no cuesta créditos; fallar la ronda sí. | Premia la agresividad; el castigo real es el tiempo. | Créditos por muerte (original probable). |
 | **D-04** | La barrera mata al instante, pero dura poco (~3 s de energía) y se puede saltar. | Es el arma con más carácter; el salto le da contrajuego. | Daño fijo de 80. |
 | **D-05** | El láser hace +20 % por la espalda y −30 % de frente. | Premia el posicionamiento (en el original, de frente se aguantaba más). | Daño uniforme. |
-| **D-06** | Las explosiones (torres, onda de choque, misiles) tienen **altura limitada** y requieren **línea de visión**. | Hace funcionar el truco de saltar la explosión y corrige el bug de la pared (F5). | Esferas de daño. |
+| **D-06** | Las explosiones (torres y onda de choque; el misil solo hace daño directo) tienen **altura limitada** y requieren **línea de visión**. | Hace funcionar el truco de saltar la explosión y corrige el bug de la pared (F5). | Esferas de daño. |
 | **D-07** | El portal se abre solo para quien cumplió la cuota. | Evita que otros escapen "de arrastre" y crea un objetivo personal. | Portal abierto para todos al cumplir alguien. |
 | **D-08** | Armas desbloqueadas por Dominio. | Corrige F2: siempre hay algo nuevo. | Todo disponible desde el inicio. |
 | **D-09** | Nombres, Runners, Dominios y arte **propios**. | Legalidad y identidad. | Usar nombres del original. |
@@ -155,3 +155,4 @@ Registro de decisiones. Para cambiar una, abrir un issue con etiqueta `design-de
 | **Mercy kill** | Matar al piloto eyectado. |
 | **Torre** | Torre de fusión: peligro explosivo del escenario. |
 | **TTK** | *Time to kill*: tiempo para destruir un Runner. |
+

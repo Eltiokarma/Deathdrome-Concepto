@@ -18,11 +18,11 @@ Godot 4.6.3.stable. Desde la raíz: `python3 scripts/prepare_data.py`, abrir `ga
 | Valores derivados / diagnóstico | F3 | — |
 | Reubicar en salida | R | — |
 
-S frena: no hay marcha atrás. F2, F3 y R son herramientas del banco de pruebas, no controles definitivos de campaña. Se puede girar detenido para salir de una pared. El láser ya funciona con clic izquierdo/J/RB; las secundarias y el radar siguen pendientes. El Runner de ensayo no tiene IA; R restaura ambos vehículos y cancela la reaparición pendiente.
+S frena: no hay marcha atrás. F2, F3 y R son herramientas del banco de pruebas, no controles definitivos de campaña. Se puede girar detenido para salir de una pared. El láser ya funciona con clic izquierdo/J/RB; el misil y la onda se prueban en el campo de armas (F9); el radar sigue pendiente. El Runner de ensayo no tiene IA; R restaura ambos vehículos y cancela la reaparición pendiente.
 
 ## Arquitectura
 
-`PlayerInput → InputFrame → Runner → RunnerMotor`. El Runner consume el mismo frame si procede de teclado/mando, de una prueba o del recorrido de demostración. InputFrame sanea valores no finitos y limita los ejes. EventBus tiene las señales tipadas del documento de arquitectura; DamageInfo es solo un contrato, sin aplicación de daño.
+`PlayerInput → InputFrame → Runner → RunnerMotor`. El Runner consume el mismo frame si procede de teclado/mando, de una prueba o del recorrido de demostración. InputFrame sanea valores no finitos y limita los ejes. EventBus tiene las señales tipadas del documento de arquitectura; DamageInfo transporta el impacto hasta HealthComponent y el sistema de atribución de bajas.
 
 Runner usa CharacterBody3D, colisión 1 × 0,7 × 2,2 m y las estadísticas de Balance. El motor proyecta la velocidad sobre el suelo, amortigua deriva lateral y usa colisiones barridas de move_and_slide. Cuatro rayos calculan la pose visual del vehículo sobre pendientes. **Esto aún no es una suspensión física de cuatro apoyos:** el casco permanece vertical y la malla se inclina. El feel y esa suspensión quedan para revisión de PUR-011.
 
@@ -49,7 +49,7 @@ Son valores de prototipo, sujetos a playtest. Los parámetros de cámara tambié
 
 `python3 scripts/check_project.py` ejecuta las pruebas GUT existentes y las nuevas de aceleración/freno, salto/apogeo, doble salto, rampa de 25°, descenso lento de cornisa, pared, cambio de stats y cámara ante pared. Hay comprobaciones de mapeos, entradas simultáneas de teclado/mando y pausa. El paquete se exporta y arranca desde un directorio sin fuentes.
 
-CI publica `combat-prototype-preview`: vista orbital y recorrido automático real en Godot. La demostración se reproduce con `godot --path game -- --driving-preview`; el movimiento se inyecta como InputFrame, no como animación de posición.
+CI publica `combat-prototype-preview-legacy` y `combat-prototype-preview-domain01`: vista orbital y recorrido automático real en Godot. La demostración se reproduce con `godot --path game -- --driving-preview`; el movimiento se inyecta como InputFrame, no como animación de posición.
 
 ## Playtest pendiente para Opus / Gerson
 
@@ -59,7 +59,7 @@ CI publica `combat-prototype-preview`: vista orbital y recorrido automático rea
 - Verificar un mando físico; los tests de entrada usan eventos sintéticos.
 - Medir GPU integrada. El render de CI es por software y no demuestra 120 fps.
 
-Salud y láser se añadieron en PUR-020/021. No hay bots, rondas, retro-render ni red. No declarar cerrado PUR-011/PUR-014 solo por los tests de regresión: requieren playtest de conducción y cámara.
+Salud y láser se añadieron en PUR-020/021. El Dominio 1 ya tiene ciclo de ronda, cuota, portal y Purga; siguen pendientes bots, retro-render y red. No declarar cerrado PUR-011/PUR-014 solo por los tests de regresión: requieren playtest de conducción y cámara.
 
 
 ## Ciclo automático del blanco de ensayo
@@ -91,7 +91,7 @@ La escena sigue siendo un prototipo de un jugador con blanco inmóvil, con zona 
 
 En F7, el disco verde alrededor del podio protege y bloquea el láser mientras el origen del Runner esté dentro. El HUD lo indica. La Purga ignora esa protección. Salir del disco permite volver a disparar; saltar normalmente dentro conserva la protección.
 
-El volumen del ensayo tiene radio 7 m (no reproduce todavía la sala completa de Ø 40 m). Sigue `round.hub_safe_mode`: `always`, `round_start` (intro/cuenta y primeros 10 s de juego) u `off`. El temporizador usa RoundManager, por lo que respeta pausa y reinicio. Los segmentos de barrera que intersectan el volumen se disipan completos.
+El volumen del ensayo tiene radio 7 m (no reproduce todavía el hub completo de Ø 120 m). Sigue `round.hub_safe_mode`: `always`, `round_start` (intro/cuenta y primeros 10 s de juego) u `off`. El temporizador usa RoundManager, por lo que respeta pausa y reinicio. Los segmentos de barrera que intersectan el volumen se disipan completos.
 
 
 ### Barrera
@@ -110,8 +110,22 @@ Enter para pasar a otra ronda conserva puntos y reinicia primera sangre. Morir o
 
 ### Purga radial (F7)
 
-A 0:30 el reloj se vuelve rojo y suena una sirena breve. A 0:00 aparece un frente rojo que avanza hacia el portal a 3.5 m/s (5.25 en D8). Al alcanzar el disco del portal, lo cierra en 10 s. La zona franca, escudo, coraza y salto no protegen; morir termina el ensayo y no permite reaparición. R/F2 y recuperación automática por caída quedan deshabilitados en esa fase.
+A 0:30 el reloj se vuelve rojo y suena una sirena breve. A 0:00 aparece un frente rojo que avanza hacia el portal a 10 m/s (15 en D8; valor de `purge.speed_mps`). Al alcanzar el disco del portal, lo cierra en 10 s. La zona franca, escudo, coraza y salto no protegen; morir termina el ensayo y no permite reaparición. R/F2 y recuperación automática por caída quedan deshabilitados en esa fase.
 
 Si ya entraste al portal, puedes terminar el ascenso. Enter reinicia otro ensayo desde RESULTS. Para probar sin esperar cinco minutos, F8 adelanta a 0:30 y una segunda pulsación a 0:00. La captura `--purge-preview` comienza a 0:02 exclusivamente para pruebas; no cambia duración de balance.
 
 Es un cierre radial alrededor de la arena greybox (radio inicial 56 m, hub de ensayo 7 m), todavía no los frentes de las cuatro salas del dominio definitivo. La pared visual mide 12 m, pero el daño cubre toda la columna vertical para evitar refugios fuera de la arena. La sirena se genera en código sin audio externo.
+
+
+## Campo de armas — F9
+
+Desde conducción o Dominio 1, F9 abre `levels/_test/weapons_sandbox.tscn`.
+El ensayo carga misil, onda y misil; Q/E selecciona y K/clic derecho dispara.
+Hay pickups junto al inicio y dos torres que pueden encadenarse. Mantén el blanco
+delante hasta completar la fijación del misil, o dispara antes para probar vuelo recto.
+Las torres dañan también al detonador: toma distancia o salta sobre la explosión.
+R reinicia el campo completo; F7 vuelve al banco de conducción; Esc pausa.
+
+La demo `--weapons-preview` dura 20 s y emplea el mismo InputFrame de juego.
+Muestra misil, onda contra torres, un blanco en suelo y otro saltando, y láser contra
+torres. CI conserva `weapons.avi` en el artefacto de vistas legacy.

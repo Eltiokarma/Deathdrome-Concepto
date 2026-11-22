@@ -114,6 +114,7 @@
     "inventory.secondary_slots": "number",
     "inventory.allow_duplicates": "bool",
     "inventory.weapon_pickup_respawn_s": "number",
+    "inventory.secondary_cooldown_s": "number",
     "items": "object",
     "items.health_orb": "object",
     "items.health_orb.unlock_domain": "number",
@@ -274,3 +275,4 @@
     "runners": "array"
   }
 }
+

@@ -20,6 +20,8 @@ var in_safe_zone: bool:
 		_manual_safe_zone = value
 var spawn_shield_s: float = 0.0
 var armored: bool = false
+## Contrato de fijación; el pickup de camuflaje se implementará en PUR-048.
+var cloaked: bool = false
 var _manual_safe_zone: bool = false
 var _clock: float = 0.0
 var _last_damage_at: float = -INF
@@ -34,8 +36,18 @@ func reset(value: float) -> void:
 	destroyed = false
 	spawn_shield_s = 0.0
 	armored = false
+	cloaked = false
 	_last_attacker = null
 	_last_damage_at = -INF
+
+
+## Cura sin pasar del máximo (orbe de salud). Devuelve lo curado.
+func heal(amount: float) -> float:
+	if destroyed or not is_finite(amount) or amount <= 0.0:
+		return 0.0
+	var healed: float = minf(amount, maximum - current)
+	current += healed
+	return healed
 
 
 func tick(delta: float) -> void:
@@ -102,3 +114,4 @@ func _valid_damage(info: DamageInfo) -> bool:
 	return info != null and is_finite(info.amount) and info.amount >= 0.0 and (
 		info.type != Enums.DamageType.LASER or info.direction.is_finite()
 	)
+

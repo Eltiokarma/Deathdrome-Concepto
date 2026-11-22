@@ -18,7 +18,10 @@ def run(args, cwd=ROOT):
 run([sys.executable, "scripts/validate_data.py"])
 run([sys.executable, "scripts/prepare_data.py"])
 run(["godot", "--headless", "--editor", "--path", "game", "--quit"])
-run(["godot", "--headless", "--path", "game", "--script", "addons/gut/gut_cmdln.gd",
+# --fixed-fps: cada fotograma avanza 1/60 s sin esperar al reloj; las pruebas de rutas
+# simulan minutos de conducción en segundos y el resultado no depende de la carga de la CPU.
+run(["godot", "--headless", "--fixed-fps", "60", "--path", "game", "--script",
+     "addons/gut/gut_cmdln.gd",
      "-gdir=res://tests", "-gexit"])
 with tempfile.TemporaryDirectory() as directory:
     package = str(Path(directory) / "purga.pck")

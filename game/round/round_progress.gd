@@ -22,6 +22,16 @@ func register(runner: Runner) -> void:
 		_kills[id] = 0
 
 
+## Incluye a quienes ya salieron del grupo runners al entrar en el portal.
+func participants() -> Array[Runner]:
+	var valid: Array[Runner] = []
+	for ref: WeakRef in _participants.values():
+		var runner: Runner = ref.get_ref() as Runner
+		if runner != null and not runner.is_queued_for_deletion():
+			valid.append(runner)
+	return valid
+
+
 func kills_for(runner: Runner) -> int:
 	if not _registered(runner):
 		return 0
@@ -75,3 +85,4 @@ func _on_destroyed(victim: Runner, killer: Runner, _weapon: StringName) -> void:
 
 func is_participant(runner: Runner) -> bool:
 	return _registered(runner)
+
