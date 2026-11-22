@@ -1,5 +1,38 @@
 # Relevo de trabajo — Codex / Claude
 
+## 2026-11-22 — Misil, onda de choque y torres de fusión
+
+Continuación del PR #13 sobre `b6b822d`. Primera tanda de armas secundarias jugables:
+
+- `SecondaryWeapon` consume los tres slots mediante K/clic derecho y Q/E, con espera
+  compartida de 0.6 s. Respeta zona franca, escudo, muerte, portal y fases de ronda.
+- `MissileLock` y `MissileProjectile`: fijación por cono/visión, aviso en HUD, vuelo
+  recto sin fijación, seguimiento limitado a 90°/s, colisión barrida y 40 PI directos.
+- `BlastDamage`, `BlastPulse` y `FusionTower`: onda de 10 m, torres de 8 m, altura
+  1.6 m, visión, atenuación, autodaño de torre y cadenas con atribución al detonador.
+  Las reservas T del Dominio 1 ahora son peligros reales; recargan en 25 s.
+- Se limpian misiles y pulsos, y se restablecen torres, fijación e inventario al
+  reiniciar la ronda. Los proyectiles antiguos no atribuyen bajas a una vida nueva.
+- F9 desde conducción o Dominio 1 abre un campo de armas con cargas, blancos y
+  torres. Q/E y K prueban el arsenal; R reinicia y F7 vuelve a conducción.
+- `--weapons-preview` muestra fijación, cadena, onda evadida con salto y detonación
+  con láser. CI genera `weapons.avi`; las vistas anteriores se conservan en dos jobs
+  paralelos y artefactos `combat-prototype-preview-legacy` / `-domain01`.
+
+**Balance provisional:** misil 32 → 60 m/s; permite cerrar 189 m en 6 s contra
+Kuntur a 28.5 m/s. No se hereda velocidad del Runner. Daño exclusivamente directo;
+una torre impactada genera su propia explosión. La onda conserva desbloqueo D2.
+
+**Verificación:** suites `test_missile.gd`, `test_fusion_tower.gd`,
+`test_secondary_weapons.gd` y `test_weapons_preview.gd`, además de las regresiones
+existentes. Godot/GUT, lint, paquete aislado y videos se validan en CI.
+
+**Pendiente real:** playtest de evasión del misil y salto ante torres; embestida,
+drenador, látigo, ítems restantes, IA, campaña y rendimiento en GPU integrada.
+El indicador de camuflaje está preparado; no equivale al ítem completo.
+
+---
+
 ## 2026-11-22 · Cierre de ronda y reinicio completo del Dominio 1
 
 Continuación del PR #13 sobre `884c375`. La descripción antigua del PR aún enumeraba

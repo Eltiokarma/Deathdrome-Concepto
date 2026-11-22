@@ -720,7 +720,7 @@ func _build_reserves() -> void:
 	for entry: Array in entries:
 		var id: String = entry[0].get_slice("-", entry[0].get_slice_count("-") - 1)
 		if not id.begins_with("T"):
-			# Misiles (M) y salud (H) ya son pickups reales; las torres esperan a PUR-044.
+			# Dominio 1 conserva sus pickups de misil y salud; onda desbloqueada en D2.
 			var pickup: Pickup = PICKUP_SCENE.instantiate()
 			pickup.name = entry[0]
 			pickup.kind = &"health_orb" if id.begins_with("H") else &"weapon"
@@ -729,23 +729,12 @@ func _build_reserves() -> void:
 			pickup.add_to_group(&"design_reserve")
 			reserves.add_child(pickup)
 			continue
-		var marker := Marker3D.new()
-		marker.name = entry[0]
-		marker.position = entry[1]
-		marker.add_to_group(&"design_reserve")
-		reserves.add_child(marker)
-		var mesh := MeshInstance3D.new()
-		var cylinder := CylinderMesh.new()
-		var is_tower: bool = id.begins_with("T")
-		cylinder.top_radius = 0.8 if is_tower else 0.5
-		cylinder.bottom_radius = cylinder.top_radius
-		cylinder.height = 1.6 if is_tower else 0.6
-		var key: String = "tower" if is_tower else ("health" if id.begins_with("H") else "reserve")
-		cylinder.material = _materials[key]
-		mesh.mesh = cylinder
-		mesh.position.y = cylinder.height / 2.0
-		marker.add_child(mesh)
-		_label(marker, entry[0] + " (reserva)", Vector3(0, cylinder.height + 0.8, 0), 40)
+		var tower := FusionTower.new()
+		tower.name = entry[0]
+		tower.position = entry[1]
+		tower.add_to_group(&"design_reserve")
+		reserves.add_child(tower)
+		_label(tower, entry[0], Vector3(0, 2.4, 0), 40)
 
 
 func _box(
@@ -838,3 +827,4 @@ static func _oriented(axis: Vector3, size: Vector3) -> Vector3:
 static func _rect_center(rect: Rect2, y: float) -> Vector3:
 	var center: Vector2 = rect.get_center()
 	return Vector3(center.x, y, center.y)
+

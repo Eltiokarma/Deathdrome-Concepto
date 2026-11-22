@@ -32,7 +32,7 @@ theme_override_font_sizes/font_size = 18
 offset_left = 26.0
 offset_top = 85.0
 theme_override_font_sizes/font_size = 14
-text = "W/S: acelerar/frenar · A/D: girar · Espacio: salto · C: cámara · V: mirar atrás\nF2: cambiar Runner · F3: stats · R: reiniciar · Esc: pausa · Mando compatible\nClic izquierdo / J / RB: láser · R: reiniciar ambos · Blanco reaparece automáticamente · Sin bots ni ronda."
+text = "W/S: acelerar/frenar · A/D: girar · Espacio: salto · C: cámara · V: mirar atrás\nF2: cambiar Runner · F3: stats · F9: armas · R: reiniciar · Esc: pausa · Mando compatible\nClic izquierdo / J / RB: láser · R: reiniciar ambos · Blanco reaparece automáticamente · Sin bots ni ronda."
 [node name="Stats" type="Label" parent="UI"]
 offset_left = 26.0
 offset_top = 155.0
@@ -56,3 +56,4 @@ theme_override_font_sizes/font_size = 18
 offset_left = 26.0
 offset_top = 425.0
 theme_override_font_sizes/font_size = 18
+

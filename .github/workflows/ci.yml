@@ -53,7 +53,39 @@ jobs:
           echo "$RUNNER_TEMP/godot" >> "$GITHUB_PATH"
       - run: python3 scripts/install_gut.py
       - run: python3 scripts/check_project.py
+
+  previews:
+    name: Videos · ${{ matrix.group }}
+    needs: godot
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    strategy:
+      fail-fast: false
+      max-parallel: 2
+      matrix:
+        group: [legacy, domain01]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Instalar Godot oficial (SHA-512)
+        run: |
+          mkdir -p "$RUNNER_TEMP/godot"
+          cd "$RUNNER_TEMP/godot"
+          base=https://github.com/godotengine/godot-builds/releases/download/4.6.3-stable
+          curl -fL --retry 3 "$base/Godot_v4.6.3-stable_linux.x86_64.zip" -o Godot_v4.6.3-stable_linux.x86_64.zip
+          curl -fL --retry 3 "$base/SHA512-SUMS.txt" -o SHA512-SUMS.txt
+          grep ' Godot_v4.6.3-stable_linux.x86_64.zip$' SHA512-SUMS.txt | sha512sum --check --strict
+          unzip -q Godot_v4.6.3-stable_linux.x86_64.zip
+          mv Godot_v4.6.3-stable_linux.x86_64 godot
+          chmod +x godot
+          echo "$RUNNER_TEMP/godot" >> "$GITHUB_PATH"
+      - run: python3 scripts/install_gut.py
+      - run: python3 scripts/prepare_data.py
+      - run: godot --headless --editor --path game --quit
       - name: Capturar arena con OpenGL por software
+        if: matrix.group == 'legacy'
         env:
           LIBGL_ALWAYS_SOFTWARE: "1"
         run: |
@@ -64,6 +96,13 @@ jobs:
           xvfb-run -a godot --path game --scene res://levels/_test/round_sandbox.tscn --audio-driver Dummy --fixed-fps 30 --write-movie "$RUNNER_TEMP/arena-preview/round.avi" --quit-after 1050 -- --combat-preview --portal-preview
           xvfb-run -a godot --path game --audio-driver Dummy --fixed-fps 30 --write-movie "$RUNNER_TEMP/arena-preview/barrier.avi" --quit-after 300 -- --barrier-preview
           xvfb-run -a godot --path game --scene res://levels/_test/round_sandbox.tscn --audio-driver Dummy --fixed-fps 30 --write-movie "$RUNNER_TEMP/arena-preview/purge.avi" --quit-after 540 -- --purge-preview
+          xvfb-run -a godot --path game --scene res://levels/_test/weapons_sandbox.tscn --audio-driver Dummy --fixed-fps 30 --write-movie "$RUNNER_TEMP/arena-preview/weapons.avi" --quit-after 600 -- --weapons-preview
+      - name: Capturar Penal Altiplano con OpenGL por software
+        if: matrix.group == 'domain01'
+        env:
+          LIBGL_ALWAYS_SOFTWARE: "1"
+        run: |
+          mkdir -p "$RUNNER_TEMP/arena-preview"
           xvfb-run -a godot --path game --scene res://levels/domain_01/penal_altiplano_sandbox.tscn --audio-driver Dummy --fixed-fps 30 --write-movie "$RUNNER_TEMP/arena-preview/domain01_route_a.avi" --quit-after 1650 -- --route-a
           xvfb-run -a godot --path game --scene res://levels/domain_01/penal_altiplano_sandbox.tscn --audio-driver Dummy --fixed-fps 30 --write-movie "$RUNNER_TEMP/arena-preview/domain01_purge.avi" --quit-after 1350 -- --overview-preview --purge-preview
           xvfb-run -a godot --path game --scene res://levels/domain_01/penal_altiplano_sandbox.tscn --audio-driver Dummy --fixed-fps 30 --write-movie "$RUNNER_TEMP/arena-preview/domain01_quota.avi" --quit-after 1020 -- --quota-preview
@@ -71,5 +110,6 @@ jobs:
           xvfb-run -a godot --path game --scene res://levels/domain_01/penal_altiplano_sandbox.tscn --audio-driver Dummy --fixed-fps 30 --write-movie "$RUNNER_TEMP/arena-preview/domain01_strafe.avi" --quit-after 1560 -- --strafe-preview
       - uses: actions/upload-artifact@v4
         with:
-          name: combat-prototype-preview
+          name: combat-prototype-preview-${{ matrix.group }}
           path: ${{ runner.temp }}/arena-preview/*.avi
+

@@ -116,7 +116,7 @@
       "lock_time_per_weapon_point_s": -0.05,
       "lock_half_angle_deg": 20,
       "lock_range_m": 175,
-      "speed_mps": 32,
+      "speed_mps": 60,
       "turn_rate_deg_s": 90,
       "lifetime_s": 6.0
     },
@@ -158,7 +158,8 @@
   "inventory": {
     "secondary_slots": 3,
     "allow_duplicates": true,
-    "weapon_pickup_respawn_s": 20
+    "weapon_pickup_respawn_s": 20,
+    "secondary_cooldown_s": 0.6
   },
   "items": {
     "health_orb": { "unlock_domain": 1, "heal": 35, "respawn_s": 25 },
@@ -217,3 +218,4 @@
     }
   }
 }
+

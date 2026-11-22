@@ -154,6 +154,9 @@ func _ready() -> void:
 	_overview_requested = "--overview-preview" in args
 	$SafeZone.radius = greybox.hub_radius
 	progress.register(runner)
+	for tower: FusionTower in get_tree().get_nodes_in_group("fusion_towers"):
+		if is_ancestor_of(tower):
+			tower.enabled = false
 	EventBus.runner_escaped.connect(_on_escaped)
 	EventBus.round_state_changed.connect(_on_round_state)
 	EventBus.runner_destroyed.connect(_on_preview_destroyed)
@@ -399,7 +402,14 @@ func _process(_delta: float) -> void:
 				if index < runner.inventory.slots.size() else "—")
 		var chosen: bool = index == runner.inventory.selected and index < runner.inventory.slots.size()
 		slots.append("[%s]" % name if chosen else " %s " % name)
-	text += "\nSECUNDARIAS %s   ·   Q/E: cambiar" % " ".join(slots)
+	text += "\nSECUNDARIAS %s   ·   Q/E: cambiar · K/clic derecho: disparar" % " ".join(slots)
+	if runner.missile_lock.target != null:
+		text += "\nMISIL · " + ("FIJADO" if runner.missile_lock.progress >= 1.0
+				else "FIJANDO %d %%" % roundi(runner.missile_lock.progress * 100.0))
+	for participant: Runner in progress.participants():
+		if participant.missile_lock.target == runner:
+			text += "\nTE ESTÁN FIJANDO · busca cobertura"
+			break
 	if runner.health.destroyed and clock.state == RoundManager.State.PURGE:
 		text += "   |   PURGADO"
 	elif runner.health.destroyed:
@@ -547,6 +557,10 @@ func _on_round_state(state: int) -> void:
 			participant.velocity = Vector3.ZERO
 			participant.laser.reset()
 			participant.barrier.reset()
+			participant.secondary.reset()
+	for tower: FusionTower in get_tree().get_nodes_in_group("fusion_towers"):
+		if is_ancestor_of(tower):
+			tower.enabled = playing
 	for pickup: Pickup in get_tree().get_nodes_in_group("pickups"):
 		if is_ancestor_of(pickup):
 			pickup.collection_enabled = playing
@@ -554,12 +568,17 @@ func _on_round_state(state: int) -> void:
 	if state == RoundManager.State.RESULTS:
 		_route.clear()
 		_clear_death_effects()
+		_clear_weapon_objects()
 		_show_overview()
 
 
 ## Reinicio colectivo: incluye vivos y escapados fuera del grupo `runners`.
 func _prepare_round() -> void:
 	portal.reset()
+	_clear_weapon_objects()
+	for tower: FusionTower in get_tree().get_nodes_in_group("fusion_towers"):
+		if is_ancestor_of(tower):
+			tower.reset()
 	if EventBus.purge_started.is_connected(_start_escape):
 		EventBus.purge_started.disconnect(_start_escape)
 	if EventBus.runner_destroyed.is_connected(_on_strafe_kill):
@@ -610,6 +629,15 @@ func _clear_death_effects() -> void:
 func _can_recover() -> bool:
 	return clock.state in [RoundManager.State.LOADING, RoundManager.State.PLAYING] and (
 			not runner.health.destroyed and not _escaped and not portal.is_ascending(runner))
+
+
+func _clear_weapon_objects() -> void:
+	for group: StringName in [&"weapon_projectiles", &"weapon_effects"]:
+		for object: Node in get_tree().get_nodes_in_group(group):
+			if is_ancestor_of(object):
+				object.remove_from_group(group)
+				object.process_mode = Node.PROCESS_MODE_DISABLED
+				object.queue_free()
 
 
 func _floor_name() -> String:
@@ -701,6 +729,9 @@ func _unhandled_input(event: InputEvent) -> void:
 		get_tree().paused = not get_tree().paused
 		return
 	if get_tree().paused:
+		return
+	if event is InputEventKey and event.pressed and not event.echo and event.keycode == KEY_F9:
+		get_tree().change_scene_to_file("res://levels/_test/weapons_sandbox.tscn")
 		return
 	if event is InputEventKey and event.pressed and not event.echo and event.keycode == KEY_F7:
 		start_round(clock.round_index % 3 + 1 if clock.state != RoundManager.State.LOADING else 1)

@@ -92,6 +92,7 @@ func _on_entered(body: Node3D) -> void:
 	runner.set_physics_process(false)
 	runner.velocity = Vector3.ZERO
 	runner.laser.reset()
+	runner.secondary.reset()
 	runner.set_deferred("collision_layer", 0)
 	runner.remove_from_group("runners")
 	runner.model.show()

@@ -20,6 +20,8 @@ var in_safe_zone: bool:
 		_manual_safe_zone = value
 var spawn_shield_s: float = 0.0
 var armored: bool = false
+## Contrato de fijación; el pickup de camuflaje se implementará en PUR-048.
+var cloaked: bool = false
 var _manual_safe_zone: bool = false
 var _clock: float = 0.0
 var _last_damage_at: float = -INF
@@ -34,6 +36,7 @@ func reset(value: float) -> void:
 	destroyed = false
 	spawn_shield_s = 0.0
 	armored = false
+	cloaked = false
 	_last_attacker = null
 	_last_damage_at = -INF
 
@@ -111,3 +114,4 @@ func _valid_damage(info: DamageInfo) -> bool:
 	return info != null and is_finite(info.amount) and info.amount >= 0.0 and (
 		info.type != Enums.DamageType.LASER or info.direction.is_finite()
 	)
+

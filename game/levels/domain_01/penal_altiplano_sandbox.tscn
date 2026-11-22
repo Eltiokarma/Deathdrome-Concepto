@@ -108,8 +108,8 @@ text = "PENAL ALTIPLANO · GREYBOX DEL DOMINIO 1"
 offset_left = 26.0
 offset_top = 54.0
 theme_override_font_sizes/font_size = 14
-text = "W/S: acelerar/frenar · A/D: girar · Espacio: salto · C: cámara · R: recuperar vivo · F7: ronda siguiente
-Sin bots · Pickups de misil y salud activos; torres reservadas · --round=N: iniciar ronda."
+text = "W/S: acelerar/frenar · A/D: girar · Espacio: salto · C: cámara · R: recuperar vivo · F7: ronda siguiente · F9: armas
+Sin bots · Misiles, salud y torres activos en ronda · --round=N: iniciar ronda."
 
 [node name="Status" type="Label" parent="UI"]
 offset_left = 26.0

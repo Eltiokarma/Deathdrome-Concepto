@@ -276,38 +276,40 @@ Objetivo: el arsenal completo funcionando en la arena de prueba.
 - [x] 3 slots, repetibles, ciclado con Q/E; con los slots llenos no se recoge. (`components/inventory_component.gd`)
 - [x] Pickups flotando y girando; reaparecen a los 20 s. (`entities/pickups/pickup.gd`; también el orbe de salud, +35 PI, 25 s)
 
-### PUR-041 · Sistema de fijación
+### PUR-041 — Sistema de fijación
 **Etiquetas:** `combat`  
 **Depende de:** PUR-040
 
 **Criterios de aceptación**
-- [ ] Fijación por cono, distancia y línea de visión; emite `lock_started` / `lock_lost`.
-- [ ] El camuflaje impide la fijación.
+- [x] Fijación por cono, distancia y línea de visión; emite `lock_started` / `lock_lost`. (`components/missile_lock.gd`, `tests/test_missile.gd`)
+- [x] El indicador `cloaked` impide fijar y rompe el seguimiento; el ítem de camuflaje completo sigue pendiente de PUR-048.
 
-### PUR-042 · Misil rastreador
+### PUR-042 — Misil rastreador
 **Etiquetas:** `combat`  
 **Depende de:** PUR-041
 
 **Criterios de aceptación**
-- [ ] Valores de [02 §5](02_COMBATE_Y_BALANCE.md#5-secundarias); sin fijación sale recto.
-- [ ] Se puede esquivar con un giro cerrado a velocidad media (prueba con 10 intentos: ≥ 5 esquivas).
+- [x] Valores de [02 §5](02_COMBATE_Y_BALANCE.md#5-secundarias); sin fijación sale recto. Rayos por tramo, daño directo y detonación de torres; no atraviesa paredes ni barreras. Prueba de persecución de Kuntur desde 175 m con velocidad de misil ajustada a 60 m/s.
+- [ ] Se puede esquivar con un giro cerrado a velocidad media (prueba humana con 10 intentos: ≥ 5 esquivas).
 
-### PUR-043 · Onda de choque
+### PUR-043 — Onda de choque
 **Etiquetas:** `combat`  
 **Depende de:** PUR-040
 
 **Criterios de aceptación**
-- [ ] `ShapeCast3D` cilíndrico (r 10 m, h 1.6 m) con comprobación de línea de visión (D-06).
-- [ ] Atenuación lineal 50 → 15 PI; detona torres.
+- [x] Volumen cilíndrico (r 10 m, h 1.6 m) con línea de visión (D-06). Se usa cálculo analítico y rayos por candidato, adecuado para los ocho Runners previstos, en lugar de `ShapeCast3D`. Se comprueba el solapamiento vertical del colisionador completo.
+- [x] Atenuación lineal 50 → 15 PI; detona torres. (`components/blast_damage.gd`, `tests/test_fusion_tower.gd`)
 
-### PUR-044 · Torre de fusión
+### PUR-044 — Torre de fusión
 **Etiquetas:** `combat`, `level`  
 **Depende de:** PUR-043
 
 **Criterios de aceptación**
-- [ ] Estados cargada / descargada visibles; recarga de 25 s.
-- [ ] Detonación por láser, contacto, onda o misil; cadenas con 0.15 s de retraso.
-- [ ] **El truco del salto funciona:** saltando en el momento justo no recibes daño.
+- [x] Estados cargada / descargada visibles; recarga de 25 s.
+- [x] Detonación por láser, contacto, onda o misil; cadenas con 0.15 s de retraso.
+- [x] **El truco del salto funciona:** el colisionador entero por encima de 1.6 m evita el daño; pruebas geométricas y demostración con salto real en el campo de armas. El ajuste de dificultad del salto sigue pendiente de playtest humano.
+
+Las secundarias ya pasan por `InputFrame`, inventario, daño, puntaje y cuota. Las pruebas cubren consumo y espera, protecciones, pérdida de fijación, reaparición y limpieza entre rondas. `weapons_sandbox.tscn` permite ensayar ambas armas sin alterar los desbloqueos del Dominio 1.
 
 ### PUR-045 · Embestida
 **Etiquetas:** `combat`  
@@ -584,3 +586,4 @@ Objetivo: **una demo pública** de un Dominio completo con arte, audio y bots.
 
 **Criterios de aceptación**
 - [ ] Purga ×1.5, cuota máxima, cierre de campaña con créditos finales.
+

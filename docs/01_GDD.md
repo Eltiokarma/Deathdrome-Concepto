@@ -114,7 +114,7 @@ Registro de decisiones. Para cambiar una, abrir un issue con etiqueta `design-de
 | **D-03** | Morir no cuesta créditos; fallar la ronda sí. | Premia la agresividad; el castigo real es el tiempo. | Créditos por muerte (original probable). |
 | **D-04** | La barrera mata al instante, pero dura poco (~3 s de energía) y se puede saltar. | Es el arma con más carácter; el salto le da contrajuego. | Daño fijo de 80. |
 | **D-05** | El láser hace +20 % por la espalda y −30 % de frente. | Premia el posicionamiento (en el original, de frente se aguantaba más). | Daño uniforme. |
-| **D-06** | Las explosiones (torres, onda de choque, misiles) tienen **altura limitada** y requieren **línea de visión**. | Hace funcionar el truco de saltar la explosión y corrige el bug de la pared (F5). | Esferas de daño. |
+| **D-06** | Las explosiones (torres y onda de choque; el misil solo hace daño directo) tienen **altura limitada** y requieren **línea de visión**. | Hace funcionar el truco de saltar la explosión y corrige el bug de la pared (F5). | Esferas de daño. |
 | **D-07** | El portal se abre solo para quien cumplió la cuota. | Evita que otros escapen "de arrastre" y crea un objetivo personal. | Portal abierto para todos al cumplir alguien. |
 | **D-08** | Armas desbloqueadas por Dominio. | Corrige F2: siempre hay algo nuevo. | Todo disponible desde el inicio. |
 | **D-09** | Nombres, Runners, Dominios y arte **propios**. | Legalidad y identidad. | Usar nombres del original. |
@@ -155,3 +155,4 @@ Registro de decisiones. Para cambiar una, abrir un issue con etiqueta `design-de
 | **Mercy kill** | Matar al piloto eyectado. |
 | **Torre** | Torre de fusión: peligro explosivo del escenario. |
 | **TTK** | *Time to kill*: tiempo para destruir un Runner. |
+

@@ -87,6 +87,8 @@ func _fire(period: float) -> void:
 		var hit: Dictionary = _ray(origin, endpoint)
 		if not hit.is_empty():
 			endpoint = hit.position
+			if hit.collider.has_method("trigger"):
+				hit.collider.trigger(runner)
 		_show_beam(origin, endpoint)
 		return
 	var previous: Runner = _ramp_target.get_ref() as Runner if _ramp_target != null else null
@@ -186,3 +188,4 @@ func _show_beam(origin: Vector3, endpoint: Vector3) -> void:
 			else Vector3.RIGHT)
 	_beam_life = 1.0 / Balance.get_f("weapons.laser.fire_rate_hz") + 0.01
 	_beam.show()
+

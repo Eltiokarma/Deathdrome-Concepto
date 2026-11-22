@@ -8,7 +8,7 @@
 
 - **Motor:** Godot **4.6.3.stable**, edición estándar (GDScript), renderer *Compatibility* para correr en GPUs integradas.
 - **Plataforma objetivo:** PC (Windows / Linux). Multijugador LAN en una fase posterior.
-- **Estado:** pre-producción. Prototipo de conducción: ocho Runners seleccionables, movimiento, salto y cámara. Láser y daño contra un blanco de ensayo; bots y ronda pendientes.
+- **Estado:** prototipo jugable. Ocho Runners seleccionables, láser, barrera, misil rastreador, onda de choque y torres de fusión. El Dominio 1 tiene inventario, pickups, cuota, portal, reaparición, Purga y reinicio de ronda. Los rivales son blancos de ensayo; la IA de bots y la campaña siguen pendientes.
 
 ---
 
@@ -50,9 +50,19 @@ python3 scripts/prepare_data.py
 godot --editor --path game
 ```
 
-Usar Godot **4.6.3.stable**. F5 abre el banco de conducción. W/S aceleran/frenan, A/D giran, Espacio salta, C cambia cámara, V mira atrás, Esc pausa, F2 cambia Runner, F3 muestra stats y R reubica la moto. También hay mapeos de mando. Clic izquierdo, J o RB disparan el láser contra el blanco; R reinicia ambos. El blanco reaparece automáticamente tras 4 s con escudo de 3 s; espera si ocupas su punto de aparición. No hay armas secundarias ni bots.
+Usar Godot **4.6.3.stable**. F5 abre el banco de conducción. W/S aceleran/frenan, A/D giran, Espacio salta, C cambia cámara, V mira atrás, Esc pausa, F2 cambia Runner, F3 muestra stats y R reubica la moto. Clic izquierdo/J/RB dispara el láser. **F9 abre el campo de armas:** Q/E selecciona slot y K/clic derecho dispara una secundaria. Hay tres cargas iniciales, pickups de misil/onda y torres; R reinicia el ensayo y F7 vuelve a conducción. El Dominio 1 conserva el desbloqueo del misil; la onda sigue prevista para el Dominio 2 y se ensaya aparte.
 
 Consulta [controles, pruebas y límites del prototipo](docs/11_CONDUCCION.md). La arena orbital anterior permanece en `game/levels/_test/test_arena.tscn` (F6).
+
+### Campo de armas
+
+```bash
+godot --path game --scene res://levels/_test/weapons_sandbox.tscn
+# Demo automática de 20 s: fijación, cadena de torres, salto y detonación con láser
+godot --path game --scene res://levels/_test/weapons_sandbox.tscn -- --weapons-preview
+```
+
+El misil causa 40 PI por impacto directo; sin fijación vuela recto. La onda llega a 10 m y las torres a 8 m, con altura limitada y paredes que bloquean el daño. Las torres también dañan a quien las detona. Ambos disparos consumen un slot y comparten una espera de 0,6 s. El balance de evasión requiere playtest humano.
 
 ### Datos y exportación
 
@@ -69,7 +79,7 @@ python3 scripts/check_gdscript.py
 python3 scripts/check_project.py
 ```
 
-GUT se instala bajo `game/addons/gut/` (MIT, licencia incluida por el instalador). CI ejecuta validación de balance, lint, GUT, prueba del paquete aislado y publica un video de la arena en el artefacto `combat-prototype-preview`. Las pruebas geométricas verifican colisiones y medidas; no sustituyen el playtest de conducción ni la medición de 120 fps en GPU integrada.
+GUT se instala bajo `game/addons/gut/` (MIT, licencia incluida por el instalador). CI ejecuta validación de balance, lint, GUT, prueba del paquete aislado y publica videos en `combat-prototype-preview-legacy` (incluye `weapons.avi`) y `combat-prototype-preview-domain01`. Los dos grupos se renderizan en paralelo después de superar las pruebas. Las pruebas geométricas verifican colisiones y medidas; no sustituyen el playtest de conducción ni la medición de 120 fps en GPU integrada.
 
 1. Lee [CONTRIBUTING.md](CONTRIBUTING.md).
 2. Elige un issue con la etiqueta `good first issue` del milestone activo ([Roadmap](docs/08_ROADMAP.md)).
@@ -82,3 +92,4 @@ Para sembrar milestones, etiquetas e issues en un repo nuevo: `scripts/seed_gith
 Código bajo [MIT](LICENSE). Los assets originales del proyecto (modelos, texturas, audio) se licencian aparte en `game/assets/LICENSE-ASSETS.md` cuando existan.
 
 *DeathDrome* es marca y obra de sus respectivos titulares. Este proyecto no está afiliado ni respaldado por ellos.
+
