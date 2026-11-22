@@ -32,7 +32,8 @@ const LARGE_ROUTES := {
 		Vector2(20, 5), Vector2(14, 20), Vector2(14, 84), Vector2(35, 92), Vector2(40, 114),
 		Vector2(40, 138),
 		Vector2(56, 146), Vector2(56, 162), Vector2(56, 178), Vector2(16, 178),
-		Vector2(0, 160), Vector2(0, 146), Vector2(-36, 140), Vector2(-36, 90),
+		# Rodea T3 (0, 160) por el este antes de cruzar el paso central (u = -8..8).
+		Vector2(8, 160), Vector2(0, 146), Vector2(-36, 140), Vector2(-36, 90),
 		Vector2(-14, 80), Vector2(-14, 12), Vector2(-3, 3),
 	],
 	# Taller: sube al anillo, recorre su lado oeste, cae al centro y vuelve por el este.

@@ -3,7 +3,8 @@ extends Node3D
 
 const RUNNER := preload("res://entities/runner/runner.tscn")
 const PICKUP := preload("res://entities/pickups/pickup.tscn")
-const TARGET_SPOTS := [Vector3(0, 0.1, -16), Vector3(16, 0.1, -10),
+# Blanco 1 fuera de la onda/torres y del cono del laser en la ultima demostracion.
+const TARGET_SPOTS := [Vector3(-4, 0.1, -22), Vector3(16, 0.1, -10),
 		Vector3(-22, 0.1, 4), Vector3(-18, 0.1, 4)]
 var runner: Runner
 var targets: Array[Runner] = []
