@@ -13,6 +13,7 @@ const RADIUS_M := 2.0
 @export var kind: StringName = &"weapon"
 @export var weapon_id: StringName = &"missile"
 var available: bool = true
+var collection_enabled: bool = true
 var respawn_left: float = 0.0
 var _age: float = 0.0
 var _visual := Node3D.new()
@@ -83,7 +84,7 @@ func tick(delta: float) -> void:
 
 
 func try_collect(runner: Runner) -> bool:
-	if not available or runner == null or runner.health.destroyed:
+	if not collection_enabled or not available or runner == null or runner.health.destroyed:
 		return false
 	if kind == &"weapon":
 		if not runner.inventory.add(weapon_id):
@@ -103,3 +104,10 @@ func try_collect(runner: Runner) -> bool:
 
 func _on_body_entered(body: Node3D) -> void:
 	try_collect(body as Runner)
+
+
+func reset() -> void:
+	available = true
+	respawn_left = 0.0
+	_visual.show()
+

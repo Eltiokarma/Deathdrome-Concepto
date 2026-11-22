@@ -128,6 +128,7 @@ var _was_on_wall: bool = false
 var _overview_angle: float = 0.6
 var _gate: int = 1
 var _escaped: bool = false
+var _overview_requested: bool = false
 var _hunt_at: int = -1
 var _hunt_points: Dictionary = {}
 var _strafing: bool = false
@@ -150,9 +151,14 @@ var _prey_lives: Dictionary = {}
 
 func _ready() -> void:
 	var args: PackedStringArray = OS.get_cmdline_user_args()
+	_overview_requested = "--overview-preview" in args
 	$SafeZone.radius = greybox.hub_radius
 	progress.register(runner)
 	EventBus.runner_escaped.connect(_on_escaped)
+	EventBus.round_state_changed.connect(_on_round_state)
+	EventBus.runner_destroyed.connect(_on_preview_destroyed)
+	EventBus.mercy_kill.connect(_on_preview_mercy)
+	EventBus.runner_respawned.connect(_on_preview_respawn)
 	EventBus.pickup_collected.connect(func(collector: Runner, id: StringName) -> void:
 		if collector == runner:
 			_log("recoge %s" % id))
@@ -255,15 +261,21 @@ func start_death_preview() -> void:
 	runner.controller = null
 	_route_name = "muerte"
 	route_events = {}
-	EventBus.runner_destroyed.connect(func(victim: Runner, _k: Runner, _w: StringName) -> void:
-		if victim == runner:
-			_log_at("muere"))
-	EventBus.mercy_kill.connect(func(_k: Runner, victim: Runner) -> void:
-		if victim == runner:
-			_log_at("piloto rematado"))
-	EventBus.runner_respawned.connect(func(respawned: Runner) -> void:
-		if respawned == runner:
-			_log_at("reaparece"))
+
+
+func _on_preview_destroyed(victim: Runner, _killer: Runner, _weapon: StringName) -> void:
+	if _route_name == "muerte" and victim == runner:
+		_log_at("muere")
+
+
+func _on_preview_mercy(_killer: Runner, victim: Runner) -> void:
+	if _route_name == "muerte" and victim == runner:
+		_log_at("piloto rematado")
+
+
+func _on_preview_respawn(respawned: Runner) -> void:
+	if _route_name == "muerte" and respawned == runner:
+		_log_at("reaparece")
 
 
 ## Ronda 2: el piloto entra en la sala 3 y derriba tres blancos disparando el láser sin
@@ -319,6 +331,8 @@ func spawn_targets(points: Array, gate: int = 1) -> Array[Runner]:
 		var world: Vector2 = greybox.room_point(point.x, point.y, gate)
 		target.reset_at(Vector3(world.x, 0.1, world.y), PI / 2.0)
 		progress.register(target)
+		target.set_physics_process(clock.state in [RoundManager.State.LOADING,
+				RoundManager.State.PLAYING, RoundManager.State.PURGE])
 		spawned.append(target)
 	return spawned
 
@@ -395,6 +409,12 @@ func _process(_delta: float) -> void:
 		text += "   |   ESCUDO %.1f s" % runner.health.spawn_shield_s
 	elif _escaped:
 		text += "   |   ESCAPÓ POR EL PORTAL"
+	if clock.state == RoundManager.State.RESULTS:
+		text += "\nRESULTADOS · %s · F7: siguiente ronda" % (
+				"ESCAPASTE" if _escaped else "PURGADO")
+	elif _escaped:
+		var remaining: int = $RoundResolution.counts().pending
+		text += "\nQUEDAN %d PARTICIPANTES · F7: siguiente ensayo" % remaining
 	status.text = text
 	status.modulate = (Color(1, 0.3, 0.3) if clock.state == RoundManager.State.PURGE
 			or (clock.state == RoundManager.State.PLAYING
@@ -403,6 +423,8 @@ func _process(_delta: float) -> void:
 
 
 func _physics_process(delta: float) -> void:
+	if get_tree().paused:
+		return
 	if overview.current:
 		_overview_angle += delta * 0.25
 		var focus := Vector3.ZERO if greybox.is_large() else Vector3(0, 0, greybox.room_center_z / 2.0)
@@ -410,8 +432,11 @@ func _physics_process(delta: float) -> void:
 		overview.position = focus + Vector3(sin(_overview_angle) * reach, reach * 1.25,
 				cos(_overview_angle) * reach)
 		overview.look_at(focus)
-	if runner.position.y < -8.0:
+	if runner.position.y < -8.0 and _can_recover():
 		_reset_runner()
+	if clock.state not in [RoundManager.State.LOADING, RoundManager.State.PLAYING,
+			RoundManager.State.PURGE]:
+		return
 	if _route.is_empty() or _waypoint >= _route.size():
 		return
 	_time += delta
@@ -496,6 +521,95 @@ func _on_escaped(escapee: Runner, _time_left: float) -> void:
 	if escapee == runner:
 		_escaped = true
 		_log("escapa por el portal")
+		_show_overview()
+
+
+func _show_overview() -> void:
+	portal.release_view()
+	greybox.set_ceilings_visible(false)
+	overview.make_current()
+
+
+func _on_round_state(state: int) -> void:
+	if clock.state != state:
+		return
+	if state == RoundManager.State.INTRO:
+		_prepare_round()
+	var playing: bool = state in [RoundManager.State.PLAYING, RoundManager.State.PURGE]
+	for participant: Runner in progress.participants():
+		participant.set_physics_process(playing and participant.is_in_group("runners"))
+		if not playing:
+			if participant.health.destroyed:
+				participant.model.hide()
+				participant.set_collision_layer_value(2, false)
+			participant.input_frame = InputFrame.new()
+			participant.last_input = InputFrame.new()
+			participant.velocity = Vector3.ZERO
+			participant.laser.reset()
+			participant.barrier.reset()
+	for pickup: Pickup in get_tree().get_nodes_in_group("pickups"):
+		if is_ancestor_of(pickup):
+			pickup.collection_enabled = playing
+			pickup.set_physics_process(playing)
+	if state == RoundManager.State.RESULTS:
+		_route.clear()
+		_clear_death_effects()
+		_show_overview()
+
+
+## Reinicio colectivo: incluye vivos y escapados fuera del grupo `runners`.
+func _prepare_round() -> void:
+	portal.reset()
+	if EventBus.purge_started.is_connected(_start_escape):
+		EventBus.purge_started.disconnect(_start_escape)
+	if EventBus.runner_destroyed.is_connected(_on_strafe_kill):
+		EventBus.runner_destroyed.disconnect(_on_strafe_kill)
+	_clear_death_effects()
+	var spawns: Array[Node] = greybox.get_node("Spawns").get_children()
+	var participants: Array[Runner] = progress.participants()
+	for index: int in range(participants.size()):
+		var marker: Node3D = spawns[index % spawns.size()]
+		participants[index].reset_at(marker.global_position + Vector3.UP * 0.1,
+				marker.global_rotation.y)
+	for pickup: Pickup in get_tree().get_nodes_in_group("pickups"):
+		if is_ancestor_of(pickup):
+			pickup.reset()
+	_escaped = false
+	_gate = 1
+	_route.clear()
+	_route_name = ""
+	_waypoint = 0
+	_time = 0.0
+	_wall_hits = 0
+	_was_on_wall = false
+	_airborne_s = 0.0
+	_hunt_at = -1
+	_hunt_points.clear()
+	_hunting = false
+	_strafing = false
+	_prey.clear()
+	_prey_lives.clear()
+	_prey_focus.clear()
+	route_events.clear()
+	route_finished = false
+	runner.controller = runner.get_node("PlayerInput") as PlayerInput
+	greybox.set_ceilings_visible(not _overview_requested)
+	if _overview_requested:
+		overview.make_current()
+
+
+func _clear_death_effects() -> void:
+	for group: StringName in [&"pilots", &"pyres"]:
+		for effect: Node in get_tree().get_nodes_in_group(group):
+			if is_ancestor_of(effect):
+				effect.remove_from_group(group)
+				effect.process_mode = Node.PROCESS_MODE_DISABLED
+				effect.queue_free()
+
+
+func _can_recover() -> bool:
+	return clock.state in [RoundManager.State.LOADING, RoundManager.State.PLAYING] and (
+			not runner.health.destroyed and not _escaped and not portal.is_ascending(runner))
 
 
 func _floor_name() -> String:
@@ -583,9 +697,13 @@ func _reset_runner() -> void:
 
 
 func _unhandled_input(event: InputEvent) -> void:
+	if event.is_action_pressed("pause"):
+		get_tree().paused = not get_tree().paused
+		return
+	if get_tree().paused:
+		return
 	if event is InputEventKey and event.pressed and not event.echo and event.keycode == KEY_F7:
 		start_round(clock.round_index % 3 + 1 if clock.state != RoundManager.State.LOADING else 1)
-	elif event.is_action_pressed("reset_runner"):
+	elif event.is_action_pressed("reset_runner") and _can_recover():
 		_reset_runner()
-	elif event.is_action_pressed("pause"):
-		get_tree().paused = not get_tree().paused
+

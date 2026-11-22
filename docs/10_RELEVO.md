@@ -1,5 +1,35 @@
 # Relevo de trabajo — Codex / Claude
 
+## 2026-11-22 · Cierre de ronda y reinicio completo del Dominio 1
+
+Continuación del PR #13 sobre `884c375`. La descripción antigua del PR aún enumeraba
+reaparición e inventario como pendientes, aunque ambos ya estaban implementados.
+
+**Corregido:**
+- `RoundResolution` cierra la ronda cuando todos los participantes escaparon o quedaron
+  destruidos durante la Purga, según docs/07. Una muerte con reaparición pendiente no
+  termina la ronda. Los ascensos siguen contando hasta que acaba el portal; el cierre
+  se difiere para que se contabilice el último puntaje.
+- Tras escapar, el jugador ve el dominio sin techos y los participantes pendientes,
+  sin quedar detrás del fundido negro ni volver a la arena. Al resolverse todos,
+  aparece el resultado y F7 permite iniciar el siguiente ensayo.
+- Cada nueva ronda recoloca a **todos** en los puntos del hub: vivos, muertos y
+  escapados. Restaura integridad y barrera, vacía slots y cuotas, restablece pickups
+  y control manual, limpia rutas y efectos; conserva el puntaje de sesión.
+- Introducción, cuenta atrás y resultados suspenden conducción, armas y recogida.
+  R y la recuperación por caída ya no reviven muertos ni eluden la Purga o el portal.
+  F7 sigue siendo un control explícito de ensayo, no progresión de campaña.
+
+**Pruebas:** nuevas suites `test_round_resolution.gd` y `test_domain_lifecycle.gd`,
+además de las pruebas existentes de rutas, portal, cuota, muerte e inventario.
+Los videos `domain01_purge.avi` y `domain01_quota.avi` de CI muestran la salida
+del ascenso y la vista general. La validación de Godot/GUT se ejecuta en CI.
+
+**Pendiente real:** bots, disparo de secundarias, campaña y menús, playtest humano
+de las rampas y rendimiento con ocho Runners. PUR-071 continúa incompleto.
+
+---
+
 ## 2026-11-06 · Puentes, túneles y rampas de salto (pedido de Gerson: «motos con poderes»)
 
 **Greybox:**
@@ -582,3 +612,4 @@ Las entradas siguientes son históricas; el estado vigente es el de esta secció
 4. Si el otro agente ya tomó el mismo bloque, elegir otro o coordinar con Gerson antes de duplicar cambios.
 
 Esta nota es el canal de relevo dentro del repositorio; no implica que el otro agente ya la haya leído.
+

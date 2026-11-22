@@ -8,6 +8,8 @@ extends Node
 
 @export var manager_path: NodePath
 @export var progress_path: NodePath
+## Un nivel con reinicio colectivo puede encargarse de la colocación inicial.
+@export var restore_fallen_on_intro: bool = true
 var pending: Dictionary = {}
 var _cursor: int = 0
 @onready var manager: RoundManager = get_node(manager_path)
@@ -82,8 +84,12 @@ func _on_mercy(_killer: Runner, owner_runner: Runner) -> void:
 func _on_state(state: int) -> void:
 	if state == RoundManager.State.PURGE and not Balance.get_b("purge.respawn_allowed"):
 		pending.clear()
+	elif state == RoundManager.State.RESULTS:
+		pending.clear()
 	elif state == RoundManager.State.INTRO:
 		pending.clear()
+		if not restore_fallen_on_intro:
+			return
 		for runner: Runner in get_tree().get_nodes_in_group("runners"):
 			if runner.health.destroyed and progress.is_participant(runner):
 				respawn(runner, false)
@@ -97,3 +103,4 @@ func _occupied(runner: Runner, marker: Node3D) -> bool:
 	query.collision_mask = 2
 	query.exclude = [runner.get_rid()]
 	return not runner.get_world_3d().direct_space_state.intersect_shape(query, 1).is_empty()
+

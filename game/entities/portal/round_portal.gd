@@ -117,6 +117,8 @@ func reset() -> void:
 		if runner == null:
 			continue
 		runner.collision_layer = journey.layer
+		# Un reinicio en el mismo frame debe ganar al set_deferred(0) de la entrada.
+		runner.set_deferred("collision_layer", journey.layer)
 		runner.set_physics_process(journey.processing)
 		runner.add_to_group("runners")
 	_journeys.clear()
@@ -127,3 +129,10 @@ func reset() -> void:
 	$Tunnel.hide()
 	$Overlay/Fade.color.a = 0.0
 	viewer.get_node("RunnerCamera/SpringArm3D/Camera3D").make_current()
+
+
+## Libera la presentación del ascenso sin devolver al escapado a la arena.
+func release_view() -> void:
+	$Tunnel.hide()
+	$Overlay/Fade.color.a = 0.0
+
